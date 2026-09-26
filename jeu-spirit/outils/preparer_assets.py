@@ -93,6 +93,7 @@ FACULTATIVES = {
     'popup': ('donjon1/popup.png', 'w', 76, ''),
     'spamling': ('donjon1/spamling.png', 'w', 64, ''),
     'clic': ('donjon1/clic.png', 'h', 76, ''),
+    'clic-b': ('donjon1/clic-b.png', 'h', 76, ''),
     'reine': ('donjon1/reine.png', 'w', 250, ''),
     'bloc': ('donjon1/bloc.png', 'w', 80, ''),
     'statue': ('donjon1/statue.png', 'w', 76, ''),

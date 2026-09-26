@@ -22,7 +22,7 @@ SG.Jeu = class {
 
   // ------------------------------------------------------------ affichage net sur tous les écrans
   redimensionner() {
-    const ratio = SG.W / SG.H;
+    const ratio = SG.W / SG.HT;
     let w = window.innerWidth, h = window.innerHeight;
     if (w / h > ratio) w = h * ratio; else h = w / ratio;
     this.canevas.style.width = w + 'px';
@@ -30,7 +30,7 @@ SG.Jeu = class {
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
     this.echelle = Math.min(2, (w * dpr) / SG.W);
     this.canevas.width = Math.round(SG.W * this.echelle);
-    this.canevas.height = Math.round(SG.H * this.echelle);
+    this.canevas.height = Math.round(SG.HT * this.echelle);
     this.fonds = {};
   }
 
@@ -325,7 +325,7 @@ SG.Jeu = class {
   // ------------------------------------------------------------ transitions
   capturer() {
     const c = document.createElement('canvas');
-    c.width = this.canevas.width; c.height = this.canevas.height;
+    c.width = this.canevas.width; c.height = Math.round(SG.H * this.echelle);
     const x = c.getContext('2d');
     x.setTransform(this.echelle, 0, 0, this.echelle, 0, 0);
     this.dessinerScene(x);
@@ -607,29 +607,34 @@ SG.Jeu = class {
 
   // ------------------------------------------------------------ dessin
   dessiner() {
-    const ctx = this.ctx;
-    ctx.setTransform(this.echelle, 0, 0, this.echelle, 0, 0);
+    const ctx = this.ctx, k = this.echelle;
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.fillStyle = '#03060f'; ctx.fillRect(0, 0, this.canevas.width, this.canevas.height);
     ctx.imageSmoothingQuality = 'high';
-    switch (this.etat) {
-      case 'chargement': this.dessinerChargement(ctx); return;
-      case 'titre': this.dessinerTitre(ctx); return;
-      case 'mode': this.dessinerMode(ctx); return;
-      case 'intro': this.dessinerIntro(ctx); return;
+    const menu = { chargement: 'dessinerChargement', titre: 'dessinerTitre', mode: 'dessinerMode', intro: 'dessinerIntro' }[this.etat];
+    if (menu) {
+      // écrans hors jeu : centrés verticalement
+      SG.decalY = SG.BANDE / 2;
+      ctx.setTransform(k, 0, 0, k, 0, SG.decalY * k);
+      this[menu](ctx);
+      return;
     }
+    SG.decalY = SG.BANDE;
+    ctx.setTransform(k, 0, 0, k, 0, 0);
+    this.dessinerBande(ctx);
+    ctx.setTransform(k, 0, 0, k, 0, SG.BANDE * k);
+    ctx.save(); ctx.beginPath(); ctx.rect(0, 0, SG.W, SG.H); ctx.clip();
     if (this.etat === 'transition' && this.transition.type === 'glisse') {
       const tr = this.transition, u = SG.clamp(tr.t / tr.duree, 0, 1);
       const e = u < 0.5 ? 2 * u * u : 1 - Math.pow(-2 * u + 2, 2) / 2;
       const d = SG.DIRS[tr.dir];
-      ctx.setTransform(1, 0, 0, 1, 0, 0);
-      const W = this.canevas.width, H = this.canevas.height;
-      ctx.drawImage(tr.avant, -d.x * W * e, -d.y * H * e);
-      ctx.drawImage(tr.apres, d.x * W * (1 - e), d.y * H * (1 - e));
-      ctx.setTransform(this.echelle, 0, 0, this.echelle, 0, 0);
-      this.dessinerHUD(ctx);
+      ctx.drawImage(tr.avant, -d.x * SG.W * e, -d.y * SG.H * e, SG.W, SG.H);
+      ctx.drawImage(tr.apres, d.x * SG.W * (1 - e), d.y * SG.H * (1 - e), SG.W, SG.H);
+      ctx.restore();
       return;
     }
     this.dessinerScene(ctx);
-    this.dessinerHUD(ctx);
+    ctx.restore();
     if (this.etat === 'transition' && this.transition.type === 'fondu') {
       const tr = this.transition, u = tr.t / tr.duree;
       ctx.fillStyle = `rgba(0,0,0,${1 - Math.abs(u * 2 - 1)})`;
@@ -864,46 +869,71 @@ SG.Jeu = class {
   }
 
   // ------------------------------------------------------------ interface
-  dessinerHUD(ctx) {
-    // cœurs
+  // bandeau du haut, comme dans Zelda : mini-carte, compteurs, objets B et A, vie
+  dessinerBande(ctx) {
+    const H = SG.BANDE;
+    const g = ctx.createLinearGradient(0, 0, 0, H);
+    g.addColorStop(0, '#0a1430'); g.addColorStop(1, '#050a1a');
+    ctx.fillStyle = g; ctx.fillRect(0, 0, SG.W, H);
+    ctx.fillStyle = '#2ad4ff'; ctx.fillRect(0, H - 4, SG.W, 4);
+    ctx.fillStyle = 'rgba(42,212,255,0.25)'; ctx.fillRect(0, H - 10, SG.W, 6);
+    // mini-carte
+    const mx = 24, my = 14, mw = 190, mh = 92;
+    ctx.fillStyle = '#1b2440'; ctx.fillRect(mx, my, mw, mh);
+    ctx.strokeStyle = '#2ad4ff'; ctx.lineWidth = 2; ctx.strokeRect(mx, my, mw, mh);
+    if (this.estDonjon()) {
+      const D = this.etatDonjon(), cw = mw / 3, chh = mh / 4;
+      for (const k in SG.DONJON1.salles) {
+        const [cx, cy] = k.split(',').map(Number);
+        if (!D.visites.includes(k) && !D.carte) continue;
+        ctx.fillStyle = D.visites.includes(k) ? '#5a6a9a' : '#2e3858';
+        ctx.fillRect(mx + cx * cw + 4, my + cy * chh + 3, cw - 8, chh - 6);
+        if (D.boussole && SG.DONJON1.salles[k].boss && !D.fini) { ctx.fillStyle = '#ff3050'; ctx.fillRect(mx + cx * cw + cw / 2 - 4, my + cy * chh + chh / 2 - 4, 8, 8); }
+      }
+      const [ex, ey] = this.salleCle().split(',').map(Number);
+      ctx.fillStyle = '#7dff5a'; ctx.beginPath(); ctx.arc(mx + ex * cw + cw / 2, my + ey * chh + chh / 2, 5, 0, 7); ctx.fill();
+    } else {
+      const cw = mw / 3, chh = mh / 3;
+      for (const k in SG.MONDE) {
+        const [cx, cy] = k.split(',').map(Number);
+        ctx.fillStyle = this.visites && this.visites.has(k) ? '#4f6a4a' : '#262f48';
+        ctx.fillRect(mx + cx * cw + 2, my + cy * chh + 2, cw - 4, chh - 4);
+      }
+      const ici = this.ecran === 'grotte' ? SG.SORTIE_GROTTE.ecran : this.ecran;
+      const [ex, ey] = ici.split(',').map(Number);
+      const sx = this.ecran === 'grotte' ? SG.SORTIE_GROTTE.x : this.spirit.x, sy = this.ecran === 'grotte' ? SG.SORTIE_GROTTE.y : this.spirit.y;
+      ctx.fillStyle = '#7dff5a'; ctx.beginPath(); ctx.arc(mx + ex * cw + sx / SG.W * cw, my + ey * chh + sy / SG.H * chh, 5, 0, 7); ctx.fill();
+    }
+    // compteurs
+    const cx0 = 250;
+    SG.dessinerButin(ctx, 'pixel', cx0 + 14, 34, 0.9);
+    SG.texte(ctx, '× ' + this.pixels, cx0 + 36, 44, 28, '#fff', 'left', '#000', 4, true);
+    SG.dessinerIcone(ctx, 'cle', cx0 + 14, 82, 34);
+    SG.texte(ctx, '× ' + (this.estDonjon() ? this.etatDonjon().cles : 0), cx0 + 36, 92, 28, '#fff', 'left', '#000', 4, true);
+    if (this.estDonjon() && this.etatDonjon().cleBoss) SG.dessinerIcone(ctx, 'cleBoss', cx0 + 110, 82, 40);
+    // cases B et A
+    const case_ = (x, lettre, type) => {
+      const w = 86, h = 92, y = 20;
+      SG.texte(ctx, lettre, x - 18, y + 52, 30, '#ffffff', 'center', '#000', 5, true);
+      ctx.fillStyle = '#ffffff'; ctx.beginPath(); ctx.roundRect(x, y + 10, w, h - 10, 12); ctx.fill();
+      const g2 = ctx.createRadialGradient(x + w / 2, y + h / 2 + 5, 4, x + w / 2, y + h / 2 + 5, 46);
+      g2.addColorStop(0, '#ffffff'); g2.addColorStop(1, '#bfe9ff');
+      ctx.fillStyle = g2; ctx.beginPath(); ctx.roundRect(x + 4, y + 14, w - 8, h - 18, 9); ctx.fill();
+      ctx.strokeStyle = '#2ad4ff'; ctx.lineWidth = 5; ctx.beginPath(); ctx.roundRect(x, y + 10, w, h - 10, 12); ctx.stroke();
+      if (type) SG.dessinerIcone(ctx, type, x + w / 2, y + h / 2 + 6, 70);
+    };
+    case_(540, 'B', this.objetB);
+    case_(670, 'A', this.ampli ? 'ampli' : null);
+    // vie
+    SG.texte(ctx, '- VIE -', 960, 42, 30, '#ff4a5a', 'center', '#000', 5, true);
     const n = this.vieMax / 4;
     for (let i = 0; i < n; i++) {
       const reste = SG.clamp((this.vie - i * 4) / 4, 0, 1);
-      SG.dessinerCoeur(ctx, 40 + i * 44, 42, 38, reste);
+      const col = i % 10, lig = Math.floor(i / 10);
+      SG.dessinerCoeur(ctx, 800 + col * 34, 70 + lig * 34, 32, reste);
     }
-    // pixels
-    SG.dessinerButin(ctx, 'pixel', 42, 92, 0.85);
-    SG.texte(ctx, '× ' + this.pixels, 62, 102, 26, '#fff', 'left');
-    if (this.fragments % 4) SG.texte(ctx, 'Fragments ' + (this.fragments % 4) + '/4', 140, 102, 20, '#ffd0dd', 'left');
-    // clés du donjon
-    if (this.estDonjon()) {
-      const D = this.etatDonjon();
-      SG.dessinerIcone(ctx, 'cle', 44, 140, 34);
-      SG.texte(ctx, '× ' + D.cles, 66, 150, 24, '#fff', 'left');
-      if (D.cleBoss) SG.dessinerIcone(ctx, 'cleBoss', 130, 140, 40);
-    }
-    // emplacements A et B, comme dans Zelda : pastille ronde claire, lettre blanche bien visible
-    const case_ = (cx, lettre, type) => {
-      const r = 46, cy = 58;
-      ctx.save();
-      ctx.fillStyle = 'rgba(4,12,30,0.75)';
-      ctx.beginPath(); ctx.arc(cx, cy, r + 8, 0, 7); ctx.fill();
-      ctx.lineWidth = 5; ctx.strokeStyle = '#2ad4ff';
-      ctx.beginPath(); ctx.arc(cx, cy, r + 4, 0, 7); ctx.stroke();
-      if (type) {
-        const g = ctx.createRadialGradient(cx, cy, 4, cx, cy, r);
-        g.addColorStop(0, '#ffffff'); g.addColorStop(0.7, '#d8f4ff'); g.addColorStop(1, '#8fd8ff');
-        ctx.fillStyle = g; ctx.beginPath(); ctx.arc(cx, cy, r - 2, 0, 7); ctx.fill();
-        SG.dessinerIcone(ctx, type, cx, cy + 2, 70);
-      }
-      // lettre dans une pastille en bas à gauche
-      ctx.fillStyle = '#0a2a5a'; ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 3;
-      ctx.beginPath(); ctx.arc(cx - r + 6, cy + r - 6, 19, 0, 7); ctx.fill(); ctx.stroke();
-      ctx.restore();
-      SG.texte(ctx, lettre, cx - r + 6, cy + r + 4, 28, '#ffffff', 'center', '#000', 4, true);
-    };
-    case_(SG.W - 190, 'B', this.objetB);
-    case_(SG.W - 70, 'A', this.ampli ? 'ampli' : null);
+    // bouton carte et pause, rappel clavier
+    SG.texte(ctx, 'Entrée : objets   Tab : carte', SG.W - 20, 112, 15, '#7f9cc4', 'right');
   }
 
   dessinerObjetBrandi(ctx) {

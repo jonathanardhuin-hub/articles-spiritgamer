@@ -3,7 +3,10 @@
 
 const SG = {};
 SG.W = 1280;          // largeur logique de l'écran
-SG.H = 720;           // hauteur logique
+SG.H = 720;           // hauteur logique de l'aire de jeu
+SG.BANDE = 124;       // bandeau d'informations en haut, comme dans Zelda
+SG.HT = SG.H + SG.BANDE;
+SG.decalY = 0;
 SG.T = 80;            // taille d'une case
 SG.COLS = 16;
 SG.ROWS = 9;
@@ -43,7 +46,7 @@ SG.IMAGES = [
 ];
 SG.img = {};
 // images facultatives : utilisées dès qu'elles existent, sinon un dessin provisoire est affiché
-SG.IMAGES_FACULTATIVES = ['manette', 'cle', 'cle-boss', 'carte-donjon', 'boussole', 'source', 'flash', 'portrait-flash',
+SG.IMAGES_FACULTATIVES = ['clic-b', 'manette', 'cle', 'cle-boss', 'carte-donjon', 'boussole', 'source', 'flash', 'portrait-flash',
   'salle-donjon', 'bloc', 'statue', 'brasero', 'pot', 'coffre', 'coffre-ouvert', 'cristal', 'cristal-actif', 'entree-terrier', 'reine'];
 
 SG.chargerImages = function (progression) {
@@ -113,7 +116,7 @@ SG.Commandes = {
     canevas.addEventListener('pointerdown', (e) => {
       SG.Son.debloquer();
       const r = canevas.getBoundingClientRect();
-      this.clics.push({ x: (e.clientX - r.left) / r.width * SG.W, y: (e.clientY - r.top) / r.height * SG.H });
+      this.clics.push({ x: (e.clientX - r.left) / r.width * SG.W, y: (e.clientY - r.top) / r.height * SG.HT - SG.decalY });
     });
     this.initTactile();
   },

@@ -307,7 +307,9 @@ SG.Clic = class extends SG.Monstre {
     const pente = this.charge ? d.x * 0.25 : Math.sin(this.t * 8) * 0.05;
     this.dessinerFlash(ctx, () => {
       ctx.save(); ctx.translate(this.x, this.y); ctx.rotate(pente);
-      SG.dessinerPied(ctx, SG.img.clic, 0, this.sonne > 0 ? -2 : 0, { retourne: d.x < 0 });
+      const pas = this.sonne > 0 ? 0 : Math.floor(this.t * (this.charge ? 14 : 6)) % 2;
+      const im = pas && SG.img['clic-b'] && SG.img['clic-b'].width ? SG.img['clic-b'] : SG.img.clic;
+      SG.dessinerPied(ctx, im, 0, (this.sonne > 0 ? -2 : 0) - pas * 3, { retourne: d.x < 0 });
       ctx.restore();
     });
   }
