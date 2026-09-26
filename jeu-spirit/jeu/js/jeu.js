@@ -698,13 +698,6 @@ SG.Jeu = class {
   dessinerScene(ctx) {
     if (this.ecran === 'grotte') {
       ctx.drawImage(SG.img.grotte, 0, 0, SG.W, SG.H);
-      if (!this.ampli) {
-        // l'Ampli posé près de l'ermite, qui brille
-        const b = Math.sin(this.t * 4) * 4;
-        ctx.save(); ctx.globalAlpha = 0.35 + Math.sin(this.t * 4) * 0.15;
-        ctx.fillStyle = '#7fe8ff'; ctx.beginPath(); ctx.arc(760, 250 + b - 20, 36, 0, Math.PI * 2); ctx.fill(); ctx.restore();
-        SG.dessinerPied(ctx, SG.img.ampli, 760, 262 + b, { echelle: 0.8 });
-      }
       this.dessinerFlammes(ctx);
     } else if (this.estDonjon()) {
       ctx.drawImage(this.fondSalle(this.ecran), 0, 0, SG.W, SG.H);
@@ -944,8 +937,8 @@ SG.Jeu = class {
     SG.cadre(ctx, SG.img['ui-panneau'], 4, 2, SG.W - 8, H - 4, 150, 34);
     const titre = (t, x, y) => SG.texte(ctx, t, x, y, 17, '#7fe8ff', 'center', '#02102a', 4, true);
     // 1. mini-carte
-    const mx = 44, my = 42, mw = 166, mh = 60;
-    titre(this.estDonjon() ? 'TERRIER' : 'PLAINE', mx + mw / 2, 36);
+    const mx = 46, my = 60, mw = 170, mh = 60;
+    titre(this.estDonjon() ? 'TERRIER' : 'PLAINE', mx + mw / 2, 52);
     ctx.fillStyle = 'rgba(5,15,35,0.9)'; ctx.beginPath(); ctx.roundRect(mx, my, mw, mh, 6); ctx.fill();
     ctx.strokeStyle = 'rgba(42,212,255,0.6)'; ctx.lineWidth = 2; ctx.stroke();
     if (this.estDonjon()) {
@@ -973,17 +966,19 @@ SG.Jeu = class {
     }
     // 2. compteurs
     const cx0 = 260;
-    titre('INVENTAIRE', cx0 + 70, 36);
-    SG.dessinerButin(ctx, 'pixel', cx0 + 20, 58, 0.75);
-    SG.texte(ctx, '× ' + this.pixels, cx0 + 42, 67, 22, '#fff', 'left', '#000', 4, true);
-    SG.dessinerIcone(ctx, 'cle', cx0 + 20, 90, 28);
-    SG.texte(ctx, '× ' + (this.estDonjon() ? this.etatDonjon().cles : 0), cx0 + 42, 99, 22, '#fff', 'left', '#000', 4, true);
-    if (this.estDonjon() && this.etatDonjon().cleBoss) SG.dessinerIcone(ctx, 'cleBoss', cx0 + 115, 90, 32);
-    SG.dessinerIcone(ctx, 'source', cx0 + 115, 58, 24);
-    SG.texte(ctx, (this.source || 0) + '/8', cx0 + 132, 67, 20, '#ffe9a0', 'left', '#000', 4, true);
+    titre('INVENTAIRE', cx0 + 70, 52);
+    SG.dessinerButin(ctx, 'pixel', cx0 + 20, 76, 0.75);
+    SG.texte(ctx, '× ' + this.pixels, cx0 + 42, 85, 22, '#fff', 'left', '#000', 4, true);
+    if (this.estDonjon()) {
+      SG.dessinerIcone(ctx, 'cle', cx0 + 20, 106, 26);
+      SG.texte(ctx, '× ' + this.etatDonjon().cles, cx0 + 42, 115, 22, '#fff', 'left', '#000', 4, true);
+    }
+    if (this.estDonjon() && this.etatDonjon().cleBoss) SG.dessinerIcone(ctx, 'cleBoss', cx0 + 115, 106, 30);
+    SG.dessinerIcone(ctx, 'source', cx0 + 115, 76, 24);
+    SG.texte(ctx, (this.source || 0) + '/8', cx0 + 132, 85, 20, '#ffe9a0', 'left', '#000', 4, true);
     // 3. objets B et A
     const case_ = (x, lettre, type) => {
-      const t = 68, y = 38;
+      const t = 66, y = 56;
       titre(lettre, x - 16, y + t / 2 + 6);
       SG.cadre(ctx, SG.img['ui-portrait'], x - 6, y - 4, t + 12, t + 12, 200, 20);
       const g2 = ctx.createRadialGradient(x + t / 2, y + t / 2, 3, x + t / 2, y + t / 2, t * 0.5);
@@ -994,17 +989,22 @@ SG.Jeu = class {
     case_(520, 'B', this.objetB);
     case_(640, 'A', this.ampli ? 'ampli' : null);
     // 4. vie
-    titre('VIE', 890, 36);
     const n = this.vieMax / 4;
+    titre('VIE', 760 + Math.min(n, 10) * 18, 52);
     for (let i = 0; i < n; i++) {
       const reste = SG.clamp((this.vie - i * 4) / 4, 0, 1);
       const col = i % 10, lig = Math.floor(i / 10);
-      SG.dessinerCoeur(ctx, 775 + col * 30, 66 + lig * 30, 28, reste);
+      SG.dessinerCoeur(ctx, 778 + col * 36, 86 + lig * 32, 34, reste);
     }
-    if (this.fragments % 4) SG.texte(ctx, 'Fragments ' + (this.fragments % 4) + '/4', 775, 104, 15, '#ffd0dd', 'left');
+    if (this.fragments % 4) SG.texte(ctx, 'Fragments ' + (this.fragments % 4) + '/4', 775, 120, 15, '#ffd0dd', 'left');
     // 5. logo du jeu
     const L = SG.img.logo;
-    if (L && L.width) { const lw = 190, lh = lw * L.height / L.width; ctx.drawImage(L, SG.W - lw - 34, (H - lh) / 2 + 2, lw, lh); }
+    if (L && L.width) {
+      // le logo tient dans la zone intérieure du cadre (entre y = 36 et y = H - 26)
+      const hMax = H - 62, wMax = 190, e = Math.min(hMax / L.height, wMax / L.width);
+      const lw = L.width * e, lh = L.height * e;
+      ctx.drawImage(L, SG.W - 44 - lw, 36 + (hMax - lh) / 2, lw, lh);
+    }
   }
 
   dessinerHUD(ctx) {
