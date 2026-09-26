@@ -193,7 +193,7 @@ SG.Jeu = class {
   // l'onde touche monstres, buissons et herbes dans la zone
   frapperZone(zone, degats, sx, sy) {
     for (const m of this.monstres) if (!m.mort && SG.boitesSeTouchent(zone, m.corps())) m.toucher(this, degats, sx, sy);
-    for (const p of this.projectiles) if (!p.ami && SG.boitesSeTouchent(zone, p.boite())) { p.fini = true; this.effets.push(new SG.Eclat(p.x, p.y)); }
+    for (const p of this.projectiles) if (!p.ami && SG.boitesSeTouchent(zone, p.boite())) { p.fini = true; this.effets.push(p instanceof SG.Pierre ? new SG.EclatPierre(p.x, p.y) : new SG.Eclat(p.x, p.y)); }
     this.couperDecor(zone);
   }
 
@@ -443,7 +443,7 @@ SG.Jeu = class {
 
   majTitre(C, clics) {
     const opts = this.optionsTitre();
-    const zones = opts.map((_, i) => ({ x: 450, y: 440 + i * 80 - 34, w: 380, h: 68 }));
+    const zones = opts.map((_, i) => ({ x: 460, y: 470 + i * 76 - 34, w: 360, h: 68 }));
     const choix = this.choixMenu(C, clics, opts.length, zones);
     if (choix < 0) return;
     const o = opts[choix];
@@ -962,18 +962,38 @@ SG.Jeu = class {
   }
 
   dessinerTitre(ctx) {
-    ctx.drawImage(this.fond(SG.ECRAN_DEPART), 0, 0, SG.W, SG.H);
-    const g = ctx.createLinearGradient(0, 0, 0, SG.H);
-    g.addColorStop(0, 'rgba(4,12,35,0.75)'); g.addColorStop(0.6, 'rgba(4,12,35,0.35)'); g.addColorStop(1, 'rgba(4,12,35,0.8)');
-    ctx.fillStyle = g; ctx.fillRect(0, 0, SG.W, SG.H);
-    const b = Math.sin(this.t * 2) * 6;
-    SG.dessinerPied(ctx, SG.img['spirit-brandit'], 200, 660 + b, { echelle: 2.3 });
-    SG.dessinerPied(ctx, SG.img['cornu-face-g'], 1090, 670, { echelle: 2.1, retourne: true });
+    // illustration avec un très léger zoom lent
+    const F = SG.img['titre-fond'];
+    const z = 1.03 + Math.sin(this.t * 0.15) * 0.02;
+    ctx.drawImage(F, SG.W / 2 - SG.W * z / 2, SG.H / 2 - SG.H * z / 2, SG.W * z, SG.H * z);
+    // lueur de la tour qui pulse
+    ctx.save();
+    ctx.globalCompositeOperation = 'lighter';
+    const tx = 885, ty = 242, a = 0.18 + Math.sin(this.t * 2.2) * 0.1;
+    const g = ctx.createRadialGradient(tx, ty, 0, tx, ty, 90);
+    g.addColorStop(0, `rgba(90,230,255,${a})`); g.addColorStop(1, 'rgba(0,120,255,0)');
+    ctx.fillStyle = g; ctx.fillRect(tx - 90, ty - 90, 180, 180);
+    // éclats violets qui tombent de la faille
+    if (!this.eclatsTitre) this.eclatsTitre = [];
+    if (Math.random() < 0.25) this.eclatsTitre.push({ x: SG.hasard(760, 1260), y: SG.hasard(0, 120), v: SG.hasard(30, 70), r: SG.hasard(3, 7), a: Math.random() * 6 });
+    for (const e of this.eclatsTitre) {
+      e.y += e.v / 60; e.x -= e.v / 200; e.a += 0.03;
+      ctx.save(); ctx.translate(e.x, e.y); ctx.rotate(e.a);
+      ctx.fillStyle = 'rgba(200,120,255,0.8)';
+      ctx.beginPath(); ctx.moveTo(0, -e.r * 1.6); ctx.lineTo(e.r * 0.6, 0); ctx.lineTo(0, e.r * 1.6); ctx.lineTo(-e.r * 0.6, 0); ctx.closePath(); ctx.fill();
+      ctx.restore();
+    }
+    this.eclatsTitre = this.eclatsTitre.filter((e) => e.y < 520);
+    ctx.restore();
+    // voile sombre en bas pour les boutons
+    const v = ctx.createLinearGradient(0, 380, 0, SG.H);
+    v.addColorStop(0, 'rgba(4,10,30,0)'); v.addColorStop(1, 'rgba(4,10,30,0.6)');
+    ctx.fillStyle = v; ctx.fillRect(0, 380, SG.W, SG.H - 380);
     const L = SG.img.logo;
-    if (L && L.width) { const lw = 720, lh = lw * L.height / L.width; ctx.drawImage(L, SG.W / 2 - lw / 2, 40 + Math.sin(this.t * 1.5) * 4, lw, lh); }
+    if (L && L.width) { const lw = 560, lh = lw * L.height / L.width; ctx.drawImage(L, 330 - lw / 2, 20 + Math.sin(this.t * 1.5) * 4, lw, lh); }
     const opts = this.optionsTitre();
-    opts.forEach((o, i) => SG.boutonMenu(ctx, o, SG.W / 2, 440 + i * 80, i === this.menuChoix, 380));
-    SG.texte(ctx, 'Flèches ou ZQSD : bouger    Espace : action    Entrée : objets    Tab : carte    F : plein écran    M : son', SG.W / 2, 700, 18, '#c8d8ee', 'center');
+    opts.forEach((o, i) => SG.boutonMenu(ctx, o, SG.W / 2, 470 + i * 76, i === this.menuChoix, 360));
+    SG.texte(ctx, 'Flèches ou ZQSD : bouger    Espace : action    Entrée : objets    Tab : carte    F : plein écran    M : son', SG.W / 2, 706, 17, '#dbe8f8', 'center');
   }
 
   dessinerMode(ctx) {

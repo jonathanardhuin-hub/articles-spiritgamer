@@ -70,6 +70,10 @@ LISTE = {
     'fx-etincelle': ('effets/etincelle.webp', 'w', 90, ''),
     'fx-onde-proche': ('effets/onde-proche.webp', 'w', 150, ''),
     'fx-onde-loin': ('effets/onde-loin.webp', 'w', 140, ''),
+    # Projectiles
+    'lance': ('projectiles/lance.png', 'w', 112, ''),
+    'pierre': ('projectiles/pierre.png', 'w', 34, ''),
+    'pierre-eclat': ('projectiles/pierre-eclat.png', 'w', 90, ''),
     # Interface
     'ui-dialogue': ('interface/cadre-dialogue.png', 'w', 960, ''),
     'ui-portrait': ('interface/cadre-portrait.png', 'w', 540, ''),
@@ -111,6 +115,9 @@ def main():
     a = np.array(c).astype(float)
     a[..., :3] = a[..., :3] * 0.22 + np.array([40, 10, 20]) * 0.3
     Image.fromarray(a.clip(0, 255).astype('uint8')).save(os.path.join(SORTIE, 'coeur-vide.webp'), 'WEBP', quality=88)
+    # illustration de l'écran titre
+    t = Image.open(os.path.join(IMG, 'interface/titre-fond.webp')).convert('RGB')
+    t.resize((1600, 900), Image.LANCZOS).save(os.path.join(SORTIE, 'titre-fond.webp'), 'WEBP', quality=85, method=6)
     # la grotte : image plein écran
     g = Image.open(os.path.join(IMG, 'decor/grotte-interieur.webp')).convert('RGB')
     g.resize((1600, 900), Image.LANCZOS).save(os.path.join(SORTIE, 'grotte.webp'), 'WEBP', quality=85, method=6)

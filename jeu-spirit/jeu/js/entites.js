@@ -495,11 +495,12 @@ SG.Projectile = class {
         }
       }
       for (const p of jeu.projectiles) {
-        if (!p.ami && !p.fini && SG.boitesSeTouchent(this.boite(), p.boite())) { p.fini = true; jeu.effets.push(new SG.Eclat(p.x, p.y)); }
+        if (!p.ami && !p.fini && SG.boitesSeTouchent(this.boite(), p.boite())) { p.fini = true; jeu.effets.push(p instanceof SG.Pierre ? new SG.EclatPierre(p.x, p.y) : new SG.Eclat(p.x, p.y)); }
       }
     } else if (SG.boitesSeTouchent(this.boite(), jeu.spirit.corps())) {
       jeu.spirit.blesser(jeu, jeu.degats(this.degats), this.x - this.vx, this.y - this.vy);
       this.fini = true;
+      if (this instanceof SG.Pierre) jeu.effets.push(new SG.EclatPierre(this.x, this.y));
     }
   }
   quandBloque(jeu) { jeu.effets.push(new SG.Eclat(this.x, this.y)); }
@@ -523,37 +524,25 @@ SG.Lance = class extends SG.Projectile {
   constructor(x, y, dir) { super(x, y, dir, 520); this.r = 16; this.degats = 4; }
   dessiner(ctx) {
     const d = SG.DIRS[this.dir];
-    ctx.save();
-    ctx.translate(this.x, this.y);
-    ctx.rotate(Math.atan2(d.y, d.x));
-    ctx.lineCap = 'round';
-    ctx.strokeStyle = '#1a1010'; ctx.lineWidth = 9;
-    ctx.beginPath(); ctx.moveTo(-50, 0); ctx.lineTo(20, 0); ctx.stroke();
-    ctx.strokeStyle = '#8a5a30'; ctx.lineWidth = 5;
-    ctx.beginPath(); ctx.moveTo(-48, 0); ctx.lineTo(18, 0); ctx.stroke();
-    ctx.fillStyle = '#b8aea0'; ctx.strokeStyle = '#1a1010'; ctx.lineWidth = 3;
-    ctx.beginPath(); ctx.moveTo(38, 0); ctx.lineTo(16, -10); ctx.lineTo(20, 0); ctx.lineTo(16, 10); ctx.closePath();
-    ctx.fill(); ctx.stroke();
-    ctx.restore();
+    SG.dessinerEffet(ctx, SG.img.lance, this.x - d.x * 20, this.y - d.y * 20, Math.atan2(d.y, d.x), 1, 1, false);
   }
 };
 
 SG.Pierre = class extends SG.Projectile {
   constructor(x, y, dir) { super(x, y, dir, 430); this.r = 14; this.degats = 2; }
+  quandBloque(jeu) { jeu.effets.push(new SG.EclatPierre(this.x, this.y)); SG.Son.effet('touche'); }
   dessiner(ctx) {
-    ctx.save();
-    ctx.translate(this.x, this.y);
-    ctx.rotate(this.t * 8);
-    ctx.fillStyle = '#4b4658'; ctx.strokeStyle = '#111'; ctx.lineWidth = 4;
-    ctx.beginPath();
-    for (let i = 0; i < 7; i++) {
-      const a = i / 7 * Math.PI * 2, r = 15 + (i % 2) * 3;
-      ctx.lineTo(Math.cos(a) * r, Math.sin(a) * r);
-    }
-    ctx.closePath(); ctx.fill(); ctx.stroke();
-    ctx.fillStyle = '#a45cff';
-    ctx.fillRect(-3, -3, 6, 6);
-    ctx.restore();
+    SG.dessinerEffet(ctx, SG.img.pierre, this.x, this.y, this.t * 8, 1, 1, false);
+  }
+};
+
+// la pierre qui éclate
+SG.EclatPierre = class {
+  constructor(x, y) { this.x = x; this.y = y; this.t = 0; this.fini = false; this.ang = Math.random() * 6; }
+  maj(jeu, dt) { this.t += dt; if (this.t > 0.3) this.fini = true; }
+  dessiner(ctx) {
+    const u = this.t / 0.3;
+    SG.dessinerEffet(ctx, SG.img['pierre-eclat'], this.x, this.y, this.ang, 0.5 + u * 0.6, 1 - u * u, false);
   }
 };
 
