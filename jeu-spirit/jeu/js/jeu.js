@@ -96,7 +96,7 @@ SG.Jeu = class {
     const e = SG.MONDE[cle];
     for (const [type, c, r] of e.ennemis || []) {
       const m = SG.creerMonstre(type, c * SG.T + 40, r * SG.T + 62);
-      m.apparition = m.dureeApparition = SG.hasard(0.6, 1.1);
+      m.apparition = 0; // apparition désactivée en attendant les images de faille
       this.placerLibre(m);
       this.monstres.push(m);
     }
