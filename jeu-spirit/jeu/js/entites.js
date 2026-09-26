@@ -70,10 +70,13 @@ SG.Spirit = class {
       if (ax > ay + (actuelleHoriz ? -0.25 : 0.25)) this.dir = a.x < 0 ? 'gauche' : 'droite';
       else if (ay > 0.01) this.dir = a.y < 0 ? 'haut' : 'bas';
       const v = this.vitesse * dt;
+      // bloqué contre un obstacle : il pousse, même si rien ne bouge
+      const x0 = this.x, y0 = this.y;
       SG.deplacer(jeu, this, a.x * v, a.y * v);
+      this.poussePose = Math.hypot(this.x - x0, this.y - y0) < v * 0.15 ? 0.15 : 0;
       this.tempsMarche += dt;
     } else {
-      this.tempsMarche = 0;
+      this.tempsMarche = 0; this.poussePose = 0;
     }
   }
 
@@ -736,7 +739,9 @@ SG.dessinerIcone = function (ctx, type, x, y, taille) {
   const im = SG.img[noms[type]];
   if (im && im.width) {
     const k = taille / Math.max(im.width, im.height);
-    ctx.drawImage(im, x - im.width * k / 2, y - im.height * k / 2, im.width * k, im.height * k);
+    // l'Ampli a son câble à droite : on recentre sur le corps de l'appareil
+    const dx = type === 'ampli' ? taille * 0.07 : 0;
+    ctx.drawImage(im, x + dx - im.width * k / 2, y - im.height * k / 2, im.width * k, im.height * k);
     return;
   }
   const s = taille / 60;

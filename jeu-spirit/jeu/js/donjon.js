@@ -49,12 +49,12 @@ SG.DONJON1 = {
       plan: [
         '################',
         '#..............#',
-        '#....o....o....#',
-        '#....o....o....#',
+        '#..o........o..#',
         '#..............#',
         '#......B.......#',
-        '#.p..........p.#',
         '#..............#',
+        '#..o........o..#',
+        '#.p..........p.#',
         '################',
       ],
       condition: 'bloc',
@@ -67,9 +67,9 @@ SG.DONJON1 = {
         '################',
         '#..............#',
         '#.F..........F.#',
-        '#.....o..o.....#',
+        '#....o....o....#',
         '#..............#',
-        '#.....o..o.....#',
+        '#....o....o....#',
         '#.F..........F.#',
         '#..............#',
         '################',
@@ -601,6 +601,14 @@ Object.assign(SG.Jeu.prototype, {
     SG.Son.effet('coeur');
     const S = this.salle(k);
     if (S.coffre && S.coffre.cache) this.effets.push(new SG.Eclat(S.coffre.c * SG.T + 40, S.coffre.r * SG.T + 40));
+    // les grilles qui s'ouvrent grâce à cette énigme scintillent, pour qu'on voie ce qui a changé
+    if (k === this.salleCle()) for (const dir of ['haut', 'bas', 'gauche', 'droite']) {
+      const p = this.porteVers(dir);
+      if (p && p.type === 'enigme:' + k) {
+        const c = { haut: [640, 40], bas: [640, SG.H - 40], gauche: [40, 360], droite: [SG.W - 40, 360] }[dir];
+        this.effets.push(new SG.Eclat(c[0], c[1]));
+      }
+    }
     this.sauver();
   },
 
@@ -643,7 +651,6 @@ Object.assign(SG.Jeu.prototype, {
       for (const b of this.blocs) if (b.pousse && b.anim <= 0) this.resoudre(k);
     }
     for (const b of this.blocs) b.anim = Math.max(0, b.anim - dt * 4);
-    if (s.poussePose > 0) s.poussePose -= dt;
     // un butin ne reste jamais pris dans un objet (coffre apparu dessus, statue, bloc) : on le pousse sur la case libre la plus proche
     for (const bt of this.butins) {
       const c = Math.floor(bt.x / SG.T), r = Math.floor((bt.y - 10) / SG.T);
@@ -662,7 +669,7 @@ Object.assign(SG.Jeu.prototype, {
       const fc = Math.floor((s.x + d.x * 34) / SG.T), fr = Math.floor((s.y - 11 + d.y * 24) / SG.T);
       const ch = this.caseSalle(fc, fr);
       if (ch === 'B') {
-        this.pousse += dt; s.poussePose = 0.2;
+        this.pousse += dt;
         if (this.pousse > 0.35) {
           this.pousse = 0;
           const b = this.blocs.find((q) => q.c === fc && q.r === fr);
@@ -910,6 +917,19 @@ SG.tracesBloc = function (ctx, x, y) {
   ctx.restore();
 };
 SG.dessinBloc = function (ctx, x, y) {
+  // le bloc est taillé dans la même pierre que les murs de la salle : il a l'air d'appartenir au donjon
+  const sv = SG.img['salle-vide'];
+  if (sv && sv.width) {
+    const k = sv.width / 1672;
+    ctx.save();
+    ctx.fillStyle = 'rgba(0,0,0,0.35)'; ctx.beginPath(); ctx.ellipse(x, y - 4, 42, 10, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#1d1930'; ctx.strokeStyle = '#07050d'; ctx.lineWidth = 4;
+    ctx.beginPath(); ctx.roundRect(x - 38, y - 40, 76, 34, 6); ctx.fill(); ctx.stroke();
+    ctx.drawImage(sv, 482 * k, 12 * k, 132 * k, 124 * k, x - 38, y - 88, 76, 66);
+    ctx.strokeStyle = '#07050d'; ctx.beginPath(); ctx.roundRect(x - 38, y - 88, 76, 66, 8); ctx.stroke();
+    ctx.restore();
+    return;
+  }
   SG.dessinImageOu('bloc', ctx, x, y, () => {
     ctx.save(); ctx.fillStyle = '#6a6284'; ctx.strokeStyle = '#120f1d'; ctx.lineWidth = 4;
     ctx.beginPath(); ctx.roundRect(x - 38, y - 92, 76, 88, 8); ctx.fill(); ctx.stroke();

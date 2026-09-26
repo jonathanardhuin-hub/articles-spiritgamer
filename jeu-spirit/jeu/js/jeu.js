@@ -957,8 +957,8 @@ SG.Jeu = class {
     SG.cadre(ctx, SG.img['ui-panneau'], 4, 2, SG.W - 8, H - 4, 150, 34);
     const titre = (t, x, y) => SG.texte(ctx, t, x, y, 17, '#7fe8ff', 'center', '#02102a', 4, true);
     // 1. mini-carte
-    const mx = 46, my = 55, mw = 170, mh = 52;
-    titre(this.estDonjon() ? 'TERRIER' : 'PLAINE', mx + mw / 2, 47);
+    const mx = 46, my = 60, mw = 170, mh = 48;
+    titre(this.estDonjon() ? 'TERRIER' : 'PLAINE', mx + mw / 2, 53);
     ctx.fillStyle = 'rgba(5,15,35,0.9)'; ctx.beginPath(); ctx.roundRect(mx, my, mw, mh, 6); ctx.fill();
     ctx.strokeStyle = 'rgba(42,212,255,0.6)'; ctx.lineWidth = 2; ctx.stroke();
     if (this.estDonjon()) {
@@ -986,44 +986,44 @@ SG.Jeu = class {
     }
     // 2. compteurs
     const cx0 = 260;
-    titre('INVENTAIRE', cx0 + 70, 47);
-    SG.dessinerButin(ctx, 'pixel', cx0 + 20, 70, 0.75);
-    SG.texte(ctx, '× ' + this.pixels, cx0 + 42, 79, 22, '#fff', 'left', '#000', 4, true);
+    titre('INVENTAIRE', cx0 + 70, 53);
+    SG.dessinerButin(ctx, 'pixel', cx0 + 20, 75, 0.72);
+    SG.texte(ctx, '× ' + this.pixels, cx0 + 42, 84, 21, '#fff', 'left', '#000', 4, true);
     if (this.estDonjon()) {
-      SG.dessinerIcone(ctx, 'cle', cx0 + 20, 98, 26);
-      SG.texte(ctx, '× ' + this.etatDonjon().cles, cx0 + 42, 107, 22, '#fff', 'left', '#000', 4, true);
+      SG.dessinerIcone(ctx, 'cle', cx0 + 20, 100, 24);
+      SG.texte(ctx, '× ' + this.etatDonjon().cles, cx0 + 42, 108, 21, '#fff', 'left', '#000', 4, true);
     }
-    if (this.estDonjon() && this.etatDonjon().cleBoss) SG.dessinerIcone(ctx, 'cleBoss', cx0 + 115, 98, 30);
-    SG.dessinerIcone(ctx, 'source', cx0 + 115, 70, 24);
-    SG.texte(ctx, (this.source || 0) + '/8', cx0 + 132, 79, 20, '#ffe9a0', 'left', '#000', 4, true);
+    if (this.estDonjon() && this.etatDonjon().cleBoss) SG.dessinerIcone(ctx, 'cleBoss', cx0 + 115, 100, 28);
+    SG.dessinerIcone(ctx, 'source', cx0 + 115, 75, 22);
+    SG.texte(ctx, (this.source || 0) + '/8', cx0 + 132, 84, 19, '#ffe9a0', 'left', '#000', 4, true);
     // 3. objets B et A
     const case_ = (x, lettre, type) => {
-      const t = 66, y = 76 - t / 2;
+      const t = 62, y = 78 - t / 2;
       titre(lettre, x - 16, y + t / 2 + 6);
       SG.cadre(ctx, SG.img['ui-portrait'], x - 6, y - 4, t + 12, t + 12, 200, 20);
       const g2 = ctx.createRadialGradient(x + t / 2, y + t / 2, 3, x + t / 2, y + t / 2, t * 0.5);
       g2.addColorStop(0, '#ffffff'); g2.addColorStop(1, '#a8e2ff');
       ctx.fillStyle = g2; ctx.beginPath(); ctx.roundRect(x + 8, y + 8, t - 16, t - 16, 8); ctx.fill();
-      if (type) SG.dessinerIcone(ctx, type, x + t / 2, y + t / 2 + 2, 48);
+      if (type) SG.dessinerIcone(ctx, type, x + t / 2, y + t / 2 + 1, 44);
     };
     case_(520, 'B', this.objetB);
     case_(640, 'A', this.ampli ? 'ampli' : null);
     // 4. vie
     const n = this.vieMax / 4;
-    titre('VIE', 760 + Math.min(n, 10) * 18, 47);
+    titre('VIE', 760 + Math.min(n, 10) * 18, 53);
     for (let i = 0; i < n; i++) {
       const reste = SG.clamp((this.vie - i * 4) / 4, 0, 1);
       const col = i % 10, lig = Math.floor(i / 10);
-      SG.dessinerCoeur(ctx, 778 + col * 36, (n > 10 ? 72 : 82) + lig * 30, 34, reste);
+      SG.dessinerCoeur(ctx, 778 + col * 36, (n > 10 ? 74 : 84) + lig * 26, 32, reste);
     }
     if (this.fragments % 4) SG.texte(ctx, 'Fragments ' + (this.fragments % 4) + '/4', 775, 116, 15, '#ffd0dd', 'left');
     // 5. logo du jeu
     const L = SG.img.logo;
     if (L && L.width) {
       // le logo tient dans la zone intérieure du cadre (entre y = 36 et y = H - 26)
-      const hMax = H - 62, wMax = 190, e = Math.min(hMax / L.height, wMax / L.width);
+      const hMax = H - 76, wMax = 190, e = Math.min(hMax / L.height, wMax / L.width);
       const lw = L.width * e, lh = L.height * e;
-      ctx.drawImage(L, SG.W - 44 - lw, 76 - lh / 2, lw, lh);
+      ctx.drawImage(L, SG.W - 44 - lw, 78 - lh / 2, lw, lh);
     }
   }
 
