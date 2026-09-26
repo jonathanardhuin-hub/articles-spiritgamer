@@ -110,8 +110,8 @@
     <h1>Catalogue d'images<small>Spirit et le Roi Clickbait · toutes les images du jeu</small></h1>
     <ul class="mode-emploi">
       <li><b>1 carte = 1 conversation ChatGPT</b>Copie le prompt, joins les images montrées sous « À joindre » (clique dessus pour les ouvrir en grand et les enregistrer).</li>
-      <li><b>Dans l'ordre des étapes</b>Commence par « Donjon 1 » : c'est ce que je code maintenant. Le reste suit région par région.</li>
-      <li><b>Envoie-moi le résultat</b>Toutes les images d'une carte dans un seul message, avec son code (par exemple D1-03).</li>
+      <li><b>Dans l'ordre des étapes</b>Commence par « Donjon 1 » : c'est ce que je code maintenant. Chaque étape suivante contient sa région et son donjon complet (catégorie Donjons : salles, portes, mécanismes, sous-sols).</li>
+      <li><b>Range les images dans Google Drive</b>Dossier « Spirit images », puis un sous-dossier par carte, nommé avec son code (par exemple D1-03). Dis-moi ensuite quels codes sont prêts : je les récupère moi-même.</li>
       <li><b>Coche « Fait »</b>La page s'en souvient dans ton navigateur, pour savoir où tu en es.</li>
     </ul>
   </header>
@@ -234,16 +234,16 @@
     ['Le Pop-up qui attaque : même fenêtre corrompue, l\'écran s\'ouvre en grand comme une bouche sombre, les lambeaux d\'énergie violette se dressent vers l\'avant.',
      'Le Spamling en plein bond : même enveloppe noircie, rabat grand ouvert, pattes griffues repliées sous lui, en l\'air.'],
     'Joins aussi le Spamling (jeu-spirit/images/donjon1/spamling.png) si tu l\'as encore.');
-  carte('d1', 'decors', 'Salle du Terrier avec ses portes', 'Plus de battants collés : la salle entière, dessinée avec ses portes. Le jeu prend chaque mur dans l\'image qui correspond à l\'état de sa porte (ouverte, grille, clé, boss ou pas de porte). Fais les 5 étapes dans la même conversation ChatGPT, dans l\'ordre.', ['salle', 'battant'],
+  carte('d1', 'donjons', 'Salle du Terrier avec ses portes', 'Plus de battants collés : la salle entière, dessinée avec ses portes. Le jeu prend chaque mur dans l\'image qui correspond à l\'état de sa porte (ouverte, grille, clé, boss ou pas de porte). Fais les 5 étapes dans la même conversation ChatGPT, dans l\'ordre.', ['salle', 'battant'],
     SALLE_PORTES('un repaire souterrain creusé par une puissance numérique maléfique, pierre sombre bleu-violet, fissures violettes lumineuses.').split('\n\n').slice(1).join('\n\n'), ['Les quatre portes ouvertes.'], null, SUITES_PORTES);
-  carte('d1', 'decors', 'Pièges et mécanismes du Terrier', 'Les nouvelles salles du plan : bandeaux, redirections, notifications, disjoncteur.', ['salle', 'statue', 'popup'],
+  carte('d1', 'donjons', 'Pièges et mécanismes du Terrier', 'Les nouvelles salles du plan : bandeaux, redirections, notifications, disjoncteur.', ['salle', 'statue', 'popup'],
     ELEM + `\n\nMême univers que la salle jointe : pierre sombre bleu-violet, fissures violettes, technologie maléfique.`,
     ['Un bandeau de pub : une longue bannière publicitaire horizontale en métal sombre qui flotte, bords déchirés, surface qui clignote en violet et rouge sombre, sans aucun texte. Format paysage 4:1.',
      'Une fenêtre de redirection : un portail rectangulaire posé à plat sur le sol, vu du dessus, cadre de métal noir, intérieur tourbillonnant violet sombre.',
      'Une bulle de notification : une petite bulle ronde rouge sombre avec un point lumineux au centre, entourée d\'un anneau violet, prête à exploser (projectile).',
      'Un disjoncteur mural : boîtier de métal sombre fixé au mur, grosse manette abaissée, voyant rouge éteint.',
      'Le même disjoncteur, manette levée, voyant qui brille en cyan.']);
-  carte('d1', 'decors', 'Mur fêlé, trappe, socle et plaque', 'Le mur à faire sauter plus tard, l\'accès aux sous-sols, et la plaque de la Salle des Plaques (le carré au sol, sur lequel on pousse la gargouille).', ['salle', 'bloc'],
+  carte('d1', 'donjons', 'Mur fêlé, trappe, socle et plaque', 'Le mur à faire sauter plus tard, l\'accès aux sous-sols, et la plaque de la Salle des Plaques (le carré au sol, sur lequel on pousse la gargouille).', ['salle', 'bloc'],
     ELEM + `\n\nMême univers que la salle jointe : pierre sombre bleu-violet, fissures violettes.`,
     ['Un morceau de mur épais vu de dessus, identique aux murs de la salle jointe, mais traversé d\'une grande fissure en étoile, sans lumière violette. Format carré.',
      'Une trappe fermée dans le sol dallé, vue exactement du dessus : lourde plaque de métal sombre rivetée, poignée en anneau.',
@@ -251,10 +251,10 @@
      'Un socle de maintenance vu de face : petit piédestal de métal avec des voyants bleus, sur lequel on pose l\'objet du donjon.',
      'Une plaque de pression carrée encastrée dans le sol dallé, vue exactement du dessus : dalle de métal sombre bordée de pierre, un losange gravé au centre, lueur violette éteinte. Format carré.',
      'La même plaque enfoncée de quelques centimètres, le losange illuminé en cyan vif.']);
-  carte('d1', 'decors', 'Les Coulisses du serveur (sous-sol)', 'Le sous-sol de profil où repose le Mégaphone. Rien à voir avec le donjon.', ['decor-plaine', 'spirit-profil'],
+  carte('d1', 'donjons', 'Les Coulisses du serveur (sous-sol)', 'Le sous-sol de profil où repose le Mégaphone. Rien à voir avec le donjon.', ['decor-plaine', 'spirit-profil'],
     `Format paysage 16:9. Vue de profil, comme un jeu de plateforme en 2D : on voit le sol en bas, le plafond en haut, et les murs sur les côtés. Toon HD, contours épais. Rien ne doit ressembler au donjon de pierre : c'est la salle technique cachée du Réseau. Aucun personnage, aucun texte.`,
     ['Une salle technique étroite : baies de serveurs noires alignées au fond avec des voyants bleus et verts qui clignotent, gros câbles qui pendent du plafond, sol en grille métallique, une échelle de maintenance qui descend du plafond à gauche, lumière bleue froide. Le sol est plat et dégagé au premier plan sur toute la largeur, pour qu\'on puisse y marcher.']);
-  carte('d1', 'decors', 'Le Câble (passage souterrain)', 'Le couloir de profil qui mène à la salle isolée de la grande clé.', ['decor-plaine', 'spirit-profil'],
+  carte('d1', 'donjons', 'Le Câble (passage souterrain)', 'Le couloir de profil qui mène à la salle isolée de la grande clé.', ['decor-plaine', 'spirit-profil'],
     `Format paysage 16:9. Vue de profil, comme un jeu de plateforme en 2D. Toon HD, contours épais. Rien ne doit ressembler au donjon de pierre. Aucun personnage, aucun texte.`,
     ['Une longue gaine technique horizontale : parois tapissées d\'énormes câbles tressés noirs et bleus qui courent d\'un bout à l\'autre, passerelle métallique plate au premier plan sur toute la largeur, une échelle à chaque extrémité (une à gauche, une à droite) qui monte vers le plafond, petites lumières cyan tous les deux mètres.']);
 
@@ -285,7 +285,7 @@
   // ================================================================== RÉGIONS 2 à 8
   const REGIONS = [
     {
-      e: 'r2', nom: 'Forêt des Forums', donjon: 'Labyrinthe des Fils',
+      e: 'r2', cave: 'une vieille salle serveur oubliée, envahie par les racines de la forêt, câbles couverts de mousse, voyants verts', tunnel: 'un tunnel étroit creusé entre les racines, câbles tressés au plafond', mecas: ['Un mur fêlé vu de dessus, dans le thème du donjon : grande fissure en étoile.', "Le même mur après l'explosion : un trou rond et sombre au milieu, débris sur les bords.", 'Un interrupteur à câble au sol, éteint (prise débranchée).', 'Le même interrupteur branché, qui brille en cyan.', 'Un câble électrifié qui barre le sol, étincelles violettes (danger).'], nom: 'Forêt des Forums', donjon: 'Labyrinthe des Fils',
       monstres: [
         ['Sylvain corrompu', 'un arbre mort qui marche sur deux grosses racines en guise de jambes, écorce noire fendue de violet, deux yeux jaunes dans un creux du tronc, branches griffues en guise de bras', 'jambes'],
         ['Traqueur', 'un archer humanoïde encapuchonné, cape sombre en lambeaux, visage invisible dans l\'ombre sauf deux yeux jaunes, arc noir fissuré de violet', 'jambes', 'une flèche d\'ombre noire et violette, vue exactement de profil, pointe vers la droite, format paysage'],
@@ -304,7 +304,7 @@
       objets: ['Un Pétard Confettis : un gros pétard cylindrique bleu et rose à bandes, mèche courte, confettis peints dessus.', 'Le même pétard posé debout, mèche allumée avec une petite étincelle jaune.', 'Une explosion de confettis vue de dessus : un nuage rond de confettis multicolores et d\'étoiles blanches, sans flammes, sans fumée noire.', 'La Manette Pro : la Manette jointe en version améliorée, coque dorée et bleue, voyants cyan.', 'Un sac à pétards en toile bleue, rempli, cordon doré.'],
     },
     {
-      e: 'r3', nom: 'Monts Hardware', donjon: 'Forge Surchauffée',
+      e: 'r3', cave: 'une salle des machines sous la forge, chaudières rougeoyantes, tuyaux, passerelles de métal', tunnel: 'une conduite de ventilation géante, grilles au sol, souffle chaud orange', mecas: ['Un brasero de forge éteint, braises grises.', 'Le même brasero allumé, grande flamme orange.', 'Une grille de sol froide.', 'La même grille brûlante, rougeoyante (danger).', 'Un tapis roulant de forge, rouleaux et bande noire, vu de dessus.'], nom: 'Monts Hardware', donjon: 'Forge Surchauffée',
       monstres: [
         ['Golem de ferraille', 'un colosse fait de plaques de métal rouillé et de pièces d\'ordinateur boulonnées, gros poings, un seul œil jaune au centre du torse, fissures violettes', 'jambes'],
         ['Harpie de fer', 'une créature ailée aux ailes faites de lames de ventilateur en métal noir, serres acérées, masque de métal avec deux yeux jaunes', 'ailes'],
@@ -323,7 +323,7 @@
       objets: ['La Lanterne RGB : une lanterne de métal sombre dont la vitre brille en dégradé rouge, vert et bleu.', 'Le Micro Pro : un micro-tige de casque en métal chromé avec un liseré cyan, plus imposant que celui de Spirit.'],
     },
     {
-      e: 'r4', nom: 'Désert du Lag', donjon: 'Salle Obscure',
+      e: 'r4', cave: 'une réserve de bobines de film, étagères de boîtes rondes, lumière de projecteur poussiéreuse', tunnel: 'un couloir technique derrière l\'écran de cinéma, rideaux noirs, câbles', mecas: ['Une torche murale de cinéma éteinte.', 'La même torche allumée.', 'Un grand écran de projection encastré, éteint.', 'Le même écran allumé qui montre une flèche lumineuse (sans texte).', 'Un rideau de velours noir fermé qui bloque un passage.'], nom: 'Désert du Lag', donjon: 'Salle Obscure',
       monstres: [
         ['Spectre du Lag', 'une silhouette fantomatique qui flotte, faite de sable noir et de pixels qui se décalent, deux yeux jaunes, contours qui tremblent', 'flotte'],
         ['Ensablé', 'une créature enfouie dans le sable, carapace de pierre sombre, grande gueule sans dents visibles, yeux jaunes', 'sable'],
@@ -342,7 +342,7 @@
       objets: ['Le Câble Grappin : un pistolet-enrouleur de câble réseau bleu, crochet de métal au bout.', 'Le crochet du grappin seul, vu de profil, pointe vers la droite (projectile).'],
     },
     {
-      e: 'r5', nom: 'Lac des Streams', donjon: 'Arène Engloutie',
+      e: 'r5', cave: 'une salle des pompes à moitié inondée, gros tuyaux, vannes, eau qui ruisselle, lumière verte', tunnel: 'un tunnel aquatique, eau jusqu\'aux chevilles, parois de pierre bleu-vert', mecas: ['Une vanne à volant fermée.', 'La même vanne ouverte, eau qui jaillit.', "Une dalle de sol immergée sous une fine couche d'eau.", "Un courant d'eau vu de dessus, flèches d'écume qui indiquent le sens.", 'Une plateforme flottante carrée en bois.'], nom: 'Lac des Streams', donjon: 'Arène Engloutie',
       monstres: [
         ['Triton à trident', 'un guerrier aquatique à écailles noires et violettes, nageoires tranchantes, trident de métal noir, yeux jaunes', 'jambes'],
         ['Méduse électrique', 'une méduse sombre et translucide traversée d\'éclairs violets, longs filaments', 'flotte'],
@@ -361,7 +361,7 @@
       objets: ['La Planche Wi-Fi : une planche flottante blanche et bleue, trois arcs Wi-Fi cyan lumineux dessinés dessus.', 'Le Micro d\'Or : un micro-tige de casque en or brillant, liseré cyan.'],
     },
     {
-      e: 'r6', nom: 'Cité des Bulles', donjon: 'Bibliothèque des Bulles',
+      e: 'r6', cave: 'une réserve de livres, cartons empilés, étagères qui ploient, lampe suspendue', tunnel: 'un passage entre deux rayonnages géants, livres empilés au sol', mecas: ['Une dalle de sol intacte.', "La même dalle fissurée qui commence à s'effriter.", 'La même dalle effondrée : trou sombre (danger).', 'Une pile de livres géants qui bloque un passage (on la renverse avec les Baskets Turbo).', 'Un lutrin avec un gros livre ouvert (sans texte lisible).'], nom: 'Cité des Bulles', donjon: 'Bibliothèque des Bulles',
       monstres: [
         ['Ombre d\'encre', 'une flaque d\'encre noire qui se dresse en silhouette de monstre, gouttes qui tombent, yeux jaunes', 'rampe'],
         ['Gargouille', 'une gargouille de pierre sombre ailée, cornes, griffes, fissures violettes, yeux jaunes', 'ailes'],
@@ -380,7 +380,7 @@
       objets: ['Les Baskets Turbo : une paire de baskets bleues avec des éclairs cyan sur les côtés et des semelles lumineuses.'],
     },
     {
-      e: 'r7', nom: 'Marais Rétro', donjon: 'Château 8 bits',
+      e: 'r7', cave: 'l\'intérieur d\'une cartouche de jeu géante, circuits verts, puces noires, contacts dorés', tunnel: 'un tuyau vert géant couché, vu de l\'intérieur, rivets', mecas: ["Un bloc de métal lourd, gris, riveté (on le déplace avec l'Aimant).", 'Des pics de métal sortis du sol (danger).', 'Les mêmes pics rentrés dans le sol.', 'Un levier mural baissé.', 'Le même levier levé.'], nom: 'Marais Rétro', donjon: 'Château 8 bits',
       monstres: [
         ['Feu follet', 'une flamme bleu-violet flottante avec un visage de braise, yeux jaunes', 'flotte'],
         ['Sorcier des marais', 'un sorcier voûté en robe de mousse sombre, bâton tordu, masque de bois, yeux jaunes', 'jambes', 'une boule de vase verte et violette (projectile)'],
@@ -399,7 +399,7 @@
       objets: ['L\'Aimant : un gros aimant en fer à cheval rouge et bleu, pointes argentées, petits arcs d\'énergie cyan.'],
     },
     {
-      e: 'r8', nom: 'Toundra du Cloud', donjon: 'Archives Gelées',
+      e: 'r8', cave: 'une chambre froide de serveurs, baies givrées, stalactites, lumière bleue pâle', tunnel: 'un tunnel de glace, parois translucides, givre au sol', mecas: ['Un pan de mur normal, dans le thème du donjon.', 'Le même pan de mur vu avec les Lunettes de Vérif : translucide, contours cyan en pointillés (faux mur).', 'Une dalle de glace glissante vue de dessus.', "Un bloc de glace à pousser (il glisse jusqu'au mur).", "Une étagère d'archives prise dans la glace."], nom: 'Toundra du Cloud', donjon: 'Archives Gelées',
       monstres: [
         ['Chevalier de givre', 'un chevalier en armure de glace sombre, épée de glace, heaume fermé avec deux yeux jaunes, fissures violettes dans la glace', 'jambes'],
         ['Loup de glace', 'un loup spectral fait de glace translucide bleu nuit, fissures violettes, yeux jaunes', 'quadrupede'],
@@ -457,11 +457,16 @@
     carte(e, 'decors', `${R.nom} : éléments`, 'Les éléments posés sur les écrans de la région.', ['decor-plaine', 'arbre'], ELEM, R.decor);
     carte(e, 'decors', `${R.nom} : sols`, 'Les textures qui tapissent le sol.', ['sol-herbe'], SOL, R.sols);
     carte(e, 'decors', `${R.nom} : lieux`, 'L\'entrée du donjon et les endroits marquants.', ['entree', 'decor-plaine'], ELEM, R.lieux);
-    carte(e, 'decors', `${R.donjon} : la salle et ses portes`, 'La salle entière dessinée avec ses portes, puis la même avec les portes fermées de chaque façon. 5 étapes dans la même conversation ChatGPT, dans l\'ordre.', ['salle'],
+    carte(e, 'donjons', `${R.donjon} : la salle et ses portes`, 'La salle entière dessinée avec ses portes, puis la même avec les portes fermées de chaque façon. 5 étapes dans la même conversation ChatGPT, dans l\'ordre.', ['salle'],
       SALLE_PORTES(R.salle).split('\n\n').slice(1).join('\n\n'), ['Les quatre portes ouvertes.'], null, SUITES_PORTES);
-    carte(e, 'decors', `${R.donjon} : objets de salle`, 'Bloc à pousser, statue, lumière, pot et coffres, dans le thème du donjon.', ['bloc', 'statue', 'coffre'],
+    carte(e, 'donjons', `${R.donjon} : objets de salle`, 'Bloc à pousser, statue, lumière, pot et coffres, dans le thème du donjon.', ['bloc', 'statue', 'coffre'],
       ELEM + `\n\nThème du donjon : ${R.salle}`,
       ['Un bloc à pousser, taillé dans la même pierre que les murs de la salle.', 'Une statue gardienne menaçante sur socle.', `Une source de lumière : ${R.lumiere}.`, 'Un pot fermé qu\'on peut casser.', 'Un coffre fermé.', 'Le même coffre ouvert, vide.']);
+    carte(e, 'donjons', `${R.donjon} : mécanismes`, 'Les éléments d\'énigme propres à ce donjon, avec leurs deux états quand ils changent.', ['salle', 'bloc', 'statue'],
+      ELEM + `\n\nThème du donjon : ${R.salle}`, R.mecas);
+    carte(e, 'donjons', `${R.donjon} : sous-sols`, 'La cave où repose l\'objet du donjon, et le passage souterrain. Vus de profil, rien à voir avec le donjon.', ['decor-plaine', 'spirit-profil'],
+      `Format paysage 16:9. Vue de profil, comme un jeu de plateforme en 2D : sol en bas, plafond en haut, murs sur les côtés. Toon HD, contours épais. Rien ne doit ressembler aux salles du donjon. Le sol est plat et dégagé au premier plan sur toute la largeur. Aucun personnage, aucun texte.`,
+      [`La cave de l'objet : ${R.cave}. Une échelle descend du plafond à gauche, un socle vide au centre.`, `Le passage souterrain : ${R.tunnel}. Une échelle à chaque extrémité.`]);
     // Spirit et son nouvel objet
     const [snom, sdesc, sf, sd, sp] = R.spirit;
     carte(e, 'perso', snom, `Le nouveau mouvement de Spirit avec l'objet du ${R.donjon}.`, RS,
@@ -477,8 +482,16 @@
      'Le Roi Clickbait qui attaque : bras levés, des dizaines de petites fenêtres pub qui jaillissent autour de lui.',
      'Le Roi Clickbait, deuxième phase : deux fois plus gros, fissures violettes partout, couronne brisée, une bouche immense.',
      'Buzz : ce qui reste du Roi une fois dégonflé, un petit lutin tout rond et un peu triste, couronne de travers, yeux jaunes humides. Il n\'a plus rien de menaçant.']);
-  carte('fin', 'decors', 'La Tour du Clickbait', 'Le dernier donjon.', ['salle'],
-    salleVide('le sommet d\'une tour de néon violet et de métal noir, murs couverts de fenêtres publicitaires éteintes, sol de dalles noires brillantes, lueurs violettes et roses.'), ['La salle vide, murs continus sans porte.']);
+  const TOUR = 'une tour de néon violet et de métal noir, murs couverts de fenêtres publicitaires éteintes, sol de dalles noires brillantes, lueurs violettes et roses.';
+  carte('fin', 'donjons', 'La Tour du Clickbait : la salle et ses portes', 'Le dernier donjon, en 5 étapes dans la même conversation ChatGPT.', ['salle'],
+    SALLE_PORTES(TOUR).split('\n\n').slice(1).join('\n\n'), ['Les quatre portes ouvertes.'], null, SUITES_PORTES);
+  carte('fin', 'donjons', 'La Tour du Clickbait : objets et pièges', 'Ce qui meuble les salles de la tour.', ['bloc', 'statue', 'coffre'],
+    ELEM + `\n\nThème : ${TOUR}`,
+    ['Un bloc à pousser en métal noir strié de néon.', 'Une statue du Roi Clickbait en miniature, sur socle.', 'Un néon sur pied qui éclaire en violet.', 'Un coffre noir et violet fermé.', 'Le même coffre ouvert, vide.', 'Un panneau publicitaire au sol qui clignote (piège), sans texte.']);
+  carte('fin', 'donjons', 'La salle du trône', 'Là où tu affrontes le Roi Clickbait.', ['salle', 'reine'],
+    salleVide('la salle du trône au sommet de la tour : un trône immense fait d\'écrans empilés contre le mur du haut, tapis violet jusqu\'au centre, grandes baies ouvertes sur un ciel d\'orage violet.'), ['La salle du trône, sans personnage.']);
+  carte('fin', 'ennemis', 'Sbires d\'élite de la tour', 'Les versions renforcées des sbires, pour la dernière ligne droite.', ['popup', 'clic'], SBIRE,
+    ['Le Pop-up d\'élite : la fenêtre corrompue en version dorée et noire, plus grande, couronnée de petites pointes.', 'Le Clic d\'élite : le curseur en métal noir et or, deux fois plus grand, lames sur les jambes.', 'Le Troll d\'élite : un Trollinet en armure de néon violet.']);
   carte('fin', 'decors', 'Le Cratère du Clickbait', 'Les abords de la tour.', ['decor-plaine', 'entree'], ELEM,
     ['L\'entrée de la Tour du Clickbait : une tour de néon violet et de métal noir qui s\'élance vers le ciel, porte gigantesque, vue de face plongeante, large de 4 cases.', 'Un rocher noir volcanique veiné de violet.', 'Une fenêtre pub géante plantée dans le sol, écran fissuré, sans texte.', 'Une coulée de rumeur violette au sol (danger).']);
   carte('fin', 'interface', 'Écran de fin', 'L\'illustration qui clôt l\'aventure.', ['titre', 'spirit-officiel', 'flash'],
@@ -486,8 +499,8 @@
     ['Spirit au centre, bras levés, tenant la Source reconstituée qui brille en blanc et cyan. Autour de lui les huit Gardiens (un hibou, une tortue, un renard robot, un fennec, une loutre, un calamar, une grenouille, un mammouth) qui applaudissent, devant le QG illuminé, feu d\'artifice bleu dans le ciel du soir. Buzz, le petit lutin, dans un coin, timide.']);
 
   // ------------------------------------------------------------------ affichage
-  const ETAPES = [['tout', 'Tout'], ['pro', 'Prologue'], ['d1', 'Donjon 1'], ['qg', 'Parvis du QG'], ['r2', 'Forêt des Forums'], ['r3', 'Monts Hardware'], ['r4', 'Désert du Lag'], ['r5', 'Lac des Streams'], ['r6', 'Cité des Bulles'], ['r7', 'Marais Rétro'], ['r8', 'Toundra du Cloud'], ['fin', 'Final']];
-  const CATS = [['tout', 'Tout'], ['perso', 'Spirit'], ['objets', 'Objets'], ['ennemis', 'Ennemis'], ['boss', 'Boss'], ['pnj', 'Gardiens et habitants'], ['decors', 'Décors'], ['interface', 'Interface']];
+  const ETAPES = [['tout', 'Tout'], ['pro', 'Prologue'], ['d1', 'Donjon 1'], ['qg', 'Parvis du QG'], ['r2', 'Forêt + Donjon 2'], ['r3', 'Monts + Donjon 3'], ['r4', 'Désert + Donjon 4'], ['r5', 'Lac + Donjon 5'], ['r6', 'Cité + Donjon 6'], ['r7', 'Marais + Donjon 7'], ['r8', 'Toundra + Donjon 8'], ['fin', 'Tour finale']];
+  const CATS = [['tout', 'Tout'], ['perso', 'Spirit'], ['objets', 'Objets'], ['ennemis', 'Ennemis'], ['boss', 'Boss'], ['pnj', 'Gardiens et habitants'], ['donjons', 'Donjons'], ['decors', 'Décors extérieurs'], ['interface', 'Interface']];
   const lire = (k, d) => { try { const v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); } catch (e) { return d; } };
   const ecrire = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} };
   let etape = lire('cat-etape', 'd1'), cat = lire('cat-cat', 'tout');
