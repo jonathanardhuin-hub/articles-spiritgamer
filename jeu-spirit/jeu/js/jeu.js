@@ -728,7 +728,7 @@ SG.Jeu = class {
           case 'E': im = I['falaise-grotte']; dy = 2; retourne = false; break;
           case 'D': im = I['entree-terrier'] && I['entree-terrier'].width ? I['entree-terrier'] : I['falaise-grotte']; dy = 2; retourne = false; break;
           case 'X': liste.push({ y, dessiner: (ctx) => SG.dessinCristal(ctx, x, y, this.barriere, this.t) }); break;
-          case 'G': liste.push({ y: y + 1, dessiner: (ctx) => SG.dessinBarriere(ctx, x, y, this.t) }); break;
+          case 'G': liste.push({ y: y + 30, dessiner: (ctx) => SG.dessinBarriere(ctx, x, y, this.t) }); break;
         }
         if (im) {
           const r = ch === 'T' || ch === 'S' ? 58 : ch === 'M' ? 70 : ch === 'E' ? 0 : 30;
@@ -935,14 +935,16 @@ SG.Jeu = class {
     let tx = x + 50;
     if (qui) {
       const parle = d.car < texte.length && Math.floor(this.t * 8) % 2 === 0;
-      const im = qui === 'spirit' ? SG.img[parle ? 'portrait-spirit-parle' : 'portrait-spirit'] : SG.img['portrait-ermite'];
+      const portraits = { spirit: parle ? 'portrait-spirit-parle' : 'portrait-spirit', ermite: 'portrait-ermite', flash: 'portrait-flash' };
+      const im = SG.img[portraits[qui]];
       const px = x + 22, py = y - 62, pw = 214, ph = 214;
       SG.cadre(ctx, SG.img['ui-portrait'], px, py, pw, ph, 200, 38);
       ctx.save();
       ctx.beginPath(); ctx.roundRect(px + 26, py + 26, pw - 52, ph - 52, 10); ctx.clip();
-      SG.dessinerPied(ctx, im, px + pw / 2, py + ph - 20, { echelle: 0.8 });
+      if (im && im.width) SG.dessinerPied(ctx, im, px + pw / 2, py + ph - 20, { echelle: 0.8 });
+      else if (qui === 'flash') { ctx.translate(px + pw / 2, py + ph / 2 + 60); ctx.scale(1.3, 1.3); new SG.Flash(0, 0).dessiner(ctx); }
       ctx.restore();
-      SG.texte(ctx, qui === 'spirit' ? 'Spirit' : 'L\'ermite', x + 262, y + 58, 30, '#7fe8ff', 'left', null, null, true);
+      SG.texte(ctx, { spirit: 'Spirit', ermite: 'L\'ermite', flash: 'Flash' }[qui], x + 262, y + 58, 30, '#7fe8ff', 'left', null, null, true);
       tx = x + 262;
     }
     SG.texteMultiligne(ctx, texte.slice(0, Math.floor(d.car)), tx, y + (qui ? 100 : 76), w - (tx - x) - 60, 28, 36, '#ffffff');

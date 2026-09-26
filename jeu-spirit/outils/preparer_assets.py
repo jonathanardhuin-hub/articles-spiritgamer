@@ -88,8 +88,36 @@ LISTE = {
     'logo': ('interface/logo.png', 'w', 780, ''),
 }
 
+# images du donjon 1 : prises en compte dès qu'elles sont déposées dans images/donjon1/
+FACULTATIVES = {
+    'popup': ('donjon1/popup.png', 'w', 76, ''),
+    'spamling': ('donjon1/spamling.png', 'w', 64, ''),
+    'clic': ('donjon1/clic.png', 'h', 76, ''),
+    'reine': ('donjon1/reine.png', 'w', 250, ''),
+    'bloc': ('donjon1/bloc.png', 'w', 80, ''),
+    'statue': ('donjon1/statue.png', 'w', 76, ''),
+    'brasero': ('donjon1/brasero.png', 'w', 64, ''),
+    'pot': ('donjon1/pot.png', 'w', 56, ''),
+    'coffre': ('donjon1/coffre.png', 'w', 78, ''),
+    'coffre-ouvert': ('donjon1/coffre-ouvert.png', 'w', 78, ''),
+    'cristal': ('donjon1/cristal.png', 'h', 96, ''),
+    'cristal-actif': ('donjon1/cristal-actif.png', 'h', 96, ''),
+    'entree-terrier': ('donjon1/entree-terrier.png', 'w', 400, ''),
+    'manette': ('donjon1/manette.png', 'w', 70, ''),
+    'cle': ('donjon1/cle.png', 'w', 60, ''),
+    'cle-boss': ('donjon1/cle-boss.png', 'w', 70, ''),
+    'carte-donjon': ('donjon1/carte-donjon.png', 'w', 70, ''),
+    'boussole': ('donjon1/boussole.png', 'w', 64, ''),
+    'source': ('donjon1/source.png', 'w', 64, ''),
+    'flash': ('donjon1/flash.png', 'h', 120, ''),
+    'portrait-flash': ('donjon1/portrait-flash.png', 'h', 200, ''),
+}
+
 def main():
     os.makedirs(SORTIE, exist_ok=True)
+    for nom, info in FACULTATIVES.items():
+        if os.path.exists(os.path.join(IMG, info[0])):
+            LISTE[nom] = info
     for nom, (src, axe, taille, opt) in LISTE.items():
         im = Image.open(os.path.join(IMG, src)).convert('RGBA')
         if opt == 'bouche':
@@ -122,6 +150,10 @@ def main():
     # illustration de l'écran titre
     t = Image.open(os.path.join(IMG, 'interface/titre-fond.webp')).convert('RGB')
     t.resize((1600, 900), Image.LANCZOS).save(os.path.join(SORTIE, 'titre-fond.webp'), 'WEBP', quality=85, method=6)
+    # salle de donjon : image plein écran (facultative)
+    sd = os.path.join(IMG, 'donjon1/salle-donjon.webp')
+    if os.path.exists(sd):
+        Image.open(sd).convert('RGB').resize((1600, 900), Image.LANCZOS).save(os.path.join(SORTIE, 'salle-donjon.webp'), 'WEBP', quality=85, method=6)
     # la grotte : image plein écran
     g = Image.open(os.path.join(IMG, 'decor/grotte-interieur.webp')).convert('RGB')
     g.resize((1600, 900), Image.LANCZOS).save(os.path.join(SORTIE, 'grotte.webp'), 'WEBP', quality=85, method=6)
