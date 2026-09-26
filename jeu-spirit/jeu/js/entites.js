@@ -490,7 +490,8 @@ SG.Projectile = class {
     // les projectiles passent au-dessus de l'eau et des herbes, mais pas des obstacles hauts
     // l'onde lointaine coupe herbes et buissons sur son passage (un buisson l'arrête)
     if (this.ami) jeu.couperDecor(this.boite());
-    if (this.ami && jeu.toucherCristalEn(this.x, this.y + 30)) { this.fini = true; jeu.effets.push(new SG.Eclat(this.x, this.y)); return; }
+    // les cristaux ne réagissent qu'à la Manette (et à l'onde proche), pas à l'onde lointaine
+    if (this.ami && !(this instanceof SG.OndeLointaine) && jeu.toucherCristalEn(this.x, this.y + 30)) { this.fini = true; jeu.effets.push(new SG.Eclat(this.x, this.y)); return; }
     if (jeu.obstacleHaut(this.x, this.y + 30)) { this.fini = true; this.quandBloque(jeu); return; }
     if (this.ami) {
       for (const m of jeu.monstres) {
