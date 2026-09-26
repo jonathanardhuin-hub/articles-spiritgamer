@@ -800,7 +800,7 @@ SG.Jeu = class {
     // taches : chemin et eau, en blocs arrondis soudés entre eux
     const tache = (car, contour, fond, clair, texture) => {
       const cases = [];
-      const egal = (ch) => ch === car || (car === ':' && (ch === 'G' || ch === 'D'));
+      const egal = (ch) => ch === car || (car === ':' && (ch === 'G' || ch === 'D')) || (car === '~' && ch === 'X');
       for (let r = 0; r < SG.ROWS; r++) for (let c = 0; c < SG.COLS; c++) if (egal(e.carte[r][c])) cases.push([c, r]);
       const est = (c, r) => {
         if (c < 0 || c >= SG.COLS || r < 0 || r >= SG.ROWS) {

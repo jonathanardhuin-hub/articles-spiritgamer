@@ -889,8 +889,12 @@ SG.dessinPorte = function (ctx, dir, p, ouverte, volets) {
   const type = p.type;
   const t = performance.now() / 1000;
   ctx.save();
-  const nom = (volets || type === 'o' || type.startsWith('enigme') || type === 'sortie') ? 'grille' : type === 'boss' ? 'porte-boss' : 'porte-cle';
+  let nom = (volets || type === 'o' || type.startsWith('enigme') || type === 'sortie') ? 'grille' : type === 'boss' ? 'porte-boss' : 'porte-cle';
+  let filtre = null;
+  // porte du boss : la porte à clé teintée de violet, tant qu'il n'y a pas d'image dédiée
+  if (nom === 'porte-boss' && !(SG.img['porte-boss'] && SG.img['porte-boss'].width)) { nom = 'porte-cle'; filtre = 'grayscale(0.5) brightness(0.5) contrast(1.3)'; }
   const im = SG.img[nom];
+  if (filtre) ctx.filter = filtre;
   if (im && im.width) {
     ctx.translate(r.x + r.w / 2, r.y + r.h / 2);
     const rot = { haut: 0, bas: Math.PI, gauche: -Math.PI / 2, droite: Math.PI / 2 }[dir];
@@ -898,6 +902,22 @@ SG.dessinPorte = function (ctx, dir, p, ouverte, volets) {
     const w = dir === 'haut' || dir === 'bas' ? r.w : r.h, h = dir === 'haut' || dir === 'bas' ? r.h : r.w;
     ctx.drawImage(im, -w / 2, -h / 2, w, h);
     ctx.restore();
+    if (type === 'boss') {
+      // porte du boss : bois noirci, lueur violette, gemme et grande serrure dorée
+      ctx.save();
+      ctx.globalCompositeOperation = 'lighter';
+      ctx.strokeStyle = `rgba(190,90,255,${0.55 + Math.sin(t * 3) * 0.2})`; ctx.lineWidth = 5;
+      ctx.shadowColor = '#b04dff'; ctx.shadowBlur = 16;
+      ctx.strokeRect(r.x + 4, r.y + 4, r.w - 8, r.h - 8);
+      ctx.restore();
+      const cx = r.x + r.w / 2, cy = r.y + r.h / 2;
+      ctx.save();
+      ctx.fillStyle = '#ffd23a'; ctx.strokeStyle = '#1a1000'; ctx.lineWidth = 3;
+      ctx.beginPath(); ctx.moveTo(cx, cy - 30); ctx.lineTo(cx + 24, cy); ctx.lineTo(cx, cy + 30); ctx.lineTo(cx - 24, cy); ctx.closePath(); ctx.fill(); ctx.stroke();
+      ctx.fillStyle = '#9b30ff'; ctx.beginPath(); ctx.moveTo(cx, cy - 16); ctx.lineTo(cx + 12, cy); ctx.lineTo(cx, cy + 16); ctx.lineTo(cx - 12, cy); ctx.closePath(); ctx.fill();
+      ctx.restore();
+      SG.dessinerIcone(ctx, 'cleBoss', cx + 64, cy + 28, 36);
+    }
   } else if (nom === 'grille') {
     // grille de fer épaisse, lueur violette
     ctx.fillStyle = 'rgba(10,5,20,0.85)'; ctx.fillRect(r.x, r.y, r.w, r.h);
