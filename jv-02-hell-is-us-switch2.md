@@ -4,7 +4,7 @@
 
 ## Du 24 septembre au 27 octobre
 
-Petit rappel du parcours. Hell Is Us est sorti en septembre 2025 sur PS5, Xbox Series X|S et PC. Le portage Switch 2 était d'abord prévu pour le 24 septembre 2026, soit ce jeudi. Il avait déjà glissé au 8 octobre, les développeurs expliquant alors vouloir éviter une fenêtre de sortie « très chargée ». Vu le mois de septembre qu'on vient de vivre, difficile de leur donner tort.
+Petit rappel du parcours. Hell Is Us est sorti en septembre 2025 sur PS5, Xbox Series X|S et PC. Le portage Switch 2 était d'abord prévu pour le jeudi 24 septembre 2026, il y a deux jours. Il avait déjà glissé au 8 octobre, les développeurs expliquant alors vouloir éviter une fenêtre de sortie « très chargée ». Vu le mois de septembre qu'on vient de vivre, difficile de leur donner tort.
 
 Nouveau décalage annoncé le 25 septembre : ce sera finalement le 27 octobre, soit dix-neuf jours plus tard. Cette fois, le motif est différent. Rogue Factor évoque des « problèmes logistiques et de distribution qui échappent à [son] contrôle ». Le studio insiste sur un point : le portage est « solide et stable », et le report n'a rien à voir avec la technique.
 
@@ -32,6 +32,4 @@ Nacon n'a pas précisé la nature exacte des soucis de distribution. On peut sup
 ---
 
 **Sources**
-- Worthplaying, « Hell Is Us Major Update And Nintendo Switch 2 Launch Delayed Until Late October », 25 septembre 2026
-- Shacknews, « Hell is Us delays Switch 2 version and first major update to October 27 », 25 septembre 2026
-- SpiritGamer, « Les jeux du catalogue PlayStation Plus d'août 2026 », août 2026
+- Rogue Factor et Nacon, communiqué officiel annonçant le report de la version Switch 2 et de la mise à jour au 27 octobre, 25 septembre 2026

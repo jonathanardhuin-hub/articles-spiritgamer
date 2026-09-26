@@ -1,6 +1,6 @@
 # Eldrem Kingdoms : des anciens d'Assassin's Creed veulent vous faire élever des dragons
 
-**Un studio fondé par des vétérans d'Ubisoft a présenté le 25 septembre Eldrem Kingdoms, un RPG solo centré sur des créatures à capturer, élever et chevaucher. Le jeu vise un accès anticipé sur Steam en 2027. Sa campagne Kickstarter, lancée le même jour, a atteint son objectif en cinq heures.**
+**Un studio indépendant de Bucarest, fondé par des vétérans d'Ubisoft, a présenté le 25 septembre Eldrem Kingdoms, un RPG solo centré sur des créatures à capturer, élever et chevaucher. Le jeu vise un accès anticipé sur Steam en 2027. Sa campagne Kickstarter, lancée le même jour, a atteint son objectif en cinq heures.**
 
 ## Un pitch qui ne fait pas dans la demi-mesure
 
@@ -37,5 +37,5 @@ Reste la prudence de rigueur. Accès anticipé en 2027, Kickstarter pour les fon
 ---
 
 **Sources**
-- Simulation Daily, « Today in Gaming News: September 25, 2026 », 25 septembre 2026
-- Kickstarter, page officielle de la campagne Eldrem Kingdoms (lancée le 25 septembre 2026)
+- Eldrem Studios, communiqué « Tame, Breed, Conquer: Ubisoft Veterans Team Up for New Creature Collecting RPG Eldrem Kingdoms » (diffusé par Griffiths PR), 25 septembre 2026
+- Kickstarter, page officielle de la campagne Eldrem Kingdoms, lancée le 25 septembre 2026

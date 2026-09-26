@@ -31,6 +31,4 @@ Rendez-vous mardi pour les images. Si le dossier tient ses promesses sur la mét
 ---
 
 **Sources**
-- Game Informer, « Cover Reveal: Grand Theft Auto VI », 25 septembre 2026
-- Aroged, « GTA 6 appears on the cover of the new issue of Game Informer », 25 septembre 2026
-- SpiritGamer, fiche GTA VI (date de sortie et plateformes), septembre 2026
+- Game Informer (détenteur de l'exclusivité), « Cover Reveal: Grand Theft Auto VI », 25 septembre 2026

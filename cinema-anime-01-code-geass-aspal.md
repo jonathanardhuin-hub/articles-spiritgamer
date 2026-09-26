@@ -1,6 +1,6 @@
 # Code Geass : Star Chaser Aspal montre ses premières images, des archers face à un mecha
 
-**Sunrise a mis en ligne le premier teaser de Code Geass : Star Chaser Aspal, la nouvelle série TV prévue pour 2027. Pas de Lelouch, pas de Britannia en vue : les premières images montrent une société à la technologie quasi médiévale confrontée à un robot géant. Kazuya Nomura dirige ce projet entièrement original, pensé pour les 20 ans de la licence.**
+**La production a mis en ligne le premier teaser de Code Geass : Star Chaser Aspal, la nouvelle série TV prévue pour 2027. Pas de Lelouch, pas de Britannia en vue : les premières images montrent une société à la technologie quasi médiévale confrontée à un robot géant. Kazuya Nomura dirige ce projet entièrement original, pensé pour les 20 ans de la licence.**
 
 ## Un teaser qui prend ses distances
 
@@ -33,7 +33,5 @@ C'est aussi un pari. Code Geass a toujours tenu par son héros et son univers po
 ---
 
 **Sources**
-- Anime News Network, « New Code Geass Star Chaser Aspal Anime Reveals Teaser Trailer, 2027 Premiere », 25 septembre 2026
-- AniTrendz, « Code Geass: Star Chaser Aspal Teaser Reveals Historical-Like Setting, 2027 Debut », 25 septembre 2026
-- Crunchyroll News, « Code Geass: Star Chaser Aspal Anime Unveils 2027 Launch, Teaser Trailer », 26 septembre 2026
-- Final Weapon, « Code Geass Star Chaser Aspal Anime Announced for 2027 Premiere », 25 septembre 2026
+- Chaîne YouTube officielle Code Geass, premier teaser de Code Geass : Star Chaser Aspal, 26 septembre 2026 (heure japonaise)
+- Sunrise et Bandai Namco Filmworks, annonce officielle du staff et de la fenêtre de diffusion 2027, 26 septembre 2026 (heure japonaise)
