@@ -14,6 +14,10 @@ Il doit parcourir le Réseau, libérer les huit Gardiens, rassembler les fragmen
 
 **Fin** : vaincu, le Roi Clickbait se dégonfle. Il n'en reste qu'un petit lutin, Buzz, qui voulait seulement qu'on le lise. La rédaction l'accueille comme stagiaire, à condition qu'il apprenne à vérifier ses sources.
 
+## Spirit
+
+Petit personnage blanc à grosse tête ronde, grands yeux bleus, casque-micro noir et bleu marqué « SG », tee-shirt bleu avec le logo SG, short bleu, baskets bleues. Style cartoon esport à contours noirs épais. Référence officielle : `images/sources/00-spirit-mascotte-officielle.webp`. Fiche des quatre vues : `images/sources/01-spirit-fiche-reference.webp`.
+
 ## Règles du monde
 
 - **Attaque** : Spirit lance une onde sonore avec son micro, à courte portée. Quand ses cœurs sont pleins, l'onde part plus loin (comme le rayon de l'épée dans Zelda). Le micro s'améliore deux fois : Micro Pro, puis Micro d'Or.
