@@ -69,7 +69,8 @@ Comme dans le Zelda NES, une même créature peut revenir dans une autre couleur
 ## Choix techniques
 
 - JavaScript et canvas HTML5, sans moteur externe. Un dossier de fichiers statiques à déposer sur l'hébergement du site.
-- Vue de dessus, un écran à la fois, cases de 32 × 32 pixels.
+- Vue de dessus, un écran à la fois, comme les Zelda en 2D, mais avec un graphisme actuel : dessins cartoon en haute définition, lissés, sans effet pixel. Écran logique de 1280 × 720, cases de 80 × 80 pixels, Spirit haut d'environ 130 pixels.
+- Sol (herbe, chemins, eau, sable) dessiné dans le code dans le même style cartoon ; objets, personnages et ennemis générés avec ChatGPT.
 - Téléphone à l'horizontale : joystick virtuel à gauche, boutons A (attaque, action) et B (objet équipé) à droite, bouton menu. Clavier sur ordinateur.
 - Musique et bruitages générés dans le code.
 - Sauvegarde automatique dans le navigateur.
