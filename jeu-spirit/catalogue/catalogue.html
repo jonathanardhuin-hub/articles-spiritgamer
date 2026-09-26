@@ -168,7 +168,7 @@
   const cartes = [];
   let numero = {};
   function carte(etape, cat, titre, pourquoi, refs, style, items, note, suites) {
-    const code = { d1: 'D1', qg: 'QG', r2: 'R2', r3: 'R3', r4: 'R4', r5: 'R5', r6: 'R6', r7: 'R7', r8: 'R8', fin: 'FIN' }[etape];
+    const code = { pro: 'PRO', d1: 'D1', qg: 'QG', r2: 'R2', r3: 'R3', r4: 'R4', r5: 'R5', r6: 'R6', r7: 'R7', r8: 'R8', fin: 'FIN' }[etape];
     numero[code] = (numero[code] || 0) + 1;
     const n = items.length;
     const liste = n === 1 ? items[0] : items.map((x, i) => `${i + 1}) ${x}`).join('\n');
@@ -179,6 +179,29 @@
   }
   const P3 = (a, b, c) => [`de face : ${a}`, `de dos : ${b}`, `de profil (tourné vers la droite) : ${c}`];
   const RS = ['spirit-officiel', 'spirit-face', 'spirit-dos', 'spirit-profil'];
+
+  // ================================================================== PROLOGUE : avant que Spirit arrive dans le Réseau
+  const ILLU = `Format paysage 16:9. Illustration de cinématique, même rendu que l'écran titre joint : toon HD, contours épais, couleurs riches, lumière travaillée. Aucun texte, aucun logo à part le SG sur Spirit.`;
+  carte('pro', 'interface', 'Les images de l\'introduction', 'Les 6 tableaux qui défilent pendant l\'histoire du début, un par phrase.', ['titre', 'spirit-officiel', 'reine'],
+    ILLU,
+    ['La fête des 11 ans : la grande place devant le QG, la nuit, guirlandes bleues, écrans géants, une foule de petits personnages animaux qui dansent, au centre une grande sphère de lumière blanche et cyan (la Source) qui flotte au-dessus d\'une fontaine.',
+     'L\'irruption : au milieu de la foule, une fenêtre publicitaire géante s\'ouvre dans le ciel, rouge et violette, et le Roi Clickbait en sort (créature gonflée faite de fenêtres pub empilées, couronne de néon violet, grand sourire, yeux jaunes). La foule recule, effrayée.',
+     'La Source brisée : la sphère de lumière éclate en huit fragments lumineux qui s\'envolent dans huit directions, le Roi Clickbait bras levés au premier plan, en contre-jour.',
+     'Le Bruit prend corps : la place déserte et sombre, des silhouettes de monstres de pierre sombre aux fissures violettes et aux yeux jaunes surgissent des écrans cassés.',
+     'Pendant ce temps, dans une petite loge cachée derrière la scène : Spirit dort sur un vieux canapé, son casque sur les oreilles, une console posée sur le ventre, lumière douce d\'écran. Il n\'entend rien.',
+     'Le réveil : Spirit assis sur le canapé, la main sur le casque, l\'air étonné, une petite onde cyan qui sort du micro comme un signal qu\'il capte.']);
+  carte('pro', 'decors', 'La loge de Spirit (où il vit)', 'La première salle jouable : là où Spirit se réveille, avant de partir dans le Réseau.', ['salle', 'decor-plaine'],
+    `Format paysage 16:9. Une pièce vue de dessus comme dans les Zelda en 2D, murs tout autour avec le même cadrage que la salle jointe (un neuvième de la hauteur en haut et en bas, un seizième de la largeur sur les côtés), une porte au milieu du mur du bas. Toon HD, contours épais, ambiance chaleureuse et un peu en désordre. Aucun personnage, aucun texte.`,
+    ['La loge de Spirit derrière la scène du QG : parquet, tapis bleu rond au centre, murs bleu nuit avec des affiches de jeux sans texte, lumière douce. Le long des murs seulement (le centre reste dégagé pour marcher) : un vieux canapé gris en haut à gauche, un bureau avec trois écrans et une chaise gamer en haut à droite, une étagère pleine de consoles et de figurines à droite, un mini-frigo, un carton de pizza vide.']);
+  carte('pro', 'decors', 'Le passage vers le Réseau', 'Ce que Spirit traverse en quittant sa loge pour arriver dans la Plaine.', ['salle', 'titre'],
+    ELEM,
+    ['Une porte de loge en bois bleu nuit, entrouverte, un filet de lumière cyan qui passe dessous.',
+     'Un portail lumineux vu de face : une fenêtre de lumière cyan et blanche aux bords qui scintillent, comme une page qui s\'ouvre, assez grande pour que Spirit la traverse.']);
+  carte('pro', 'perso', 'Spirit endormi et réveillé', 'Pour la scène jouable du réveil dans la loge.', RS,
+    `${SPIRIT}\n\n${FOND_P}`,
+    ['Spirit endormi, allongé sur le dos vu du dessus légèrement plongeant, bras pendant, bouche entrouverte, une petite bulle de sommeil (sans lettres Z), casque sur les oreilles.',
+     'Spirit assis vu de face, qui s\'étire, bras levés, yeux mi-clos, bâillement.',
+     'Spirit debout vu de face, la main sur l\'écouteur de son casque, sourcils levés, comme s\'il entendait un signal lointain.']);
 
   // ================================================================== DONJON 1 (maintenant)
   carte('d1', 'perso', 'Spirit lance la Manette', 'La pose du lancer, pour quand tu utilises la Manette Retour avec B.', RS.concat('manette'),
@@ -463,7 +486,7 @@
     ['Spirit au centre, bras levés, tenant la Source reconstituée qui brille en blanc et cyan. Autour de lui les huit Gardiens (un hibou, une tortue, un renard robot, un fennec, une loutre, un calamar, une grenouille, un mammouth) qui applaudissent, devant le QG illuminé, feu d\'artifice bleu dans le ciel du soir. Buzz, le petit lutin, dans un coin, timide.']);
 
   // ------------------------------------------------------------------ affichage
-  const ETAPES = [['tout', 'Tout'], ['d1', 'Donjon 1'], ['qg', 'Parvis du QG'], ['r2', 'Forêt des Forums'], ['r3', 'Monts Hardware'], ['r4', 'Désert du Lag'], ['r5', 'Lac des Streams'], ['r6', 'Cité des Bulles'], ['r7', 'Marais Rétro'], ['r8', 'Toundra du Cloud'], ['fin', 'Final']];
+  const ETAPES = [['tout', 'Tout'], ['pro', 'Prologue'], ['d1', 'Donjon 1'], ['qg', 'Parvis du QG'], ['r2', 'Forêt des Forums'], ['r3', 'Monts Hardware'], ['r4', 'Désert du Lag'], ['r5', 'Lac des Streams'], ['r6', 'Cité des Bulles'], ['r7', 'Marais Rétro'], ['r8', 'Toundra du Cloud'], ['fin', 'Final']];
   const CATS = [['tout', 'Tout'], ['perso', 'Spirit'], ['objets', 'Objets'], ['ennemis', 'Ennemis'], ['boss', 'Boss'], ['pnj', 'Gardiens et habitants'], ['decors', 'Décors'], ['interface', 'Interface']];
   const lire = (k, d) => { try { const v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); } catch (e) { return d; } };
   const ecrire = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} };
