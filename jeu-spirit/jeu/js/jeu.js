@@ -338,6 +338,7 @@ SG.Jeu = class {
       case 'dialogue': this.majFeux(dt); this.majDialogue(dt, C, clics); break;
       case 'objet': this.majFeux(dt); this.objet.t += dt; if (this.objet.t > 0.8) this.majDialogue(dt, C, clics); break;
       case 'pause': this.majPause(C, clics); break;
+      case 'carte': if (C.appuis.carte || C.appuis.menu || C.appuis.A || C.appuis.B || clics.length) { SG.Son.effet('choix'); this.etat = 'jeu'; } break;
       case 'transition': this.majTransition(dt); break;
       case 'finPartie': this.majFin(dt, C, clics); break;
     }
@@ -345,7 +346,8 @@ SG.Jeu = class {
 
   majJeu(dt, C) {
     const s = this.spirit;
-    if (C.appuis.menu) { this.etat = 'pause'; this.menuChoix = 0; return; }
+    if (C.appuis.menu) { this.etat = 'pause'; this.menuChoix = 0; SG.Son.effet('choix'); return; }
+    if (C.appuis.carte) { this.etat = 'carte'; SG.Son.effet('choix'); return; }
     if (C.appuis.A) {
       if (!this.parler()) {
         if (this.ampli) s.attaquer(this);
@@ -476,16 +478,18 @@ SG.Jeu = class {
   }
 
   majPause(C, clics) {
-    const opts = ['Reprendre', SG.Son.muet ? 'Activer le son' : 'Couper le son', 'Plein écran', 'Retour au titre'];
-    const zones = opts.map((_, i) => ({ x: 860, y: 190 + i * 88 - 34, w: 330, h: 68 }));
+    const opts = ['Reprendre', 'Carte', SG.Son.muet ? 'Activer le son' : 'Couper le son', 'Plein écran', 'Retour au titre'];
+    const zones = opts.map((_, i) => ({ x: 860, y: 170 + i * 84 - 34, w: 330, h: 68 }));
+    if (C.appuis.carte) { this.etat = 'carte'; return; }
     if (C.appuis.menu && clics.length === 0) { this.etat = 'jeu'; return; }
     const choix = this.choixMenu({ appuis: { ...C.appuis, menu: false } }, clics, opts.length, zones);
     if (choix < 0) return;
     SG.Son.effet('valide');
     if (choix === 0) this.etat = 'jeu';
-    else if (choix === 1) SG.Son.basculer();
-    else if (choix === 2) SG.pleinEcran();
-    else if (choix === 3) { this.sauver(); this.allerTitre(); }
+    else if (choix === 1) this.etat = 'carte';
+    else if (choix === 2) SG.Son.basculer();
+    else if (choix === 3) SG.pleinEcran();
+    else if (choix === 4) { this.sauver(); this.allerTitre(); }
   }
 
   majFin(dt, C, clics) {
@@ -538,6 +542,7 @@ SG.Jeu = class {
     if (this.etat === 'objet') this.dessinerObjetBrandi(ctx);
     if (this.dlg && (this.etat === 'dialogue' || (this.etat === 'objet' && this.objet.t > 0.8))) this.dessinerDialogue(ctx);
     if (this.etat === 'pause') this.dessinerPause(ctx);
+    if (this.etat === 'carte') this.dessinerEcranCarte(ctx);
     if (this.etat === 'finPartie') this.dessinerFin(ctx);
   }
 
@@ -840,8 +845,8 @@ SG.Jeu = class {
 
   dessinerCarte(ctx, x, y, w, h) {
     ctx.drawImage(SG.img['ui-parchemin'], x, y, w, h);
-    const cw = w * 0.74 / 3, ch = cw * 9 / 16;
-    const ox = x + (w - cw * 3) / 2, oy = y + (h - ch * 3) / 2;
+    const ch = h * 0.24, cw = ch * 16 / 9;
+    const ox = x + (w - cw * 3) / 2, oy = y + (h - ch * 3) / 2 + h * 0.03;
     for (const cle in SG.MONDE) {
       const [cx, cy] = cle.split(',').map(Number);
       const vx = ox + cx * cw, vy = oy + cy * ch;
@@ -878,28 +883,52 @@ SG.Jeu = class {
     ctx.fillStyle = '#d8202e'; ctx.strokeStyle = '#3a0a0a'; ctx.lineWidth = 2;
     ctx.beginPath(); ctx.arc(mx, my, 6, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
     ctx.restore();
-    SG.texte(ctx, 'Plaine des Pixels', x + w / 2, y + h - 22, 22, '#5a3810', 'center', 'rgba(255,240,200,0.8)', 4, true);
+    SG.texte(ctx, 'Plaine des Pixels', x + w / 2, y + h * 0.11, Math.round(h * 0.06), '#5a3810', 'center', 'rgba(255,240,200,0.8)', 4, true);
   }
 
   dessinerPause(ctx) {
     ctx.fillStyle = 'rgba(3,8,20,0.7)';
     ctx.fillRect(0, 0, SG.W, SG.H);
     SG.cadre(ctx, SG.img['ui-panneau'], 30, 24, SG.W - 60, SG.H - 48, 150, 60);
-    SG.texte(ctx, 'PAUSE', SG.W / 2, 78, 40, '#ffffff', 'center', '#0a2a5a', 6, true);
-    // carte
-    this.dessinerCarte(ctx, 90, 100, 700, 390);
-    // objets
-    const ox = 110, oy = 520;
-    SG.cadre(ctx, SG.img['ui-portrait'], ox, oy, 100, 100, 200, 24);
-    if (this.ampli) SG.dessinerPied(ctx, SG.img.ampli, ox + 50, oy + 82, { echelle: 0.8 });
-    SG.texte(ctx, this.ampli ? 'Ampli' : 'Aucun objet', ox + 50, oy + 124, 18, '#cfe8ff', 'center');
-    SG.dessinerCoeur(ctx, 300, 555, 44, 0.25 * (this.fragments % 4));
-    SG.texte(ctx, `Fragments : ${this.fragments % 4}/4`, 334, 564, 22, '#fff', 'left');
-    SG.dessinerButin(ctx, 'pixel', 300, 608, 0.9);
-    SG.texte(ctx, `Pixels : ${this.pixels}`, 334, 617, 22, '#fff', 'left');
-    const opts = ['Reprendre', SG.Son.muet ? 'Activer le son' : 'Couper le son', 'Plein écran', 'Retour au titre'];
-    opts.forEach((o, i) => SG.boutonMenu(ctx, o, 1025, 190 + i * 88, i === this.menuChoix, 330));
-    SG.texte(ctx, this.ecran === 'grotte' ? 'La grotte de l\'ermite' : SG.MONDE[this.ecran].nom, 1025, 590, 22, '#9fc4e8', 'center');
+    SG.texte(ctx, 'OBJETS', SG.W / 2, 78, 40, '#ffffff', 'center', '#0a2a5a', 6, true);
+    // les emplacements d'objets : un par donjon, comme dans Zelda
+    const objets = [
+      ['Ampli', this.ampli ? SG.img.ampli : null, 'A'],
+      ['?', null], ['?', null], ['?', null], ['?', null], ['?', null], ['?', null], ['?', null], ['?', null],
+    ];
+    const taille = 118, ecart = 18, ox = 100, oy = 120;
+    objets.forEach(([nom, im, touche], i) => {
+      const x = ox + (i % 3) * (taille + ecart), y = oy + Math.floor(i / 3) * (taille + ecart);
+      ctx.save(); if (!im) ctx.globalAlpha = 0.45;
+      SG.cadre(ctx, SG.img['ui-portrait'], x, y, taille, taille, 200, 26);
+      ctx.restore();
+      if (im) {
+        SG.dessinerPied(ctx, im, x + taille / 2, y + taille - 32, { echelle: 0.85 });
+        SG.texte(ctx, nom, x + taille / 2, y + taille - 12, 17, '#cfe8ff', 'center');
+        if (touche) SG.texte(ctx, touche, x + 22, y + 34, 18, '#7fe8ff', 'left', null, null, true);
+      }
+    });
+    // état de Spirit
+    const ex = 560;
+    SG.texte(ctx, 'Spirit', ex, 150, 30, '#7fe8ff', 'left', null, null, true);
+    SG.dessinerPied(ctx, SG.img['spirit-face'], ex + 90, 360, { echelle: 1.5 });
+    SG.dessinerCoeur(ctx, ex + 16, 420, 44, 0.25 * (this.fragments % 4));
+    SG.texte(ctx, `Fragments : ${this.fragments % 4}/4`, ex + 48, 429, 22, '#fff', 'left');
+    SG.dessinerButin(ctx, 'pixel', ex + 16, 476, 0.9);
+    SG.texte(ctx, `Pixels : ${this.pixels}`, ex + 48, 485, 22, '#fff', 'left');
+    SG.texte(ctx, `Cœurs : ${this.vieMax / 4}`, ex + 48, 535, 22, '#fff', 'left');
+    SG.dessinerCoeur(ctx, ex + 16, 526, 36, 1);
+    const opts = ['Reprendre', 'Carte', SG.Son.muet ? 'Activer le son' : 'Couper le son', 'Plein écran', 'Retour au titre'];
+    opts.forEach((o, i) => SG.boutonMenu(ctx, o, 1025, 170 + i * 84, i === this.menuChoix, 330));
+    SG.texte(ctx, 'Tab : carte', 1025, 640, 18, '#9fc4e8', 'center');
+  }
+
+  dessinerEcranCarte(ctx) {
+    ctx.fillStyle = 'rgba(3,8,20,0.8)';
+    ctx.fillRect(0, 0, SG.W, SG.H);
+    this.dessinerCarte(ctx, 70, 40, SG.W - 140, 610);
+    const lieu = this.ecran === 'grotte' ? 'La grotte de l\'ermite' : SG.MONDE[this.ecran].nom;
+    SG.texte(ctx, 'Tu es ici : ' + lieu, SG.W / 2, 695, 22, '#ffffff', 'center');
   }
 
   dessinerFin(ctx) {
@@ -931,7 +960,7 @@ SG.Jeu = class {
     if (L && L.width) { const lw = 720, lh = lw * L.height / L.width; ctx.drawImage(L, SG.W / 2 - lw / 2, 40 + Math.sin(this.t * 1.5) * 4, lw, lh); }
     const opts = this.optionsTitre();
     opts.forEach((o, i) => SG.boutonMenu(ctx, o, SG.W / 2, 440 + i * 80, i === this.menuChoix, 380));
-    SG.texte(ctx, 'Flèches ou ZQSD : bouger    Espace : action    Entrée : pause    F : plein écran    M : son', SG.W / 2, 700, 18, '#c8d8ee', 'center');
+    SG.texte(ctx, 'Flèches ou ZQSD : bouger    Espace : action    Entrée : objets    Tab : carte    F : plein écran    M : son', SG.W / 2, 700, 18, '#c8d8ee', 'center');
   }
 
   dessinerMode(ctx) {

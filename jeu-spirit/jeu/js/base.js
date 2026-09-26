@@ -74,7 +74,7 @@ SG.Commandes = {
   appuis: {},        // actions enfoncées ce tour-ci
   precedent: {},
   joy: { x: 0, y: 0, actif: false },
-  tactileA: false, tactileB: false, tactileMenu: false,
+  tactileA: false, tactileB: false, tactileMenu: false, tactileCarte: false,
   clics: [],         // clics / touchers sur le canevas (menus)
 
   init(canevas) {
@@ -85,7 +85,7 @@ SG.Commandes = {
       ArrowRight: 'droite', KeyD: 'droite',
       Space: 'A', KeyX: 'A', KeyJ: 'A',
       KeyC: 'B', KeyK: 'B',
-      Enter: 'menu', Escape: 'menu', KeyP: 'menu',
+      Enter: 'menu', Escape: 'menu', KeyP: 'menu', Tab: 'carte', KeyN: 'carte',
     };
     window.addEventListener('keydown', (e) => {
       const a = carte[e.code];
@@ -152,6 +152,7 @@ SG.Commandes = {
     lier('btn-a', 'tactileA');
     lier('btn-b', 'tactileB');
     lier('btn-menu', 'tactileMenu');
+    lier('btn-carte', 'tactileCarte');
   },
 
   // à appeler une fois par image : calcule les appuis nouveaux
@@ -162,6 +163,7 @@ SG.Commandes = {
       A: !!this.touches.A || this.tactileA,
       B: !!this.touches.B || this.tactileB,
       menu: !!this.touches.menu || this.tactileMenu,
+      carte: !!this.touches.carte || this.tactileCarte,
     };
     if (this.joy.actif) {
       etat.haut = etat.haut || this.joy.y < -0.5;
