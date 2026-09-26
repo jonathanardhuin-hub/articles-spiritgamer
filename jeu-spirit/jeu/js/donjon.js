@@ -374,6 +374,7 @@ SG.ReinePopup = class extends SG.Monstre {
         ctx.fillStyle = g; ctx.fillRect(this.x - 130, this.y - h - 200, 260, 240);
         ctx.globalCompositeOperation = 'source-over';
       }
+      if (SG.img.reine && SG.img.reine.width) { SG.dessinerPied(ctx, SG.img.reine, this.x, this.y - h + 40, { sy: 1 + Math.sin(this.t * 6) * 0.02 }); ctx.restore(); return; }
       SG.dessinerPied(ctx, SG.img.popup, this.x, this.y - h, { echelle: 2.5, sy: 1 + Math.sin(this.t * 6) * 0.02 });
       // couronne
       ctx.translate(this.x, this.y - h - 170);
