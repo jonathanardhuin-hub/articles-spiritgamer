@@ -882,20 +882,28 @@ SG.Jeu = class {
       SG.texte(ctx, '× ' + D.cles, 66, 150, 24, '#fff', 'left');
       if (D.cleBoss) SG.dessinerIcone(ctx, 'cleBoss', 130, 140, 40);
     }
-    // emplacements A et B
-    const case_ = (x, lettre, type) => {
-      const t = 104;
-      SG.cadre(ctx, SG.img['ui-portrait'], x, 8, t, t, 200, 24);
+    // emplacements A et B, comme dans Zelda : pastille ronde claire, lettre blanche bien visible
+    const case_ = (cx, lettre, type) => {
+      const r = 46, cy = 58;
+      ctx.save();
+      ctx.fillStyle = 'rgba(4,12,30,0.75)';
+      ctx.beginPath(); ctx.arc(cx, cy, r + 8, 0, 7); ctx.fill();
+      ctx.lineWidth = 5; ctx.strokeStyle = '#2ad4ff';
+      ctx.beginPath(); ctx.arc(cx, cy, r + 4, 0, 7); ctx.stroke();
       if (type) {
-        const g = ctx.createRadialGradient(x + t / 2, 8 + t / 2, 2, x + t / 2, 8 + t / 2, 40);
-        g.addColorStop(0, 'rgba(200,240,255,0.9)'); g.addColorStop(1, 'rgba(40,110,180,0)');
-        ctx.fillStyle = g; ctx.fillRect(x + 20, 28, t - 40, t - 40);
-        SG.dessinerIcone(ctx, type, x + t / 2, 8 + t / 2, 64);
+        const g = ctx.createRadialGradient(cx, cy, 4, cx, cy, r);
+        g.addColorStop(0, '#ffffff'); g.addColorStop(0.7, '#d8f4ff'); g.addColorStop(1, '#8fd8ff');
+        ctx.fillStyle = g; ctx.beginPath(); ctx.arc(cx, cy, r - 2, 0, 7); ctx.fill();
+        SG.dessinerIcone(ctx, type, cx, cy + 2, 70);
       }
-      SG.texte(ctx, lettre, x + 20, 34, 20, '#7fe8ff', 'left', null, null, true);
+      // lettre dans une pastille en bas à gauche
+      ctx.fillStyle = '#0a2a5a'; ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 3;
+      ctx.beginPath(); ctx.arc(cx - r + 6, cy + r - 6, 19, 0, 7); ctx.fill(); ctx.stroke();
+      ctx.restore();
+      SG.texte(ctx, lettre, cx - r + 6, cy + r + 4, 28, '#ffffff', 'center', '#000', 4, true);
     };
-    case_(SG.W - 232, 'B', this.objetB);
-    case_(SG.W - 120, 'A', this.ampli ? 'ampli' : null);
+    case_(SG.W - 190, 'B', this.objetB);
+    case_(SG.W - 70, 'A', this.ampli ? 'ampli' : null);
   }
 
   dessinerObjetBrandi(ctx) {
@@ -1036,8 +1044,8 @@ SG.Jeu = class {
       }
       if (type) {
         const g = ctx.createRadialGradient(x + taille / 2, y + taille / 2, 4, x + taille / 2, y + taille / 2, taille * 0.42);
-        g.addColorStop(0, 'rgba(200,240,255,0.95)'); g.addColorStop(0.6, 'rgba(120,200,240,0.55)'); g.addColorStop(1, 'rgba(40,110,180,0)');
-        ctx.fillStyle = g; ctx.beginPath(); ctx.roundRect(x + 22, y + 22, taille - 44, taille - 44, 8); ctx.fill();
+        g.addColorStop(0, '#ffffff'); g.addColorStop(0.7, '#d8f4ff'); g.addColorStop(1, '#8fd8ff');
+        ctx.fillStyle = g; ctx.beginPath(); ctx.roundRect(x + 20, y + 20, taille - 40, taille - 40, 10); ctx.fill();
         SG.dessinerIcone(ctx, type, x + taille / 2, y + taille / 2, 72);
         const O = SG.OBJETS[type];
         const equipe = type === 'ampli' || this.objetB === type;
@@ -1052,18 +1060,33 @@ SG.Jeu = class {
       SG.texte(ctx, O.nom, px, 150, 28, '#7fe8ff', 'left', null, null, true);
       SG.texte(ctx, 'Bouton ' + O.touche, px, 182, 20, '#ffd23a', 'left');
       SG.texteMultiligne(ctx, O.texte, px, 220, 290, 19, 27, '#e8f2ff');
-      if (type !== 'ampli' && this.objetB !== type) SG.texte(ctx, 'A : équiper sur B', px, 380, 18, '#9fc4e8', 'left');
+      if (type !== 'ampli' && this.objetB !== type) SG.texte(ctx, 'Espace : équiper sur B', px, 350, 18, '#ffd23a', 'left');
     } else {
       SG.texte(ctx, '?', px, 150, 28, '#7fa0c0', 'left', null, null, true);
       SG.texteMultiligne(ctx, 'Un objet t\'attend au fond d\'un donjon. Chaque objet ouvre de nouveaux passages dans le monde.', px, 190, 290, 19, 27, '#9fb4d0');
     }
+    // équipement actuel, en grand
+    const eq = (cx, lettre, t) => {
+      const r = 40, cy = 430;
+      ctx.fillStyle = 'rgba(4,12,30,0.8)'; ctx.beginPath(); ctx.arc(cx, cy, r + 6, 0, 7); ctx.fill();
+      ctx.strokeStyle = '#2ad4ff'; ctx.lineWidth = 4; ctx.beginPath(); ctx.arc(cx, cy, r + 3, 0, 7); ctx.stroke();
+      if (t) {
+        const g = ctx.createRadialGradient(cx, cy, 4, cx, cy, r);
+        g.addColorStop(0, '#ffffff'); g.addColorStop(1, '#8fd8ff');
+        ctx.fillStyle = g; ctx.beginPath(); ctx.arc(cx, cy, r - 2, 0, 7); ctx.fill();
+        SG.dessinerIcone(ctx, t, cx, cy + 2, 60);
+      }
+      SG.texte(ctx, lettre, cx, cy - r - 12, 26, '#ffffff', 'center', '#000', 4, true);
+    };
+    eq(px + 60, 'B', this.objetB);
+    eq(px + 200, 'A', this.ampli ? 'ampli' : null);
     // état de Spirit
-    SG.dessinerCoeur(ctx, px + 16, 470, 40, 0.25 * (this.fragments % 4));
-    SG.texte(ctx, `Fragments de cœur : ${this.fragments % 4}/4`, px + 46, 478, 19, '#fff', 'left');
-    SG.dessinerButin(ctx, 'pixel', px + 16, 516, 0.85);
-    SG.texte(ctx, `Pixels : ${this.pixels}`, px + 46, 524, 19, '#fff', 'left');
-    SG.dessinerIcone(ctx, 'source', px + 16, 562, 34);
-    SG.texte(ctx, `Fragments de Source : ${this.source || 0}/8`, px + 46, 570, 19, '#fff', 'left');
+    SG.dessinerCoeur(ctx, px + 16, 520, 40, 0.25 * (this.fragments % 4));
+    SG.texte(ctx, `Fragments de cœur : ${this.fragments % 4}/4`, px + 46, 528, 19, '#fff', 'left');
+    SG.dessinerButin(ctx, 'pixel', px + 16, 560, 0.85);
+    SG.texte(ctx, `Pixels : ${this.pixels}`, px + 46, 568, 19, '#fff', 'left');
+    SG.dessinerIcone(ctx, 'source', px + 16, 598, 30);
+    SG.texte(ctx, `Fragments de Source : ${this.source || 0}/8`, px + 46, 606, 19, '#fff', 'left');
     const opts = ['Reprendre', 'Carte', SG.Son.muet ? 'Activer le son' : 'Couper le son', 'Plein écran', 'Retour au titre'];
     opts.forEach((o, i) => SG.boutonMenu(ctx, o, 1025, 170 + i * 84, this.focusPause === 'boutons' && i === this.menuChoix, 330));
     SG.texte(ctx, 'Flèches : choisir    Tab : carte', 1025, 640, 17, '#9fc4e8', 'center');
