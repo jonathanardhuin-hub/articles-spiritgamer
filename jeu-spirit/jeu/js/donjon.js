@@ -736,7 +736,12 @@ Object.assign(SG.Jeu.prototype, {
     const ctx = cv.getContext('2d');
     ctx.scale(k, k);
     const im = SG.img['salle-donjon'];
-    if (im && im.width) {
+    const sv = SG.img['salle-vide'];
+    if (sv && sv.width) {
+      // salle sans porte : son sol intérieur (152..1521 × 152..785) tombe exactement sur la grille de jeu
+      const sx = 1120 / 1369, sy = 560 / 633;
+      ctx.drawImage(sv, 80 - 152 * sx, 80 - 152 * sy, 1672 * sx, 941 * sy);
+    } else if (im && im.width) {
       // l'image est calée pour que son sol corresponde exactement à la grille de la salle (cases 1 à 14, lignes 1 à 7)
       ctx.drawImage(im, -42, -41, 1365, 811);
       // les ouvertures sans porte sont murées avec un morceau du mur voisin
@@ -747,7 +752,7 @@ Object.assign(SG.Jeu.prototype, {
         gauche: [[0, 224, 92, 124, 0, 96], [0, 348, 92, 126, 0, 476]],
         droite: [[1188, 224, 92, 124, 1188, 96], [1188, 348, 92, 126, 1188, 476]],
       };
-      for (const dir in ouv) {
+      for (const dir in (sv && sv.width ? {} : ouv)) {
         if (this.porteVers(dir)) continue;
         for (const [x, y, w, h, sx, sy] of ouv[dir]) ctx.drawImage(cv, sx * k, sy * k, w * k, h * k, x, y, w, h);
       }
@@ -935,77 +940,19 @@ SG.dessinCristal = function (ctx, x, y, frappe, t) {
   });
 };
 SG.dessinPorte = function (ctx, dir, p, ouverte, volets) {
-  if (!p || ouverte) return;
-  const T = SG.T;
-  // la porte couvre toute l'ouverture du mur, épaisseur comprise
-  const r = dir === 'haut' ? { x: 566, y: 4, w: 148, h: 74 } : dir === 'bas' ? { x: 566, y: 642, w: 148, h: 74 }
-    : dir === 'gauche' ? { x: 4, y: 318, w: 74, h: 84 } : { x: 1202, y: 318, w: 74, h: 84 };
+  if (!p) return;
   const type = p.type;
-  const t = performance.now() / 1000;
-  ctx.save();
-  let nom = (volets || type === 'o' || type.startsWith('enigme') || type === 'sortie') ? 'grille' : type === 'boss' ? 'porte-boss' : 'porte-cle';
-  let filtre = null;
-  // porte du boss : la porte à clé teintée de violet, tant qu'il n'y a pas d'image dédiée
-  if (nom === 'porte-boss' && !(SG.img['porte-boss'] && SG.img['porte-boss'].width)) { nom = 'porte-cle'; filtre = 'grayscale(0.5) brightness(0.5) contrast(1.3)'; }
+  let nom = 'porte-ouverte';
+  if (!ouverte) nom = (volets || type === 'o' || type.startsWith('enigme') || type === 'sortie') ? 'grille' : type === 'boss' ? 'porte-boss' : 'porte-cle';
   const im = SG.img[nom];
-  if (filtre) ctx.filter = filtre;
-  if (im && im.width) {
-    ctx.translate(r.x + r.w / 2, r.y + r.h / 2);
-    const rot = { haut: 0, bas: Math.PI, gauche: -Math.PI / 2, droite: Math.PI / 2 }[dir];
-    ctx.rotate(rot);
-    const w = dir === 'haut' || dir === 'bas' ? r.w : r.h, h = dir === 'haut' || dir === 'bas' ? r.h : r.w;
-    ctx.drawImage(im, -w / 2, -h / 2, w, h);
-    ctx.restore();
-    if (type === 'boss') {
-      // porte du boss : bois noirci, lueur violette, gemme et grande serrure dorée
-      ctx.save();
-      ctx.globalCompositeOperation = 'lighter';
-      ctx.strokeStyle = `rgba(190,90,255,${0.55 + Math.sin(t * 3) * 0.2})`; ctx.lineWidth = 5;
-      ctx.shadowColor = '#b04dff'; ctx.shadowBlur = 16;
-      ctx.strokeRect(r.x + 4, r.y + 4, r.w - 8, r.h - 8);
-      ctx.restore();
-      const cx = r.x + r.w / 2, cy = r.y + r.h / 2;
-      ctx.save();
-      ctx.fillStyle = '#ffd23a'; ctx.strokeStyle = '#1a1000'; ctx.lineWidth = 3;
-      ctx.beginPath(); ctx.moveTo(cx, cy - 30); ctx.lineTo(cx + 24, cy); ctx.lineTo(cx, cy + 30); ctx.lineTo(cx - 24, cy); ctx.closePath(); ctx.fill(); ctx.stroke();
-      ctx.fillStyle = '#9b30ff'; ctx.beginPath(); ctx.moveTo(cx, cy - 16); ctx.lineTo(cx + 12, cy); ctx.lineTo(cx, cy + 16); ctx.lineTo(cx - 12, cy); ctx.closePath(); ctx.fill();
-      ctx.restore();
-      SG.dessinerIcone(ctx, 'cleBoss', cx + 64, cy + 28, 36);
-    }
-  } else if (nom === 'grille') {
-    // grille de fer épaisse, lueur violette
-    ctx.fillStyle = 'rgba(10,5,20,0.85)'; ctx.fillRect(r.x, r.y, r.w, r.h);
-    ctx.shadowColor = '#b04dff'; ctx.shadowBlur = 12;
-    const hor = r.w > r.h, n = hor ? 6 : 4;
-    for (let i = 0; i < n; i++) {
-      ctx.fillStyle = '#8a86a8'; ctx.strokeStyle = '#0d0b16'; ctx.lineWidth = 3;
-      if (hor) { const xx = r.x + 8 + i * (r.w - 16) / (n - 1) - 6; ctx.fillRect(xx, r.y, 12, r.h); ctx.strokeRect(xx, r.y, 12, r.h); }
-      else { const yy = r.y + 8 + i * (r.h - 16) / (n - 1) - 6; ctx.fillRect(r.x, yy, r.w, 12); ctx.strokeRect(r.x, yy, r.w, 12); }
-    }
-    ctx.shadowBlur = 0;
-    ctx.fillStyle = '#5a5470';
-    if (hor) { ctx.fillRect(r.x, r.y + r.h * 0.3, r.w, 8); ctx.fillRect(r.x, r.y + r.h * 0.7, r.w, 8); }
-    else { ctx.fillRect(r.x + r.w * 0.3, r.y, 8, r.h); ctx.fillRect(r.x + r.w * 0.7, r.y, 8, r.h); }
-    ctx.restore();
-  } else {
-    // porte en bois cerclée de fer, avec une serrure bien visible
-    const boss = type === 'boss';
-    ctx.shadowColor = boss ? '#ffd23a' : '#ffe9a0'; ctx.shadowBlur = 14 + Math.sin(t * 4) * 4;
-    ctx.fillStyle = boss ? '#4a1a4a' : '#7a4a1e'; ctx.strokeStyle = '#0d0b16'; ctx.lineWidth = 5;
-    ctx.beginPath(); ctx.roundRect(r.x, r.y, r.w, r.h, 8); ctx.fill(); ctx.stroke();
-    ctx.shadowBlur = 0;
-    ctx.strokeStyle = 'rgba(0,0,0,0.35)'; ctx.lineWidth = 3;
-    const hor = r.w > r.h;
-    for (let i = 1; i < 4; i++) { ctx.beginPath(); if (hor) { ctx.moveTo(r.x + i * r.w / 4, r.y + 4); ctx.lineTo(r.x + i * r.w / 4, r.y + r.h - 4); } else { ctx.moveTo(r.x + 4, r.y + i * r.h / 4); ctx.lineTo(r.x + r.w - 4, r.y + i * r.h / 4); } ctx.stroke(); }
-    ctx.fillStyle = boss ? '#c9a020' : '#5a5470';
-    if (hor) { ctx.fillRect(r.x, r.y + 10, r.w, 10); ctx.fillRect(r.x, r.y + r.h - 20, r.w, 10); }
-    else { ctx.fillRect(r.x + 10, r.y, 10, r.h); ctx.fillRect(r.x + r.w - 20, r.y, 10, r.h); }
-    // serrure dorée et icône de la clé
-    const cx = r.x + r.w / 2, cy = r.y + r.h / 2;
-    ctx.fillStyle = '#ffd23a'; ctx.strokeStyle = '#1a1000'; ctx.lineWidth = 3;
-    ctx.beginPath(); ctx.arc(cx, cy, 20, 0, 7); ctx.fill(); ctx.stroke();
-    ctx.fillStyle = '#1a1000'; ctx.beginPath(); ctx.arc(cx, cy - 4, 6, 0, 7); ctx.fill(); ctx.fillRect(cx - 3, cy, 6, 11);
-    ctx.restore();
-    SG.dessinerIcone(ctx, boss ? 'cleBoss' : 'cle', cx + (dir === 'gauche' ? 40 : dir === 'droite' ? -40 : 52), cy + (dir === 'haut' ? 34 : dir === 'bas' ? -34 : 44), 34);
-  }
+  if (!im || !im.width) return;
+  // module de porte façon Zelda : dessiné pour le mur du haut, puis tourné pour les autres murs
+  const w = 280, h = w * im.height / im.width;
+  const centre = { haut: [640, 0, 0], bas: [640, SG.H, Math.PI], gauche: [0, 360, -Math.PI / 2], droite: [SG.W, 360, Math.PI / 2] }[dir];
+  ctx.save();
+  ctx.translate(centre[0], centre[1]);
+  ctx.rotate(centre[2]);
+  // le bas du module (côté salle) dépasse de 40 pixels dans la salle
+  ctx.drawImage(im, -w / 2, 120 - h, w, h);
+  ctx.restore();
 };

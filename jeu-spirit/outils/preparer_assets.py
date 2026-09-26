@@ -111,7 +111,10 @@ FACULTATIVES = {
     'boussole': ('donjon1/boussole.png', 'w', 64, ''),
     'source': ('donjon1/source.png', 'w', 64, ''),
     'flash': ('donjon1/flash.png', 'h', 120, ''),
-    'porte-cle': ('donjon1/porte-cle.png', 'w', 160, ''),
+    'porte-cle': ('donjon1/porte-cle.png', 'w', 280, ''),
+    'porte-ouverte': ('donjon1/porte-ouverte.png', 'w', 280, ''),
+    'porte-boss': ('donjon1/porte-boss.png', 'w', 280, ''),
+    'grille': ('donjon1/grille.png', 'w', 280, ''),
     'gouffre': ('donjon1/gouffre.png', 'w', 200, ''),
     'flash-carnet': ('donjon1/flash-carnet.png', 'h', 120, ''),
     'portrait-flash': ('donjon1/portrait-flash.png', 'h', 200, ''),
@@ -164,6 +167,9 @@ def main():
     t = Image.open(os.path.join(IMG, 'interface/titre-fond.webp')).convert('RGB')
     t.resize((1600, 900), Image.LANCZOS).save(os.path.join(SORTIE, 'titre-fond.webp'), 'WEBP', quality=85, method=6)
     # salle de donjon : image plein écran (facultative)
+    sv = os.path.join(IMG, 'donjon1/salle-vide.webp')
+    if os.path.exists(sv):
+        Image.open(sv).convert('RGB').resize((1672, 941), Image.LANCZOS).save(os.path.join(SORTIE, 'salle-vide.webp'), 'WEBP', quality=85, method=6)
     sd = os.path.join(IMG, 'donjon1/salle-donjon.webp')
     if os.path.exists(sd):
         Image.open(sd).convert('RGB').resize((1600, 900), Image.LANCZOS).save(os.path.join(SORTIE, 'salle-donjon.webp'), 'WEBP', quality=85, method=6)

@@ -46,7 +46,7 @@ SG.IMAGES = [
 ];
 SG.img = {};
 // images facultatives : utilisées dès qu'elles existent, sinon un dessin provisoire est affiché
-SG.IMAGES_FACULTATIVES = ['gouffre', 'grille', 'porte-cle', 'porte-boss', 'clic-b', 'manette', 'cle', 'cle-boss', 'carte-donjon', 'boussole', 'source', 'flash', 'flash-carnet', 'portrait-flash',
+SG.IMAGES_FACULTATIVES = ['salle-vide', 'porte-ouverte', 'gouffre', 'grille', 'porte-cle', 'porte-boss', 'clic-b', 'manette', 'cle', 'cle-boss', 'carte-donjon', 'boussole', 'source', 'flash', 'flash-carnet', 'portrait-flash',
   'salle-donjon', 'bloc', 'statue', 'brasero', 'pot', 'coffre', 'coffre-ouvert', 'cristal', 'cristal-actif', 'entree-terrier', 'reine'];
 
 SG.chargerImages = function (progression) {

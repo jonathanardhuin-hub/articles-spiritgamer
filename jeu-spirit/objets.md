@@ -38,6 +38,10 @@ Ils ne servent que dans le donjon où on les trouve, comme dans Zelda.
 - **Cœur d'or** : donné par chaque boss, un cœur de plus d'un coup.
 - **Fragment de Source** : donné par chaque Gardien libéré. Il en faut huit pour affronter le Roi Clickbait.
 
+## Munitions
+
+À partir du donjon 2, les **Pétards Confettis** fonctionnent comme les bombes de Zelda : un stock limité (10, puis plus avec des sacs plus grands), qu'on recharge en ramassant des pétards laissés par les monstres, dans les herbes, ou en les achetant à la boutique. Ils font sauter les murs fissurés, y compris celui du donjon 1 qui cache une salle secrète.
+
 ## À quoi servent les Pixels
 
-La boutique du Parvis du QG (phase 3) vendra des cœurs, des recharges de Pétards Confettis, un bouclier et une bourse plus grande. Certains habitants demanderont des Pixels pour un indice ou un mini-jeu.
+La boutique du Parvis du QG (phase 3) vendra des cœurs, des Pétards Confettis (par lot), un sac à pétards plus grand, un bouclier et une bourse plus grande. Certains habitants demanderont des Pixels pour un indice ou un mini-jeu.
