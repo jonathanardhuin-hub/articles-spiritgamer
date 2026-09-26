@@ -198,6 +198,7 @@ SG.Monstre = class {
     this.t += dt;
     this.flash = Math.max(0, this.flash - dt);
     if (this.apparition > 0) { this.apparition -= dt; return false; }
+    if (this.etourdi > 0) { this.etourdi -= dt; return false; }
     if (this.recul) {
       this.recul.t -= dt;
       SG.deplacer(jeu, this, this.recul.vx * dt, this.recul.vy * dt);
@@ -487,6 +488,7 @@ SG.Projectile = class {
     // les projectiles passent au-dessus de l'eau et des herbes, mais pas des obstacles hauts
     // l'onde lointaine coupe herbes et buissons sur son passage (un buisson l'arrête)
     if (this.ami) jeu.couperDecor(this.boite());
+    if (this.ami && jeu.toucherCristalEn(this.x, this.y + 30)) { this.fini = true; jeu.effets.push(new SG.Eclat(this.x, this.y)); return; }
     if (jeu.obstacleHaut(this.x, this.y + 30)) { this.fini = true; this.quandBloque(jeu); return; }
     if (this.ami) {
       for (const m of jeu.monstres) {
@@ -713,4 +715,57 @@ SG.Feu = class {
     }
     ctx.restore();
   }
+};
+
+// icônes des objets (image générée si elle existe, sinon dessin provisoire)
+SG.dessinerIcone = function (ctx, type, x, y, taille) {
+  const noms = { ampli: 'ampli', manette: 'manette', cle: 'cle', cleBoss: 'cle-boss', carte: 'carte-donjon', boussole: 'boussole', source: 'source', receptacle: 'coeur-or' };
+  const im = SG.img[noms[type]];
+  if (im && im.width) {
+    const k = taille / Math.max(im.width, im.height);
+    ctx.drawImage(im, x - im.width * k / 2, y - im.height * k / 2, im.width * k, im.height * k);
+    return;
+  }
+  const s = taille / 60;
+  ctx.save(); ctx.translate(x, y); ctx.scale(s, s);
+  ctx.lineWidth = 4; ctx.strokeStyle = '#111';
+  if (type === 'cle' || type === 'cleBoss') {
+    ctx.fillStyle = type === 'cleBoss' ? '#ffcc20' : '#c8c8d8';
+    ctx.beginPath(); ctx.arc(-12, 0, 12, 0, 7); ctx.fill(); ctx.stroke();
+    ctx.fillRect(-2, -5, 34, 10); ctx.strokeRect(-2, -5, 34, 10);
+    ctx.fillRect(20, 5, 6, 10); ctx.strokeRect(20, 5, 6, 10);
+  } else if (type === 'carte') {
+    ctx.fillStyle = '#e8cf92'; ctx.beginPath(); ctx.roundRect(-26, -20, 52, 40, 4); ctx.fill(); ctx.stroke();
+    ctx.strokeStyle = '#8a5a20'; ctx.beginPath(); ctx.moveTo(-16, -8); ctx.lineTo(0, -8); ctx.lineTo(0, 8); ctx.lineTo(16, 8); ctx.stroke();
+  } else if (type === 'boussole') {
+    ctx.fillStyle = '#d8b040'; ctx.beginPath(); ctx.arc(0, 0, 24, 0, 7); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = '#f4f0e0'; ctx.beginPath(); ctx.arc(0, 0, 17, 0, 7); ctx.fill();
+    ctx.fillStyle = '#d02030'; ctx.beginPath(); ctx.moveTo(0, -15); ctx.lineTo(5, 0); ctx.lineTo(-5, 0); ctx.closePath(); ctx.fill();
+  } else if (type === 'manette') {
+    ctx.fillStyle = '#1b2a4a'; ctx.beginPath(); ctx.roundRect(-28, -14, 56, 28, 14); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = '#2ad4ff'; ctx.beginPath(); ctx.arc(-13, 0, 5, 0, 7); ctx.arc(13, 0, 5, 0, 7); ctx.fill();
+  } else if (type === 'source') {
+    ctx.globalCompositeOperation = 'lighter';
+    const g = ctx.createRadialGradient(0, 0, 2, 0, 0, 30); g.addColorStop(0, 'rgba(255,255,220,1)'); g.addColorStop(1, 'rgba(255,200,60,0)');
+    ctx.fillStyle = g; ctx.fillRect(-30, -30, 60, 60);
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.fillStyle = '#ffe070'; ctx.beginPath(); ctx.moveTo(0, -22); ctx.lineTo(14, 0); ctx.lineTo(0, 22); ctx.lineTo(-14, 0); ctx.closePath(); ctx.fill(); ctx.stroke();
+  }
+  ctx.restore();
+};
+
+// barrière de Bruit qui ferme la route du nord
+SG.dessinBarriere = function (ctx, x, y, t) {
+  ctx.save();
+  ctx.globalCompositeOperation = 'lighter';
+  for (let i = 0; i < 3; i++) {
+    const a = 0.25 + Math.sin(t * 4 + i * 2) * 0.12;
+    ctx.fillStyle = `rgba(170,60,255,${a})`;
+    ctx.fillRect(x - 40, y - 100 + i * 4, 80, 96);
+  }
+  ctx.strokeStyle = 'rgba(230,180,255,0.8)'; ctx.lineWidth = 2;
+  ctx.beginPath();
+  for (let k = 0; k < 6; k++) { const yy = y - 90 + k * 16 + Math.sin(t * 6 + k) * 4; ctx.moveTo(x - 40, yy); ctx.lineTo(x + 40, yy + Math.sin(t * 9 + k) * 6); }
+  ctx.stroke();
+  ctx.restore();
 };

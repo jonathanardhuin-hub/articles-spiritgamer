@@ -70,6 +70,10 @@ LISTE = {
     'fx-etincelle': ('effets/etincelle.webp', 'w', 90, ''),
     'fx-onde-proche': ('effets/onde-proche.webp', 'w', 150, ''),
     'fx-onde-loin': ('effets/onde-loin.webp', 'w', 140, ''),
+    # Monstres du donjon 1 (provisoires, à redessiner)
+    'popup': ('ennemis/popup.png', 'w', 70, ''),
+    'spamling': ('ennemis/spamling.png', 'w', 62, ''),
+    'clic': ('ennemis/clic.png', 'h', 72, ''),
     # Projectiles
     'lance': ('projectiles/lance.png', 'w', 112, ''),
     'pierre': ('projectiles/pierre.png', 'w', 34, ''),

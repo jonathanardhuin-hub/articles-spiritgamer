@@ -39,15 +39,25 @@ SG.IMAGES = [
   'cornu-profil', 'cornu-profil-a', 'cornu-profil-b',
   'cp-face', 'cp-face-g', 'cp-face-d', 'cp-dos', 'cp-dos-g', 'cp-dos-d', 'cp-profil', 'cp-profil-a',
   'coeur', 'coeur-vide', 'coeur-or', 'fragment', 'pixel-bleu', 'pixel-rose',
-  'fx-fumee', 'fx-etincelle', 'ui-dialogue', 'ui-portrait', 'ui-panneau', 'ui-bouton', 'ui-bouton-actif', 'ui-parchemin', 'logo', 'lance', 'pierre', 'pierre-eclat', 'titre-fond', 'fx-onde-proche', 'fx-onde-loin', 'sol-herbe', 'sol-terre', 'sol-eau',
+  'fx-fumee', 'fx-etincelle', 'ui-dialogue', 'ui-portrait', 'ui-panneau', 'ui-bouton', 'ui-bouton-actif', 'ui-parchemin', 'logo', 'lance', 'pierre', 'pierre-eclat', 'titre-fond', 'popup', 'spamling', 'clic', 'fx-onde-proche', 'fx-onde-loin', 'sol-herbe', 'sol-terre', 'sol-eau',
 ];
 SG.img = {};
+// images facultatives : utilisées dès qu'elles existent, sinon un dessin provisoire est affiché
+SG.IMAGES_FACULTATIVES = ['manette', 'cle', 'cle-boss', 'carte-donjon', 'boussole', 'source', 'flash', 'portrait-flash',
+  'salle-donjon', 'bloc', 'statue', 'brasero', 'pot', 'coffre', 'coffre-ouvert', 'cristal', 'cristal-actif', 'entree-terrier', 'reine'];
 
 SG.chargerImages = function (progression) {
   let faites = 0;
+  for (const nom of SG.IMAGES_FACULTATIVES) {
+    const im = new Image();
+    im.onerror = () => { im.manquante = true; };
+    im.src = 'assets/' + nom + '.webp';
+    SG.img[nom] = im;
+  }
   return Promise.all(SG.IMAGES.map((nom) => new Promise((ok) => {
     const im = new Image();
-    im.onload = im.onerror = () => { faites++; progression(faites / SG.IMAGES.length); ok(); };
+    im.onload = () => { faites++; progression(faites / SG.IMAGES.length); ok(); };
+    im.onerror = () => { faites++; progression(faites / SG.IMAGES.length); ok(); };
     im.src = 'assets/' + nom + '.webp';
     SG.img[nom] = im;
   })));
@@ -296,6 +306,16 @@ SG.Son = {
       tempo: 0.32,
       melodie: [57, 2, 60, 2, 64, 3, 62, 1, 60, 4, 0, 2, 55, 2, 59, 2, 62, 3, 60, 1, 57, 6],
       basse: [45, 8, 43, 8, 41, 8, 40, 8],
+    },
+    donjon: {
+      tempo: 0.26,
+      melodie: [57, 1, 0, 1, 60, 1, 0, 1, 63, 2, 62, 1, 60, 1, 57, 2, 0, 2, 55, 1, 0, 1, 58, 1, 0, 1, 62, 2, 60, 1, 58, 1, 55, 4],
+      basse: [33, 4, 33, 4, 31, 4, 31, 4, 29, 4, 29, 4, 28, 4, 28, 4],
+    },
+    boss: {
+      tempo: 0.16,
+      melodie: [64, 1, 64, 1, 67, 1, 64, 1, 70, 2, 69, 1, 67, 1, 64, 1, 64, 1, 67, 1, 64, 1, 71, 2, 70, 2],
+      basse: [40, 2, 40, 2, 43, 2, 40, 2, 46, 2, 45, 2, 43, 2, 40, 2],
     },
     titre: {
       tempo: 0.22,

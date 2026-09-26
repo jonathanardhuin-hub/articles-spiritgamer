@@ -7,8 +7,8 @@
 //  h  hautes herbes (l'onde les coupe, on peut marcher dedans)       r  rocher
 //  x  rocher fissuré   MM amas de rochers (2 cases)                 P  panneau
 //  g  falaise (invisible, pleine)          E  entrée de grotte
-SG.CASES_PLEINES = new Set(['~', 'T', 'S', 'b', 'r', 'x', 'M', 'P', 'g']);
-SG.CASES_DESTRUCTIBLES = new Set(['b', 'h']);
+SG.CASES_PLEINES = new Set(['~', 'T', 'S', 'b', 'r', 'x', 'M', 'P', 'g', 'X', 'G']);
+SG.CASES_DESTRUCTIBLES = new Set(['b', 'h', 'p']);
 
 SG.MONDE = {
   // x,y : colonne et ligne de l'écran dans la Plaine
@@ -107,10 +107,10 @@ SG.MONDE = {
   '1,0': {
     nom: 'La Route du Nord',
     carte: [
-      'SSSSSSSSSMMSSSSS',
-      'SS.......::...SS',
-      'S......P.::....S',
-      'S..h.....::..b.S',
+      'SSSSSSSSSGGSSSSS',
+      'SS.......::~~~~S',
+      'S......P.::~X~~S',
+      'S..h.....::~~~~S',
       '::::::::::::::::',
       'S....b...::....S',
       'S.,......::..h.S',
@@ -118,14 +118,14 @@ SG.MONDE = {
       'SSSSSSSSS::SSSSS',
     ],
     ennemis: [['crache', 4, 6], ['gresille', 12, 2], ['gresille', 13, 6]],
-    panneaux: { '7,2': 'Route de la Forêt des Forums. Des éboulis bloquent le passage. Il faudra trouver un moyen de les faire sauter.' },
+    panneaux: { '7,2': 'Route de la Forêt des Forums. Une barrière de Bruit ferme le passage. Le cristal sur l\'îlot, de l\'autre côté de l\'eau, semble la commander.' },
   },
   '0,0': {
     nom: 'Le Bois aux Grésilles',
     carte: [
       'SSSSSSSSSSSSSSSS',
-      'ST..b..T...T...S',
-      'S..h....b.....TS',
+      'S...b.ggDgg....S',
+      'S..h...........S',
       'S.T....h...b...S',
       'S......T...:::::',
       'S..b.h.....:.h.S',
@@ -190,15 +190,17 @@ SG.TEXTES = {
   ],
   ermiteApres: [
     ['ermite', 'Quand ton cœur est plein, ton onde porte beaucoup plus loin. Garde-le en tête.'],
-    ['ermite', 'Le premier Gardien est retenu au nord, au-delà de la Forêt des Forums. Mais des éboulis bloquent la route.'],
-    ['ermite', 'En attendant, nettoie la Plaine. Et fouille les buissons : le Bruit y cache parfois des choses.'],
+    ['ermite', 'Le Bruit a creusé un terrier sous le Bois aux Grésilles, au nord-ouest de la Plaine. Le premier Gardien, Flash, y est retenu.'],
+    ['ermite', 'Fouille aussi les buissons et les hautes herbes : le Bruit y cache parfois des choses.'],
   ],
   ermiteRevoir: [
-    ['ermite', 'La route du nord est toujours bloquée. Fouille la Plaine, et reviens me voir si tu as besoin de reprendre des forces.'],
+    ['ermite', 'Le Terrier des Pop-ups est au nord-ouest, dans le Bois aux Grésilles. Reviens me voir si tu as besoin de reprendre des forces.'],
   ],
   ampli: 'Tu as obtenu l\'Ampli ! Branché sur ton casque, il transforme ta voix en onde sonore. Appuie sur A (Espace au clavier) pour attaquer.',
   fragment: (n) => n % 4 === 0
     ? 'Tu as trouvé un fragment de cœur ! Avec les quatre, tu gagnes un cœur de plus.'
     : `Tu as trouvé un fragment de cœur ! (${n % 4} sur 4) Réunis-en quatre pour gagner un cœur de plus.`,
+  foretBientot: 'La barrière s\'est dissipée. Au-delà commence la Forêt des Forums... La suite de l\'aventure arrive dans la prochaine version du jeu.',
+  barriere: 'Le cristal s\'illumine. Au loin, la barrière de Bruit de la route du nord se dissipe !',
   sansAmpli: 'Spirit n\'a aucun moyen de se défendre. Il vaudrait mieux passer à la grotte d\'abord.',
 };
