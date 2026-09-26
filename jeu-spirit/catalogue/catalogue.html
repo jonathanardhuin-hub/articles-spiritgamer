@@ -142,7 +142,7 @@
   const entete = (n) => n === 1
     ? `Crée 1 image, seule dans son fichier.`
     : `Crée ${n} images distinctes, une par une, chacune dans un fichier à part que je peux télécharger séparément. Ne les assemble jamais dans une même image, pas de planche.`;
-  const SPIRIT = `Le personnage est Spirit, reproduit exactement comme sur les images jointes : petit personnage tout blanc à grosse tête ronde, grands yeux bleus, casque-micro noir et bleu marqué SG avec sa tige de micro, tee-shirt bleu avec le logo SG, short bleu à bandes cyan, baskets bleues et blanches. Mêmes proportions, même rendu toon HD à contours noirs épais que les images jointes.`;
+  const SPIRIT = `Le personnage est Spirit, reproduit exactement comme sur les images jointes : petit personnage tout blanc à grosse tête ronde, grands yeux bleus, casque-micro noir et bleu marqué SG avec sa tige de micro, tee-shirt bleu avec le logo SG, short bleu à bandes cyan, baskets bleues et blanches. Mêmes proportions, même rendu toon HD à contours noirs épais que les images jointes.\n\nDétail obligatoire, à ne jamais oublier : les lettres SG en cyan sur la face extérieure de chaque écouteur du casque, bien lisibles dans toutes les vues où l'écouteur se voit (de face : sur les deux écouteurs ; de profil : sur l'écouteur visible ; de dos : sur les deux écouteurs vus de l'arrière). Le logo SG est aussi sur le devant du tee-shirt. Ce sont les seules lettres autorisées dans l'image.`;
   const FOND_P = `Fond uni gris moyen (#808080), personnage entier et centré, même taille d'une image à l'autre, pas d'ombre au sol, aucun décor, aucun texte.`;
   const VUES = `Vues strictes : « de face » = tourné vers nous ; « de dos » = dos à nous, on ne voit pas le visage ; « de profil » = tourné vers la droite, un seul œil visible. Jamais de trois quarts.`;
   const MONSTRE = `Même rendu que les monstres des images jointes : toon HD, contours noirs épais, volumes, créature menaçante et crédible (ni mignonne ni rigolote), corps sombre parcouru de fissures d'où filtre une lueur violette, yeux jaunes lumineux. Aucun animal réel, aucun sang. Fond uni gris moyen (#808080), créature entière et centrée, pas d'ombre au sol, pas de halo, aucun texte.`;
@@ -185,7 +185,7 @@
   const RS = ['spirit-officiel', 'spirit-face', 'spirit-dos', 'spirit-profil'];
 
   // ================================================================== PROLOGUE : avant que Spirit arrive dans le Réseau
-  const ILLU = `Format paysage 16:9, dimensions exactes 1672 × 941 pixels. Illustration de cinématique, même rendu que l'écran titre joint : toon HD, contours épais, couleurs riches, lumière travaillée. Aucun texte, aucun logo à part le SG sur Spirit.`;
+  const ILLU = `Format paysage 16:9, dimensions exactes 1672 × 941 pixels. Illustration de cinématique, même rendu que l'écran titre joint : toon HD, contours épais, couleurs riches, lumière travaillée. Aucun texte, aucun logo à part le SG sur Spirit : SG en cyan sur chaque écouteur de son casque et sur le devant de son tee-shirt, à ne jamais oublier.`;
   carte('pro', 'interface', 'Les images de l\'introduction', 'Les 6 tableaux qui défilent pendant l\'histoire du début, un par phrase.', ['titre', 'spirit-officiel', 'reine'],
     ILLU,
     ['La fête des 11 ans : la grande place devant le QG, la nuit, guirlandes bleues, écrans géants, une foule de petits personnages animaux qui dansent, au centre une grande sphère de lumière blanche et cyan (la Source) qui flotte au-dessus d\'une fontaine.',
