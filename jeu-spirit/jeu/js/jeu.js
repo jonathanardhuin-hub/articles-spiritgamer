@@ -896,16 +896,17 @@ SG.Jeu = class {
       ['Ampli', this.ampli ? SG.img.ampli : null, 'A'],
       ['?', null], ['?', null], ['?', null], ['?', null], ['?', null], ['?', null], ['?', null], ['?', null],
     ];
-    const taille = 118, ecart = 18, ox = 100, oy = 120;
+    const taille = 112, ecart = 22, ox = 100, oy = 112;
     objets.forEach(([nom, im, touche], i) => {
-      const x = ox + (i % 3) * (taille + ecart), y = oy + Math.floor(i / 3) * (taille + ecart);
+      const x = ox + (i % 3) * (taille + ecart), y = oy + Math.floor(i / 3) * (taille + 44);
       ctx.save(); if (!im) ctx.globalAlpha = 0.45;
       SG.cadre(ctx, SG.img['ui-portrait'], x, y, taille, taille, 200, 26);
       ctx.restore();
       if (im) {
-        SG.dessinerPied(ctx, im, x + taille / 2, y + taille - 32, { echelle: 0.85 });
-        SG.texte(ctx, nom, x + taille / 2, y + taille - 12, 17, '#cfe8ff', 'center');
-        if (touche) SG.texte(ctx, touche, x + 22, y + 34, 18, '#7fe8ff', 'left', null, null, true);
+        // objet centré dans la case, nom sous la case
+        SG.dessinerEffet(ctx, im, x + taille / 2, y + taille / 2, 0, 0.95, 1, false);
+        if (!touche) SG.texte(ctx, nom, x + taille / 2, y + taille + 24, 18, '#cfe8ff', 'center');
+        if (touche) SG.texte(ctx, nom + ' (' + touche + ')', x + taille / 2, y + taille + 24, 18, '#cfe8ff', 'center');
       }
     });
     // état de Spirit
