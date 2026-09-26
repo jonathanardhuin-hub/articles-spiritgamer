@@ -505,6 +505,7 @@ Object.assign(SG.Jeu.prototype, {
     this.effets = []; this.projectiles = []; this.butins = []; this.monstres = []; this.pnj = [];
     this.pousse = 0;
     this.entreeSalle = null;
+    this.tSalle = 0;             // temps passé dans la salle : les grilles se ferment juste après l'entrée
     // blocs mobiles : position de départ, ou sur la plaque si l'énigme est résolue
     this.blocs = [];
     S.plan.forEach((ligne, r) => [...ligne].forEach((ch, c) => { if (ch === 'B') this.blocs.push({ c, r, anim: 0, dc: 0, dr: 0 }); }));
@@ -541,8 +542,8 @@ Object.assign(SG.Jeu.prototype, {
   // la salle bloque-t-elle ses portes (combat ou boss en cours) ?
   sallePortesFermees() {
     const S = this.salle(), k = this.salleCle(), D = this.etatDonjon();
-    if (S.boss && !D.fini) return true;
-    return !!(S.combat && !D.resolues.includes(k) && this.monstres.length > 0);
+    const piege = (S.boss && !D.fini) || !!(S.combat && !D.resolues.includes(k) && this.monstres.length > 0);
+    return piege && (this.tSalle || 0) >= SG.DELAI_GRILLES;
   },
 
   porteVers(dir) {
@@ -626,6 +627,9 @@ Object.assign(SG.Jeu.prototype, {
 
   // mise à jour propre au donjon, appelée à chaque image de jeu
   majDonjon(dt, C) {
+    const avant = this.tSalle || 0;
+    this.tSalle = avant + dt;
+    if (avant < SG.DELAI_GRILLES && this.tSalle >= SG.DELAI_GRILLES && this.sallePortesFermees()) SG.Son.effet('porte');
     const S = this.salle(), k = this.salleCle(), D = this.etatDonjon(), s = this.spirit;
     if (!this.entreeSalle) this.entreeSalle = { x: s.x, y: s.y };
     if (s.chute > 0) {
@@ -860,7 +864,7 @@ Object.assign(SG.Jeu.prototype, {
     // portes (toujours derrière les personnages : dessinées sur le fond)
     for (const dir of ['haut', 'bas', 'gauche', 'droite']) {
       const p = this.porteVers(dir);
-      liste.push({ y: dir === 'bas' ? SG.H + 100 : -100, dessiner: (ctx) => SG.dessinPorte(ctx, dir, p, this.porteOuverte(dir), this.sallePortesFermees()) });
+      liste.push({ y: dir === 'bas' ? SG.H + 100 : -100, dessiner: (ctx) => SG.dessinPorte(ctx, dir, p, this.porteOuverte(dir), this.sallePortesFermees(), SG.clamp(((this.tSalle || 0) - SG.DELAI_GRILLES) / 0.22, 0, 1)) });
     }
   },
 
@@ -983,7 +987,8 @@ SG.dessinCristal = function (ctx, x, y, frappe, t) {
     ctx.restore();
   });
 };
-SG.dessinPorte = function (ctx, dir, p, ouverte, volets) {
+SG.DELAI_GRILLES = 0.6;
+SG.dessinPorte = function (ctx, dir, p, ouverte, volets, descente = 1) {
   if (!p) return;
   const type = p.type;
   let nom = 'battant-ouvert';
@@ -1001,7 +1006,11 @@ SG.dessinPorte = function (ctx, dir, p, ouverte, volets) {
   if (im && im.width) {
     // on garde les proportions du battant : on prend la bande centrale de l'image (serrure au milieu) au lieu de l'écraser
     const w = L - 12, h = 82, sh = Math.min(im.height, im.width * h / w);
-    ctx.drawImage(im, 0, (im.height - sh) / 2, im.width, sh, -L / 2 + 6, -40, w, h);
+    // la grille qui vient de se fermer descend du haut de l'embrasure
+    const glisse = volets && !ouverte ? (1 - descente) * h : 0;
+    ctx.save(); ctx.beginPath(); ctx.rect(-L / 2, -40, L, 80); ctx.clip();
+    ctx.drawImage(im, 0, (im.height - sh) / 2, im.width, sh, -L / 2 + 6, -40 - glisse, w, h);
+    ctx.restore();
   }
   // montants de pierre : ombre et contour pour l'encastrer
   ctx.strokeStyle = '#0b0814'; ctx.lineWidth = 5;

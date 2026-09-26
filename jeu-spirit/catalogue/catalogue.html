@@ -1,0 +1,545 @@
+<title>Catalogue d'images Spirit</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Nunito:wght@400;600;700;800&display=swap">
+<style>
+  :root {
+    color-scheme: dark;
+    --fond: #070d1f;
+    --panneau: #0e1a38;
+    --panneau-2: #132449;
+    --bord: #1f3a72;
+    --cyan: #2ad4ff;
+    --cyan-pale: #9fe9ff;
+    --violet: #a45cff;
+    --texte: #e6efff;
+    --texte-doux: #9db0d6;
+    --ok: #53e08a;
+    --titre: 'Lilita One', 'Arial Black', system-ui, sans-serif;
+    --corps: 'Nunito', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  }
+  * { box-sizing: border-box; }
+  body {
+    background: var(--fond);
+    color: var(--texte);
+    font: 16px/1.5 var(--corps);
+    padding-inline: 16px;
+    padding-block: 0 64px;
+  }
+  .page { max-width: 1180px; margin: 0 auto; }
+  header.tete { padding-block: 32px 20px; display: grid; gap: 14px; }
+  h1 {
+    font: 400 clamp(34px, 6vw, 56px)/1 var(--titre);
+    margin: 0; letter-spacing: 0.5px;
+    color: #fff;
+    text-shadow: 0 3px 0 #0a2a6a, 0 0 22px rgba(42, 212, 255, 0.45);
+  }
+  h1 small { display: block; font: 700 15px/1.3 var(--corps); color: var(--cyan-pale); letter-spacing: 2px; text-transform: uppercase; margin-top: 10px; text-shadow: none; }
+  .mode-emploi { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; margin: 0; padding: 0; list-style: none; }
+  .mode-emploi li { background: var(--panneau); border: 1px solid var(--bord); border-radius: 10px; padding: 12px 14px; color: var(--texte-doux); font-size: 15px; }
+  .mode-emploi b { color: var(--texte); display: block; font-size: 15px; margin-bottom: 2px; }
+
+  nav.filtres {
+    position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5;
+    background: rgba(7, 13, 31, 0.94); backdrop-filter: blur(6px);
+    border-bottom: 1px solid var(--bord);
+    padding-block: 10px; display: grid; gap: 8px;
+  }
+  .rangee { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+  .rangee .etiq { font: 800 11px/1 var(--corps); letter-spacing: 1.5px; text-transform: uppercase; color: var(--texte-doux); margin-right: 4px; min-width: 64px; }
+  .puce {
+    font: 700 14px/1 var(--corps); color: var(--texte-doux);
+    background: var(--panneau); border: 1px solid var(--bord); border-radius: 999px;
+    padding: 8px 12px; cursor: pointer;
+  }
+  .puce:hover { color: var(--texte); border-color: var(--cyan); }
+  .puce[aria-pressed="true"] { background: var(--cyan); color: #04122e; border-color: var(--cyan); }
+  .puce:focus-visible, button:focus-visible, a:focus-visible { outline: 3px solid var(--violet); outline-offset: 2px; }
+  .compte { margin-left: auto; font-size: 14px; color: var(--texte-doux); font-variant-numeric: tabular-nums; }
+
+  section.categorie { margin-top: 34px; }
+  section.categorie > h2 {
+    font: 400 28px/1.1 var(--titre); color: #fff; margin: 0 0 14px;
+    display: flex; align-items: baseline; gap: 10px;
+  }
+  section.categorie > h2 span { font: 700 14px var(--corps); color: var(--texte-doux); }
+  .grille { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 520px), 1fr)); gap: 16px; }
+
+  article.carte {
+    background: linear-gradient(180deg, var(--panneau-2), var(--panneau));
+    border: 1px solid var(--bord); border-radius: 14px;
+    padding: 16px; display: grid; gap: 12px; align-content: start;
+  }
+  article.carte.faite { opacity: 0.55; }
+  article.carte.faite .code { background: var(--ok); color: #03220f; }
+  .entete { display: flex; gap: 10px; align-items: flex-start; }
+  .code { font: 800 12px/1 var(--corps); letter-spacing: 1px; background: var(--cyan); color: #04122e; border-radius: 6px; padding: 5px 7px; white-space: nowrap; margin-top: 3px; }
+  .entete h3 { font: 800 19px/1.25 var(--corps); margin: 0; flex: 1; text-wrap: balance; }
+  .nb { font: 700 13px var(--corps); color: var(--cyan-pale); white-space: nowrap; margin-top: 3px; }
+  .pourquoi { margin: 0; color: var(--texte-doux); font-size: 15px; }
+  .joindre { display: grid; gap: 6px; }
+  .joindre .etiq, .bloc-prompt .etiq { font: 800 11px/1 var(--corps); letter-spacing: 1.5px; text-transform: uppercase; color: var(--violet); }
+  .vignettes { display: flex; gap: 8px; flex-wrap: wrap; }
+  .vignette { width: 86px; display: grid; gap: 4px; text-decoration: none; color: var(--texte-doux); font-size: 11px; line-height: 1.2; text-align: center; }
+  .vignette img {
+    width: 86px; height: 86px; object-fit: contain; border-radius: 8px;
+    background: #6f7480 repeating-conic-gradient(#7c818d 0 25%, #6f7480 0 50%) 0 0 / 16px 16px;
+    border: 1px solid var(--bord);
+  }
+  .vignette:hover img { border-color: var(--cyan); }
+  .note-ref { background: rgba(164, 92, 255, 0.12); border: 1px dashed var(--violet); color: var(--texte); border-radius: 8px; padding: 8px 10px; font-size: 14px; }
+  .bloc-prompt { display: grid; gap: 6px; }
+  .prompts { display: grid; gap: 14px; }
+  .prompt {
+    white-space: pre-wrap; margin: 0; max-height: 260px; overflow: auto;
+    background: #050a18; border: 1px solid var(--bord); border-radius: 10px;
+    padding: 12px; font: 14px/1.5 var(--corps); color: #d9e6ff;
+  }
+  .actions { display: flex; gap: 8px; flex-wrap: wrap; }
+  .actions button {
+    font: 800 14px/1 var(--corps); border-radius: 8px; padding: 10px 14px; cursor: pointer;
+    border: 1px solid var(--cyan); background: transparent; color: var(--cyan);
+  }
+  .actions button.copier { background: var(--cyan); color: #04122e; }
+  .actions button.fait[aria-pressed="true"] { background: var(--ok); border-color: var(--ok); color: #03220f; }
+  .vide { color: var(--texte-doux); padding: 30px 0; }
+  @media (prefers-reduced-motion: no-preference) { .puce, .actions button { transition: background 0.15s, color 0.15s, border-color 0.15s; } }
+</style>
+
+<div class="page">
+  <header class="tete">
+    <h1>Catalogue d'images<small>Spirit et le Roi Clickbait · toutes les images du jeu</small></h1>
+    <ul class="mode-emploi">
+      <li><b>1 carte = 1 conversation ChatGPT</b>Copie le prompt, joins les images montrées sous « À joindre » (clique dessus pour les ouvrir en grand et les enregistrer).</li>
+      <li><b>Dans l'ordre des étapes</b>Commence par « Donjon 1 » : c'est ce que je code maintenant. Le reste suit région par région.</li>
+      <li><b>Envoie-moi le résultat</b>Toutes les images d'une carte dans un seul message, avec son code (par exemple D1-03).</li>
+      <li><b>Coche « Fait »</b>La page s'en souvient dans ton navigateur, pour savoir où tu en es.</li>
+    </ul>
+  </header>
+
+  <nav class="filtres" aria-label="Filtres">
+    <div class="rangee" id="etapes"><span class="etiq">Étape</span></div>
+    <div class="rangee" id="categories"><span class="etiq">Catégorie</span><span class="compte" id="compte"></span></div>
+  </nav>
+
+  <main id="liste"></main>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  // ------------------------------------------------------------------ images de référence
+  const REFS = {
+    'spirit-officiel': 'Spirit officiel', 'spirit-face': 'Spirit face', 'spirit-dos': 'Spirit dos', 'spirit-profil': 'Spirit profil',
+    'spirit-attaque': 'Spirit attaque', 'spirit-portrait': 'Portrait Spirit', 'spirit-pousse': 'Spirit pousse',
+    'monstres': 'Monstres Plaine', 'cornu': 'Cornu', 'cornu-pas': 'Cornu qui marche', 'popup': 'Pop-up', 'clic': 'Clic', 'reine': 'Reine Pop-up',
+    'decor-plaine': 'Décor Plaine', 'arbre': 'Arbre', 'salle': 'Salle du Terrier', 'grotte': 'Grotte', 'ampli': 'Ampli', 'manette': 'Manette',
+    'coffre': 'Coffre', 'statue': 'Gargouille', 'bloc': 'Bloc', 'flash': 'Flash', 'portrait-flash': 'Portrait Flash', 'ermite': 'Ermite',
+    'ui': 'Cadre interface', 'battant': 'Battant de porte', 'sol-herbe': 'Sol herbe', 'titre': 'Écran titre', 'projectiles': 'Projectiles', 'entree': 'Entrée du Terrier',
+  };
+
+  // ------------------------------------------------------------------ morceaux de prompt communs
+  const entete = (n) => n === 1
+    ? `Crée 1 image, seule dans son fichier.`
+    : `Crée ${n} images distinctes, une par une, chacune dans un fichier à part que je peux télécharger séparément. Ne les assemble jamais dans une même image, pas de planche.`;
+  const SPIRIT = `Le personnage est Spirit, reproduit exactement comme sur les images jointes : petit personnage tout blanc à grosse tête ronde, grands yeux bleus, casque-micro noir et bleu marqué SG avec sa tige de micro, tee-shirt bleu avec le logo SG, short bleu à bandes cyan, baskets bleues et blanches. Mêmes proportions, même rendu toon HD à contours noirs épais que les images jointes.`;
+  const FOND_P = `Fond uni gris moyen (#808080), personnage entier et centré, même taille d'une image à l'autre, pas d'ombre au sol, aucun décor, aucun texte.`;
+  const VUES = `Vues strictes : « de face » = tourné vers nous ; « de dos » = dos à nous, on ne voit pas le visage ; « de profil » = tourné vers la droite, un seul œil visible. Jamais de trois quarts.`;
+  const MONSTRE = `Même rendu que les monstres des images jointes : toon HD, contours noirs épais, volumes, créature menaçante et crédible (ni mignonne ni rigolote), corps sombre parcouru de fissures d'où filtre une lueur violette, yeux jaunes lumineux. Aucun animal réel, aucun sang. Fond uni gris moyen (#808080), créature entière et centrée, pas d'ombre au sol, pas de halo, aucun texte.`;
+  const SBIRE = `Même rendu que les sbires joints : créature numérique maléfique, toon HD, contours noirs épais, métal ou matière sombre fissurée de violet lumineux, yeux jaunes brillants, inquiétante et pas rigolote. Aucun sang. Vue de face, légèrement plongeante comme dans les Zelda en 2D. Fond uni gris moyen (#808080), créature entière et centrée, pas d'ombre au sol, pas de halo, aucun texte.`;
+  const OBJET = `Même rendu que l'objet joint : toon HD, contours noirs épais, couleurs franches, reflets nets. Objet seul, entier, centré, vu bien de face, sans perspective de biais. Fond uni gris moyen (#808080), pas d'ombre, pas de halo, aucun texte ni chiffre.`;
+  const ELEM = `Même rendu et même angle que les éléments de décor joints : vue de dessus plongeante comme dans les Zelda en 2D, on voit le dessus et la face avant, jamais de biais ni de côté. Toon HD, contours noirs épais. Élément seul, entier, centré. Fond uni gris moyen (#808080), pas d'ombre au sol, aucun texte.`;
+  const SOL = `Chaque image est une texture de sol carrée qui se répète sans raccord visible (seamless), vue exactement du dessus, sans perspective, sans ombre portée, sans objet posé, sans bord ni cadre. Toon HD, mêmes couleurs saturées que le sol joint.`;
+  const GARDIEN = `Même rendu que le Gardien joint (Flash, le hibou reporter) : animal inventé qui se tient debout comme un personnage, toon HD, contours noirs épais, air bienveillant et un peu fatigué d'avoir été enfermé. Fond uni gris moyen (#808080), personnage entier et centré, pas d'ombre au sol, aucun texte.`;
+  const PNJ = `Même rendu que les personnages joints : toon HD, contours noirs épais, personnage inventé (animal qui se tient debout comme un humain), sympathique et crédible. Fond uni gris moyen (#808080), pas d'ombre au sol, aucun texte.`;
+  const PORTES = `Chaque image est un battant de porte vu exactement de face, qui remplit toute l'image jusqu'aux bords, au format paysage 2:1 (deux fois plus large que haut). Rien autour : ni mur, ni sol, ni cadre de pierre. Même rendu que le battant joint, toon HD, contours épais. Aucun texte.`;
+  const SALLE_PORTES = (theme) => `Crée 1 image, seule dans son fichier.\n\nFormat paysage 16:9. Une salle de donjon entière vue de dessus comme dans les Zelda en 2D, avec exactement le même cadrage que la salle jointe : murs épais tout autour (un neuvième de la hauteur de l'image en haut et en bas, un seizième de la largeur à gauche et à droite). Une porte au milieu exact de chacun des quatre murs (haut, bas, gauche, droite), construite dans l'épaisseur du mur, avec son encadrement de pierre, bien intégrée au décor. Les quatre portes sont ouvertes : on voit un passage plongé dans l'ombre. Sol en dalles parfaitement vide, sans objet ni personnage. Toon HD, contours épais, lumière d'ambiance. Aucun texte.\n\nThème : ${theme}`;
+  const SUITES_PORTES = [
+    `Modifie l'image précédente. Garde absolument tout identique au pixel près (murs, sol, lumière, cadrage, encadrements des portes). Change uniquement l'intérieur des quatre passages : ils sont maintenant fermés par une grille de barreaux épais qui vient de descendre.`,
+    `Modifie à nouveau l'image de la salle aux portes ouvertes. Garde absolument tout identique. Change uniquement l'intérieur des quatre passages : ils sont fermés par une lourde porte verrouillée, avec une grosse serrure dorée au centre.`,
+    `Modifie à nouveau l'image de la salle aux portes ouvertes. Garde absolument tout identique. Change uniquement l'intérieur des quatre passages : ils sont fermés par la porte du boss, la plus impressionnante, ornée, menaçante.`,
+    `Modifie à nouveau l'image de la salle aux portes ouvertes. Garde absolument tout identique. Rebouche complètement les quatre passages et leurs encadrements : à leur place, le mur continue normalement, comme s'il n'y avait jamais eu de porte.`,
+  ];
+  const salleVide = (theme) => `Format paysage 16:9. Une salle de donjon vide vue de dessus comme dans les Zelda en 2D, avec exactement le même cadrage que la salle jointe : murs épais tout autour (un neuvième de la hauteur de l'image en haut et en bas, un seizième de la largeur à gauche et à droite), murs pleins et continus sur les quatre côtés, sans aucune porte ni ouverture (le jeu découpe les portes lui-même). Sol en dalles, parfaitement vide, sans objet ni personnage. Toon HD, contours épais, lumière d'ambiance. Aucun texte.\n\nThème : ${theme}`;
+  const marche = (quadrupede) => quadrupede
+    ? `Pour chacune des 3 vues de la carte précédente (face, dos, profil droit), fais 2 images de marche : d'abord patte avant gauche et patte arrière droite en avant, puis patte avant droite et patte arrière gauche en avant. Même taille, même cadrage et même éclairage que les images de poses jointes.`
+    : `Pour chacune des 3 vues de la carte précédente (face, dos, profil droit), fais 2 images de marche : d'abord la jambe gauche en avant et la droite en arrière, puis la jambe droite en avant et la gauche en arrière. Une seule jambe en avant à la fois, bien visible. Les bras se balancent à l'opposé des jambes. Même taille, même cadrage et même éclairage que les images de poses jointes.`;
+
+  const cartes = [];
+  let numero = {};
+  function carte(etape, cat, titre, pourquoi, refs, style, items, note, suites) {
+    const code = { d1: 'D1', qg: 'QG', r2: 'R2', r3: 'R3', r4: 'R4', r5: 'R5', r6: 'R6', r7: 'R7', r8: 'R8', fin: 'FIN' }[etape];
+    numero[code] = (numero[code] || 0) + 1;
+    const n = items.length;
+    const liste = n === 1 ? items[0] : items.map((x, i) => `${i + 1}) ${x}`).join('\n');
+    cartes.push({
+      id: `${code}-${String(numero[code]).padStart(2, '0')}`, etape, cat, titre, pourquoi, refs, note, n: n + (suites ? suites.length : 0),
+      prompts: [`${entete(n)}\n\n${style}\n\n${liste}`].concat(suites || []),
+    });
+  }
+  const P3 = (a, b, c) => [`de face : ${a}`, `de dos : ${b}`, `de profil (tourné vers la droite) : ${c}`];
+  const RS = ['spirit-officiel', 'spirit-face', 'spirit-dos', 'spirit-profil'];
+
+  // ================================================================== DONJON 1 (maintenant)
+  carte('d1', 'perso', 'Spirit lance la Manette', 'La pose du lancer, pour quand tu utilises la Manette Retour avec B.', RS.concat('manette'),
+    `${SPIRIT}\n\n${VUES}\n\n${FOND_P}\n\nSpirit vient de lancer un objet (l'objet n'est pas dessiné) : bras droit tendu loin devant, main ouverte qui vient de lâcher, bras gauche en arrière pour l'équilibre, buste penché vers l'avant, jambe avant fléchie, jambe arrière tendue, regard concentré, bouche fermée.`,
+    P3('bras tendu vers nous, main ouverte face à nous', 'bras tendu vers le fond, main cachée par le corps', 'bras tendu vers la droite à hauteur d\'épaule'));
+  carte('d1', 'perso', 'Spirit tire avec le Mégaphone', 'La pose de tir du Mégaphone, l\'objet caché sous le donjon 1.', RS,
+    `${SPIRIT}\n\n${VUES}\n\n${FOND_P}\n\nSpirit tient à deux mains le Mégaphone joint, collé à sa bouche, le pavillon pointé droit devant lui, jambes écartées et bien ancrées, comme s'il criait dedans de toutes ses forces. Yeux plissés d'effort.`,
+    P3('pavillon pointé vers nous, on voit l\'intérieur du pavillon', 'pavillon pointé vers le fond, on voit l\'arrière du Mégaphone dépasser de sa tête', 'pavillon pointé vers la droite'),
+    'Joins aussi le Mégaphone que tu auras créé avec la carte D1-06.');
+  carte('d1', 'perso', 'Spirit sur l\'échelle', 'Pour descendre dans les sous-sols, vus de profil.', RS,
+    `${SPIRIT}\n\n${FOND_P}\n\nSpirit vu exactement de dos, accroché à une échelle qui n'est pas dessinée : les deux mains en l'air à des hauteurs différentes, comme s'il tenait deux barreaux, les jambes à des hauteurs différentes, comme s'il posait les pieds sur deux barreaux.`,
+    ['main gauche en haut, pied droit en haut', 'main droite en haut, pied gauche en haut (l\'inverse exact de l\'image 1)']);
+  carte('d1', 'perso', 'Spirit prend un coup', 'Pour qu\'on voie clairement quand un ennemi te touche.', RS,
+    `${SPIRIT}\n\n${VUES}\n\n${FOND_P}\n\nSpirit vient d'être frappé : il recule d'un pas, le buste rejeté en arrière, les bras écartés, les yeux fermés très fort, la bouche en grimace. Aucune blessure, aucun sang.`,
+    P3('il recule vers nous', 'il recule vers nous, on voit son dos', 'il recule vers la gauche, tourné vers la droite'));
+  carte('d1', 'perso', 'Portraits de Spirit pour les dialogues', 'Plus d\'émotions dans la fenêtre de dialogue.', ['spirit-portrait', 'spirit-officiel'],
+    `${SPIRIT}\n\nMême cadrage que le portrait joint : buste et tête, vu de face, centré. Fond uni gris moyen (#808080), aucun texte.`,
+    ['étonné : yeux grands ouverts, sourcils levés, petite bouche ronde', 'déterminé : sourcils froncés, petit sourire en coin, regard droit devant', 'inquiet : sourcils relevés au centre, bouche serrée, regard vers le côté']);
+  carte('d1', 'objets', 'Mégaphone, son onde et le carnet de Flash', 'L\'objet du sous-sol du donjon 1, son tir, et les pages du carnet qui donnent les indices.', ['ampli', 'manette'],
+    OBJET,
+    ['Le Mégaphone : un mégaphone de reporter noir et bleu, poignée pistolet, pavillon évasé avec un liseré cyan lumineux, même style que l\'Ampli joint.',
+     'L\'onde du Mégaphone : un projectile d\'onde sonore allongé, trois arcs de cercle cyan emboîtés, lumineux, qui file vers la droite. Format paysage.',
+     'Une page arrachée d\'un carnet de reporter : papier crème à spirales, pliée en deux, quelques griffonnages illisibles et un petit dessin de chouette. Aucun mot lisible.']);
+  carte('d1', 'ennemis', 'Le Clic doré', 'Les trois Clics dorés : le dernier lâche la Manette Retour.', ['clic', 'popup'],
+    SBIRE,
+    ['Le Clic doré : exactement le même Clic que celui joint (curseur de souris en métal tranchant avec deux jambes), mais en or sombre patiné, fissures violettes, yeux jaunes, debout prêt à foncer.',
+     'Le même Clic doré en pleine course : jambe gauche loin devant, jambe droite loin derrière, penché vers l\'avant.']);
+  carte('d1', 'ennemis', 'Pop-up et Spamling qui attaquent', 'Une deuxième image pour chacun, pour qu\'ils bougent au lieu de glisser.', ['popup'],
+    SBIRE + `\n\nMême créature que celle jointe, même taille, même cadrage.`,
+    ['Le Pop-up qui attaque : même fenêtre corrompue, l\'écran s\'ouvre en grand comme une bouche sombre, les lambeaux d\'énergie violette se dressent vers l\'avant.',
+     'Le Spamling en plein bond : même enveloppe noircie, rabat grand ouvert, pattes griffues repliées sous lui, en l\'air.'],
+    'Joins aussi le Spamling (jeu-spirit/images/donjon1/spamling.png) si tu l\'as encore.');
+  carte('d1', 'decors', 'Salle du Terrier avec ses portes', 'Plus de battants collés : la salle entière, dessinée avec ses portes. Le jeu prend chaque mur dans l\'image qui correspond à l\'état de sa porte (ouverte, grille, clé, boss ou pas de porte). Fais les 5 étapes dans la même conversation ChatGPT, dans l\'ordre.', ['salle', 'battant'],
+    SALLE_PORTES('un repaire souterrain creusé par une puissance numérique maléfique, pierre sombre bleu-violet, fissures violettes lumineuses.').split('\n\n').slice(1).join('\n\n'), ['Les quatre portes ouvertes.'], null, SUITES_PORTES);
+  carte('d1', 'decors', 'Pièges et mécanismes du Terrier', 'Les nouvelles salles du plan : bandeaux, redirections, notifications, disjoncteur.', ['salle', 'statue', 'popup'],
+    ELEM + `\n\nMême univers que la salle jointe : pierre sombre bleu-violet, fissures violettes, technologie maléfique.`,
+    ['Un bandeau de pub : une longue bannière publicitaire horizontale en métal sombre qui flotte, bords déchirés, surface qui clignote en violet et rouge sombre, sans aucun texte. Format paysage 4:1.',
+     'Une fenêtre de redirection : un portail rectangulaire posé à plat sur le sol, vu du dessus, cadre de métal noir, intérieur tourbillonnant violet sombre.',
+     'Une bulle de notification : une petite bulle ronde rouge sombre avec un point lumineux au centre, entourée d\'un anneau violet, prête à exploser (projectile).',
+     'Un disjoncteur mural : boîtier de métal sombre fixé au mur, grosse manette abaissée, voyant rouge éteint.',
+     'Le même disjoncteur, manette levée, voyant qui brille en cyan.']);
+  carte('d1', 'decors', 'Mur fêlé, trappe et socle', 'Le mur à faire sauter plus tard, et l\'accès aux sous-sols.', ['salle', 'bloc'],
+    ELEM + `\n\nMême univers que la salle jointe : pierre sombre bleu-violet, fissures violettes.`,
+    ['Un morceau de mur épais vu de dessus, identique aux murs de la salle jointe, mais traversé d\'une grande fissure en étoile, sans lumière violette. Format carré.',
+     'Une trappe fermée dans le sol dallé, vue exactement du dessus : lourde plaque de métal sombre rivetée, poignée en anneau.',
+     'La même trappe ouverte : un trou carré qui s\'enfonce dans le noir, le haut d\'une échelle de maintenance métallique qui dépasse.',
+     'Un socle de maintenance vu de face : petit piédestal de métal avec des voyants bleus, sur lequel on pose l\'objet du donjon.']);
+  carte('d1', 'decors', 'Les Coulisses du serveur (sous-sol)', 'Le sous-sol de profil où repose le Mégaphone. Rien à voir avec le donjon.', ['decor-plaine', 'spirit-profil'],
+    `Format paysage 16:9. Vue de profil, comme un jeu de plateforme en 2D : on voit le sol en bas, le plafond en haut, et les murs sur les côtés. Toon HD, contours épais. Rien ne doit ressembler au donjon de pierre : c'est la salle technique cachée du Réseau. Aucun personnage, aucun texte.`,
+    ['Une salle technique étroite : baies de serveurs noires alignées au fond avec des voyants bleus et verts qui clignotent, gros câbles qui pendent du plafond, sol en grille métallique, une échelle de maintenance qui descend du plafond à gauche, lumière bleue froide. Le sol est plat et dégagé au premier plan sur toute la largeur, pour qu\'on puisse y marcher.']);
+  carte('d1', 'decors', 'Le Câble (passage souterrain)', 'Le couloir de profil qui mène à la salle isolée de la grande clé.', ['decor-plaine', 'spirit-profil'],
+    `Format paysage 16:9. Vue de profil, comme un jeu de plateforme en 2D. Toon HD, contours épais. Rien ne doit ressembler au donjon de pierre. Aucun personnage, aucun texte.`,
+    ['Une longue gaine technique horizontale : parois tapissées d\'énormes câbles tressés noirs et bleus qui courent d\'un bout à l\'autre, passerelle métallique plate au premier plan sur toute la largeur, une échelle à chaque extrémité (une à gauche, une à droite) qui monte vers le plafond, petites lumières cyan tous les deux mètres.']);
+
+  // ================================================================== PARVIS DU QG
+  carte('qg', 'decors', 'Le Parvis du QG : bâtiments', 'Le village de départ et sa boutique.', ['decor-plaine', 'arbre'],
+    ELEM + `\n\nUnivers : la place devant le QG de SpiritGamer, moderne et chaleureuse, néons bleus.`,
+    ['Le QG : un bâtiment moderne à deux étages, grandes baies vitrées, façade bleu nuit et blanc, grande antenne sur le toit, une porte au centre, sans aucun texte ni logo. Largeur de 4 cases.',
+     'La boutique : un petit kiosque avec un auvent rayé bleu et blanc, un comptoir, des étagères derrière, sans texte. Largeur de 2 cases.',
+     'Une fontaine ronde en pierre claire avec un jet d\'eau et un anneau de lumière cyan.',
+     'Un lampadaire néon bleu.',
+     'Un banc public en bois et métal.']);
+  carte('qg', 'decors', 'Sols du Parvis', 'Pavés et pelouse soignée.', ['sol-herbe'],
+    SOL, ['pavés gris-bleu réguliers', 'pelouse tondue bien verte', 'dalles claires de place publique']);
+  carte('qg', 'pnj', 'Les habitants du Parvis', 'La marchande, le rédacteur en chef et une jeune fan : chacun en pied et en portrait.', ['ermite', 'flash', 'portrait-flash'],
+    PNJ,
+    ['Mona, la marchande : chatte rousse ronde, tablier bleu, sourire commerçant, debout de face, entière.',
+     'Portrait de Mona, buste et tête de face, même cadrage que le portrait joint.',
+     'Gus, le rédacteur en chef : vieux blaireau à lunettes, chemise aux manches retroussées, tasse de café à la main, debout de face.',
+     'Portrait de Gus, buste et tête de face.',
+     'Lila, une jeune fan : petite lapine avec un sweat bleu à capuche et une console portable, debout de face.']);
+  carte('qg', 'objets', 'Articles de la boutique', 'Ce que Mona vend contre des Pixels.', ['ampli'],
+    OBJET,
+    ['Un bouclier rond en métal bleu nuit, bord cyan, sans symbole.', 'Une bourse en tissu bleu fermée par un cordon doré, bien remplie.', 'Une canette de boisson énergisante bleue et rouge avec un cœur blanc dessiné dessus, sans texte (elle rend de la vie).', 'Une bourse plus grande en cuir bleu, fermoir doré.']);
+  carte('qg', 'interface', 'Carte du Réseau', 'La carte du monde entier, pour l\'écran Carte.', ['ui', 'titre'],
+    `Format paysage 16:9. Même habillage que le cadre joint : néon bleu cyan, métal sombre. Toon HD. Aucun texte.`,
+    ['Une carte illustrée vue de dessus du monde du jeu, en 10 régions bien distinctes : au centre une place moderne (le QG) ; autour, une plaine verte, une forêt dense, des montagnes métalliques, un désert, un grand lac, une ville de bandes dessinées, un marais, une toundra enneigée ; tout en haut, un cratère sombre avec une tour violette. Les régions sont reliées par des chemins. Aucun nom écrit.']);
+
+  // ================================================================== RÉGIONS 2 à 8
+  const REGIONS = [
+    {
+      e: 'r2', nom: 'Forêt des Forums', donjon: 'Labyrinthe des Fils',
+      monstres: [
+        ['Sylvain corrompu', 'un arbre mort qui marche sur deux grosses racines en guise de jambes, écorce noire fendue de violet, deux yeux jaunes dans un creux du tronc, branches griffues en guise de bras', 'jambes'],
+        ['Traqueur', 'un archer humanoïde encapuchonné, cape sombre en lambeaux, visage invisible dans l\'ombre sauf deux yeux jaunes, arc noir fissuré de violet', 'jambes', 'une flèche d\'ombre noire et violette, vue exactement de profil, pointe vers la droite, format paysage'],
+        ['Chauve-ombre', 'une chauve-souris faite de fumée noire et de cuir sombre, ailes déchirées, fissures violettes, yeux jaunes', 'ailes'],
+      ],
+      decor: ['Un arbre de forêt dense, grand et touffu, tronc épais, feuillage vert sombre.', 'Une souche creuse moussue.', 'Un groupe de champignons géants violets aux chapeaux luisants.', 'Un tronc couché en travers, deux cases de large.', 'Un rocher fissuré couvert de mousse, fissure bien visible (on le fera sauter avec un pétard).'],
+      sols: ['mousse de sous-bois', 'sentier de terre couvert d\'aiguilles de pin', 'rivière sombre de forêt'],
+      lieux: ['L\'entrée du Labyrinthe des Fils : une colline couverte de câbles et de racines entremêlés, une entrée sombre au centre, vue de face plongeante, large de 3 cases.', 'Une borne Wi-Fi de voyage éteinte : poteau de métal bleu avec une antenne et un écran rond noir.', 'La même borne allumée : l\'écran rond brille en cyan, trois arcs Wi-Fi lumineux au-dessus.'],
+      sbires: ['Le Trollinet : petit troll trapu en pierre sombre et mousse, massue faite de câbles tressés, yeux jaunes.', 'Le Fil-serpent : serpent fait de câbles électriques tressés, une prise électrique en guise de tête, étincelles violettes.', 'Le Hibou-rumeur : hibou mécanique sombre, plumes en papier journal noirci et déchiré, yeux jaunes, aucun texte lisible.'],
+      animSbires: ['le Trollinet qui frappe, massue levée au-dessus de la tête', 'le Fil-serpent qui se dresse, gueule-prise ouverte', 'le Hibou-rumeur ailes grandes ouvertes, en vol'],
+      salle: 'un labyrinthe souterrain envahi de câbles et de racines, pierre verdâtre sombre, fils électriques qui courent le long des murs, lueurs violettes.',
+      lumiere: 'une lanterne à câble suspendue à un pied de métal',
+      boss: ['Le Troll des Commentaires', 'un énorme troll trapu en pierre sombre et câbles, une bouche immense d\'où débordent des bulles de commentaire noires et vides (sans texte), petits yeux jaunes, deux poings énormes', 'bouche grande ouverte, poings levés au-dessus de la tête, prêt à écraser le sol', 'une bulle de commentaire noire et épaisse, bord violet, sans texte (le projectile qu\'il crache)'],
+      gardien: ['Note, la tortue testeuse', 'une tortue dont la carapace ressemble à une manette de jeu, lunettes rondes, bloc-notes et stylo à la main', 'en train d\'écrire sur son bloc-notes, concentrée'],
+      spirit: ['Spirit pose un pétard', 'Spirit accroupi, un genou au sol, les deux mains posées devant lui comme s\'il déposait délicatement un objet au sol (l\'objet n\'est pas dessiné), regard prudent', 'mains posées vers nous', 'mains posées vers le fond, on voit son dos voûté', 'mains posées vers la droite'],
+      objets: ['Un Pétard Confettis : un gros pétard cylindrique bleu et rose à bandes, mèche courte, confettis peints dessus.', 'Le même pétard posé debout, mèche allumée avec une petite étincelle jaune.', 'Une explosion de confettis vue de dessus : un nuage rond de confettis multicolores et d\'étoiles blanches, sans flammes, sans fumée noire.', 'La Manette Pro : la Manette jointe en version améliorée, coque dorée et bleue, voyants cyan.', 'Un sac à pétards en toile bleue, rempli, cordon doré.'],
+    },
+    {
+      e: 'r3', nom: 'Monts Hardware', donjon: 'Forge Surchauffée',
+      monstres: [
+        ['Golem de ferraille', 'un colosse fait de plaques de métal rouillé et de pièces d\'ordinateur boulonnées, gros poings, un seul œil jaune au centre du torse, fissures violettes', 'jambes'],
+        ['Harpie de fer', 'une créature ailée aux ailes faites de lames de ventilateur en métal noir, serres acérées, masque de métal avec deux yeux jaunes', 'ailes'],
+        ['Rouilleur', 'une créature trapue à carapace de plaques rouillées, capable de se rouler en boule, yeux jaunes sous la carapace', 'boule'],
+      ],
+      decor: ['Un rocher métallique gris aux reflets bleus.', 'Un pylône électrique tordu, câbles arrachés.', 'Un tas de pièces détachées : engrenages, vis, plaques.', 'Un grand cristal de silicium bleu pâle planté dans la roche.', 'Un bout de rail de mine avec un wagonnet vide.'],
+      sols: ['roche grise de montagne', 'gravier métallique', 'coulée de lave orange qui bouillonne (danger)'],
+      lieux: ['L\'entrée de la Forge Surchauffée : une grande porte de forge taillée dans la montagne, deux cheminées qui fument, lueur orange à l\'intérieur, vue de face plongeante, large de 3 cases.', 'L\'entrée d\'une grotte sombre dans la roche (il faudra la Lanterne).'],
+      sbires: ['Le Scarabug : scarabée mécanique à la carapace en circuit imprimé noir, pinces tranchantes.', 'Le Ventilo : un ventilateur d\'ordinateur volant aux pales tranchantes, cadre noir, un œil jaune au centre.', 'Le Câble-brûlant : un gros câble d\'alimentation incandescent qui ondule comme un serpent, prise chauffée au rouge en guise de tête.'],
+      animSbires: ['le Scarabug pinces grandes ouvertes', 'le Ventilo penché en avant, pales floues de vitesse', 'le Câble-brûlant dressé, prise qui crache des étincelles'],
+      salle: 'une forge industrielle, métal noirci, grilles au sol, rivets, conduits sur les murs, lueurs orange et violettes.',
+      lumiere: 'un brasero de forge en fonte',
+      boss: ['Surchauffe', 'un processeur géant vivant, dissipateur hérissé en guise de couronne, cœur incandescent orange visible au centre, quatre bras faits de gros câbles', 'cœur qui flamboie, bras de câbles levés, vapeur qui s\'échappe du dissipateur', 'une boule de chaleur orange et violette (le projectile qu\'il lance)'],
+      gardien: ['Volt, le renard robot', 'un renard mécanique aux plaques orange et chrome, queue en câbles souples, tournevis à la ceinture', 'en train de réparer un petit appareil avec son tournevis'],
+      spirit: ['Spirit porte la Lanterne', 'Spirit tient à bout de bras la Lanterne RGB (non dessinée) devant lui, bras tendu en avant et légèrement levé, air attentif', 'bras tendu vers nous', 'bras tendu vers le fond', 'bras tendu vers la droite'],
+      objets: ['La Lanterne RGB : une lanterne de métal sombre dont la vitre brille en dégradé rouge, vert et bleu.', 'Le Micro Pro : un micro-tige de casque en métal chromé avec un liseré cyan, plus imposant que celui de Spirit.'],
+    },
+    {
+      e: 'r4', nom: 'Désert du Lag', donjon: 'Salle Obscure',
+      monstres: [
+        ['Spectre du Lag', 'une silhouette fantomatique qui flotte, faite de sable noir et de pixels qui se décalent, deux yeux jaunes, contours qui tremblent', 'flotte'],
+        ['Ensablé', 'une créature enfouie dans le sable, carapace de pierre sombre, grande gueule sans dents visibles, yeux jaunes', 'sable'],
+        ['Scorpion de verre', 'un scorpion en verre fumé noir, dard de verre violet lumineux, huit pattes fines, yeux jaunes', 'pattes'],
+      ],
+      decor: ['Un cactus en verre vert sombre.', 'Une dune de sable, deux cases de large.', 'Un vieux projecteur de cinéma rouillé à moitié enfoui dans le sable.', 'Un rocher de grès rouge.', 'Un palmier sec.'],
+      sols: ['sable doré', 'sable dur craquelé', 'bord de ravin qui plonge dans le vide (vue de dessus)'],
+      lieux: ['L\'entrée de la Salle Obscure : un cinéma abandonné creusé dans une falaise, marquise éteinte sans texte, portes noires, vue de face plongeante, large de 3 cases.', 'Un poteau d\'accroche pour le grappin : poteau de métal planté dans le sol avec un anneau au sommet.'],
+      sbires: ['Le Lagger : une silhouette humanoïde figée, faite de pixels saccadés et de traînées décalées, qui avance par à-coups.', 'Le Sablier : un sablier vivant en verre noir, sable violet qui coule à l\'envers, petits bras de métal.', 'Le Mirage : un reflet ondulant et transparent de monstre, contours flous, yeux jaunes nets.'],
+      animSbires: ['le Lagger dédoublé en plein saut d\'image', 'le Sablier retourné tête en bas', 'le Mirage presque effacé, seuls les yeux restent nets'],
+      salle: 'une salle de cinéma abandonnée, velours noir sur les murs, pierre sombre, faisceaux de projecteur poussiéreux, lueurs violettes.',
+      lumiere: 'un projecteur de cinéma sur pied qui éclaire',
+      boss: ['Le Spoiler', 'une créature faite de pellicule de film noire enroulée sur elle-même, un œil-projecteur jaune au centre qui projette un faisceau, des bras de pellicule', 'œil-projecteur grand ouvert, faisceau de lumière jaune projeté vers l\'avant, bras écartés', 'un fragment de pellicule tranchant qui tourne (le projectile qu\'il lance)'],
+      gardien: ['Bobine, le fennec cinéphile', 'un fennec aux immenses oreilles, écharpe rouge, clap de cinéma à la main (sans texte)', 'en train de refermer son clap, clin d\'œil'],
+      spirit: ['Spirit tire le Grappin', 'Spirit tient à deux mains le Câble Grappin (non dessiné) pointé devant lui, bras tendus, jambes fléchies pour encaisser le recul', 'bras pointés vers nous', 'bras pointés vers le fond', 'bras pointés vers la droite'],
+      objets: ['Le Câble Grappin : un pistolet-enrouleur de câble réseau bleu, crochet de métal au bout.', 'Le crochet du grappin seul, vu de profil, pointe vers la droite (projectile).'],
+    },
+    {
+      e: 'r5', nom: 'Lac des Streams', donjon: 'Arène Engloutie',
+      monstres: [
+        ['Triton à trident', 'un guerrier aquatique à écailles noires et violettes, nageoires tranchantes, trident de métal noir, yeux jaunes', 'jambes'],
+        ['Méduse électrique', 'une méduse sombre et translucide traversée d\'éclairs violets, longs filaments', 'flotte'],
+        ['Crabe-armure', 'un gros crabe à carapace d\'armure noire rivetée, pinces massives, yeux jaunes sur tiges', 'pattes'],
+      ],
+      decor: ['Un nénuphar géant avec une fleur violette.', 'Une touffe de roseaux.', 'Un rocher moussu à moitié dans l\'eau.', 'Un ponton de bois, une case de large, planches bien alignées.', 'Une bouée-antenne rouge et blanche qui flotte.'],
+      sols: ['eau profonde bleu sombre', 'sable mouillé de rive', 'planches de ponton'],
+      lieux: ['L\'entrée de l\'Arène Engloutie : une arène de pierre à demi immergée, colonnes, un grand écran éteint au-dessus de l\'entrée, vue de face plongeante, large de 3 cases.', 'Une petite île ronde avec un arbre, entourée d\'eau.'],
+      sbires: ['Le Poisson-spoil : poisson sombre aux dents cachées, nageoires en lames, œil jaune unique.', 'La Bulle de chat : une bulle de discussion vivante et flottante, noire et luisante, sans texte, deux yeux jaunes.', 'Le Crabe-captcha : crabe dont la carapace est une grille de petites cases sombres, pinces levées.'],
+      animSbires: ['le Poisson-spoil qui bondit hors de l\'eau', 'la Bulle de chat gonflée, prête à éclater', 'le Crabe-captcha qui charge de côté'],
+      salle: 'une arène engloutie, pierre bleu-vert, flaques d\'eau au sol, écrans géants éteints encastrés dans les murs, lueurs violettes.',
+      lumiere: 'une vasque d\'eau lumineuse sur pied',
+      boss: ['Le Kraken du Chat', 'un kraken sombre dont chaque tentacule se termine par une bulle de chat noire (sans texte), un grand œil jaune, bec caché', 'tentacules dressés vers le ciel, œil plissé de colère', 'une bulle de chat noire qui rebondit (le projectile qu\'il lance)'],
+      gardien: ['Replay, la loutre commentatrice', 'une loutre avec un casque-micro orange de commentatrice, veste de sport, carton de score à la main (sans chiffres)', 'bras levés en train de commenter une action, bouche ouverte'],
+      spirit: ['Spirit sur la Planche Wi-Fi', 'Spirit debout sur la Planche Wi-Fi (dessinée sous ses pieds), jambes fléchies, bras écartés pour l\'équilibre, comme un surfeur', 'planche vue de face', 'planche vue de dos', 'planche vue de profil, pointe vers la droite'],
+      objets: ['La Planche Wi-Fi : une planche flottante blanche et bleue, trois arcs Wi-Fi cyan lumineux dessinés dessus.', 'Le Micro d\'Or : un micro-tige de casque en or brillant, liseré cyan.'],
+    },
+    {
+      e: 'r6', nom: 'Cité des Bulles', donjon: 'Bibliothèque des Bulles',
+      monstres: [
+        ['Ombre d\'encre', 'une flaque d\'encre noire qui se dresse en silhouette de monstre, gouttes qui tombent, yeux jaunes', 'rampe'],
+        ['Gargouille', 'une gargouille de pierre sombre ailée, cornes, griffes, fissures violettes, yeux jaunes', 'ailes'],
+        ['Masque volant', 'un masque de théâtre noir fissuré de violet qui flotte, rubans en lambeaux, orbites aux yeux jaunes', 'flotte'],
+      ],
+      decor: ['Une pile de livres géants.', 'Un réverbère ancien.', 'Un kiosque à journaux fermé (sans texte).', 'Une fontaine d\'encre noire.', 'Une pile de caisses en bois (on les cassera avec les Baskets Turbo).'],
+      sols: ['pavés de ville', 'trottoir en dalles', 'dalles fissurées qui s\'effritent (danger)'],
+      lieux: ['L\'entrée de la Bibliothèque des Bulles : une façade monumentale à colonnes, grandes portes, fenêtres rondes, sans texte, vue de face plongeante, large de 3 cases.'],
+      sbires: ['La Tache d\'encre : une tache noire vivante, éclaboussures en guise de pattes.', 'L\'Onomatopée vivante : les lettres BAM en relief, en métal sombre fissuré de violet, avec des yeux jaunes (seul texte autorisé : BAM).', 'La Case animée : une case de bande dessinée vivante, cadre noir épais, intérieur sombre, yeux jaunes.'],
+      animSbires: ['la Tache d\'encre qui s\'étale en éclaboussure', 'l\'Onomatopée qui explose en lettres éparpillées', 'la Case animée qui se plie en deux pour mordre'],
+      salle: 'une bibliothèque gigantesque, rayonnages sombres encastrés dans les murs, parquet ancien, lueurs violettes.',
+      lumiere: 'une lampe de lecture sur pied',
+      boss: ['Le Plagiaire', 'une copie sombre de Spirit (même silhouette que les images de Spirit jointes) : corps noir d\'encre, yeux jaunes, casque violet, une tache d\'encre à la place du logo SG', 'bras tendu vers l\'avant qui imite l\'attaque de Spirit, onde sonore violette qui sort du micro', 'une onde sonore violette (le projectile qu\'il lance)'],
+      gardien: ['Encre, le calamar dessinateur', 'un calamar debout avec un béret, une plume à la main et un carnet de croquis', 'en train de dessiner dans son carnet'],
+      spirit: ['Spirit fonce avec les Baskets Turbo', 'Spirit en pleine course, très penché vers l\'avant, bras en arrière, jambes en grande foulée', 'il fonce vers nous', 'il fonce vers le fond', 'il fonce vers la droite'],
+      objets: ['Les Baskets Turbo : une paire de baskets bleues avec des éclairs cyan sur les côtés et des semelles lumineuses.'],
+    },
+    {
+      e: 'r7', nom: 'Marais Rétro', donjon: 'Château 8 bits',
+      monstres: [
+        ['Feu follet', 'une flamme bleu-violet flottante avec un visage de braise, yeux jaunes', 'flotte'],
+        ['Sorcier des marais', 'un sorcier voûté en robe de mousse sombre, bâton tordu, masque de bois, yeux jaunes', 'jambes', 'une boule de vase verte et violette (projectile)'],
+        ['Carapace à pointes', 'une créature à carapace hérissée de pointes noires, pattes courtes, yeux jaunes', 'boule'],
+      ],
+      decor: ['Un arbre de marais tordu aux racines dans l\'eau.', 'Une cartouche de jeu géante plantée dans la boue (sans étiquette).', 'Une vieille borne d\'arcade envahie de lianes, écran éteint, sans texte.', 'Une souche pourrie.', 'Un bloc de métal lourd (on le déplacera avec l\'Aimant).'],
+      sols: ['boue sombre', 'eau verte de marais', 'herbe humide'],
+      lieux: ['L\'entrée du Château 8 bits : un château aux formes cubiques, tours carrées, en rendu toon HD (pas de pixel art), vue de face plongeante, large de 3 cases.'],
+      sbires: ['Le Slime 8 bits : un slime aux formes cubiques, rendu toon HD lisse (pas de pixel art), vert sombre et violet.', 'La Chauve-souris pixel : chauve-souris aux ailes carrées, rendu toon HD lisse.', 'Le Moustique-glitch : moustique noir dont le corps se décale en tranches, yeux jaunes.'],
+      animSbires: ['le Slime 8 bits écrasé avant de bondir', 'la Chauve-souris pixel ailes basses', 'le Moustique-glitch dédoublé'],
+      salle: 'un château aux blocs cubiques, pierre grise et vert sombre, torches, lueurs violettes.',
+      lumiere: 'une torche cubique sur pied',
+      boss: ['Le Glitch Géant', 'une créature géante faite de blocs décalés, de morceaux d\'image qui se chevauchent et de couleurs qui bavent, deux yeux jaunes, rendu toon HD', 'corps éclaté en blocs qui flottent autour de lui', 'un bloc d\'erreur carré qui tourne (le projectile qu\'il lance)'],
+      gardien: ['Cartouche, la grenouille collectionneuse', 'une grenouille avec un sac à dos plein de cartouches de jeu (sans étiquettes) et de grosses lunettes', 'en train d\'admirer une cartouche à bout de bras'],
+      spirit: ['Spirit utilise l\'Aimant', 'Spirit tient l\'Aimant (non dessiné) à deux mains devant lui, bras tendus, jambes écartées, corps penché en arrière comme s\'il tirait quelque chose de lourd', 'bras tendus vers nous', 'bras tendus vers le fond', 'bras tendus vers la droite'],
+      objets: ['L\'Aimant : un gros aimant en fer à cheval rouge et bleu, pointes argentées, petits arcs d\'énergie cyan.'],
+    },
+    {
+      e: 'r8', nom: 'Toundra du Cloud', donjon: 'Archives Gelées',
+      monstres: [
+        ['Chevalier de givre', 'un chevalier en armure de glace sombre, épée de glace, heaume fermé avec deux yeux jaunes, fissures violettes dans la glace', 'jambes'],
+        ['Loup de glace', 'un loup spectral fait de glace translucide bleu nuit, fissures violettes, yeux jaunes', 'quadrupede'],
+        ['Colosse de pierre', 'un géant de pierre gelée, lent et massif, poings énormes, yeux jaunes', 'jambes'],
+      ],
+      decor: ['Un sapin enneigé.', 'Un gros bloc de glace transparent.', 'Une baie de serveur prise dans la glace.', 'Une stalagmite de glace.', 'Une congère de neige.'],
+      sols: ['neige fraîche', 'glace lisse bleutée', 'pierre gelée'],
+      lieux: ['L\'entrée des Archives Gelées : un bâtiment d\'archives à colonnes pris dans la glace, stalactites, vue de face plongeante, large de 3 cases.', 'Un pan de mur qui paraît normal.', 'Le même pan de mur vu à travers les Lunettes de Vérif : translucide, contours cyan en pointillés (faux mur).'],
+      sbires: ['Le Cookie traqueur : un cookie noir aux pépites violettes lumineuses, avec des yeux jaunes et de petites pattes.', 'Le Pingouin-bot : un pingouin robot noir et métal, visière jaune.', 'Le Nuage-captcha : un nuage sombre découpé en grille de cases, yeux jaunes.'],
+      animSbires: ['le Cookie traqueur qui roule', 'le Pingouin-bot qui glisse sur le ventre', 'le Nuage-captcha qui lance un éclair'],
+      salle: 'des archives gelées, étagères de dossiers prises dans la glace encastrées dans les murs, pierre bleu pâle, givre, lueurs violettes.',
+      lumiere: 'une lampe d\'archives au verre givré',
+      boss: ['La Rumeur', 'une immense silhouette de brume sombre, sans visage, entourée de petites bulles qui chuchotent, deux yeux jaunes', 'bras de brume déployés, bulles qui tourbillonnent autour d\'elle', 'la même Rumeur presque invisible : seuls un contour pâle et les yeux jaunes sont visibles'],
+      gardien: ['Mémo, le mammouth archiviste', 'un mammouth en gilet, petites lunettes, une pile de dossiers dans les bras', 'en train de consulter un dossier ouvert'],
+      spirit: ['Spirit avec les Lunettes de Vérif', 'Spirit porte les Lunettes de Vérif (grosses lunettes cyan à monture noire) sur les yeux, debout, main sur la branche des lunettes', 'de face', 'de dos (on voit la branche des lunettes)', 'de profil'],
+      objets: ['Les Lunettes de Vérif : grosses lunettes à monture noire, verres cyan lumineux avec un petit symbole de coche.'],
+    },
+  ];
+
+  for (const R of REGIONS) {
+    const e = R.e;
+    // monstres du monde extérieur
+    for (const [nom, desc, type, projectile] of R.monstres) {
+      const poses = [`Le ${nom} vu de face : ${desc}.`, `Le même ${nom} vu exactement de dos.`, `Le même ${nom} vu exactement de profil, tourné vers la droite.`];
+      if (projectile) poses.push(`Son projectile : ${projectile}.`);
+      carte(e, 'ennemis', `${nom} : poses`, `Monstre de la ${R.nom}.`, ['monstres', 'cornu'], MONSTRE, poses);
+      if (type === 'jambes' || type === 'quadrupede' || type === 'pattes') {
+        const items = [];
+        for (const v of ['de face', 'de dos', 'de profil droit']) for (const pas of (type === 'jambes' ? ['jambe gauche en avant', 'jambe droite en avant'] : ['première foulée', 'deuxième foulée (pattes inversées)'])) items.push(`${nom} ${v}, ${pas}.`);
+        carte(e, 'ennemis', `${nom} : marche`, 'Les images de marche, pour qu\'il ne glisse pas.', ['cornu', 'cornu-pas'],
+          `${MONSTRE}\n\n${type === 'pattes' ? 'Pour chacune des 3 vues de la carte précédente, fais 2 images de marche : pattes de gauche et de droite en alternance. Même taille, même cadrage et même éclairage que les images de poses jointes.' : marche(type === 'quadrupede')}`,
+          items, `Joins aussi les 3 poses du ${nom} créées avec la carte précédente.`);
+      } else {
+        const anim = { ailes: ['ailes levées au maximum', 'ailes baissées au maximum', 'en piqué vers l\'avant'], flotte: ['étiré vers le haut', 'tassé vers le bas', 'qui attaque en fonçant vers l\'avant'], boule: ['roulé en boule, vu de face', 'roulé en boule, vu de profil', 'qui se déroule, à moitié sorti'], rampe: ['étalé au sol', 'dressé à mi-hauteur', 'dressé de toute sa taille, prêt à frapper'], sable: ['seulement une bosse de sable qui bouge, avec les yeux qui dépassent', 'à moitié sorti du sable', 'bondissant hors du sable, gueule ouverte'] }[type];
+        carte(e, 'ennemis', `${nom} : mouvement`, 'Les images d\'animation, pour qu\'il bouge vraiment.', ['monstres'],
+          `${MONSTRE}\n\nMême créature que les images de poses jointes, même taille, même cadrage.`,
+          anim.map((a) => `Le ${nom} vu de face, ${a}.`), `Joins les 3 poses du ${nom} créées avec la carte précédente.`);
+      }
+    }
+    // sbires du donjon
+    carte(e, 'ennemis', `Sbires du ${R.donjon}`, 'Les ennemis de l\'intérieur du donjon.', ['popup', 'clic'], SBIRE, R.sbires);
+    carte(e, 'ennemis', `Sbires du ${R.donjon} : mouvement`, 'Une deuxième image par sbire.', ['popup', 'clic'],
+      `${SBIRE}\n\nMêmes créatures que celles jointes, même taille, même cadrage.`, R.animSbires.map((a) => a[0].toUpperCase() + a.slice(1) + '.'),
+      'Joins les 3 sbires créés avec la carte précédente.');
+    // boss
+    const [bnom, bdesc, battaque, bextra] = R.boss;
+    carte(e, 'boss', bnom, `Le boss du ${R.donjon}.`, bnom === 'Le Plagiaire' ? ['reine', 'spirit-officiel', 'spirit-face'] : ['reine', 'monstres'],
+      `${MONSTRE}\n\nC'est un boss : créature imposante, très détaillée, qui occupera un tiers de l'écran.`,
+      [`${bnom} vu de face : ${bdesc}.`, `${bnom} qui attaque : ${battaque}.`, `${bnom} étourdi : tête basse, yeux qui clignotent, fissures qui s'éteignent.`, bextra[0].toUpperCase() + bextra.slice(1) + '.']);
+    // gardien
+    const [gnom, gdesc, gaction] = R.gardien;
+    carte(e, 'pnj', gnom, `Le Gardien libéré à la fin du ${R.donjon}.`, ['flash', 'portrait-flash'], GARDIEN,
+      [`${gnom}, debout de face : ${gdesc}.`, `${gnom} ${gaction}.`, `Portrait de ${gnom} : buste et tête de face, même cadrage que le portrait joint.`]);
+    // décors
+    carte(e, 'decors', `${R.nom} : éléments`, 'Les éléments posés sur les écrans de la région.', ['decor-plaine', 'arbre'], ELEM, R.decor);
+    carte(e, 'decors', `${R.nom} : sols`, 'Les textures qui tapissent le sol.', ['sol-herbe'], SOL, R.sols);
+    carte(e, 'decors', `${R.nom} : lieux`, 'L\'entrée du donjon et les endroits marquants.', ['entree', 'decor-plaine'], ELEM, R.lieux);
+    carte(e, 'decors', `${R.donjon} : la salle et ses portes`, 'La salle entière dessinée avec ses portes, puis la même avec les portes fermées de chaque façon. 5 étapes dans la même conversation ChatGPT, dans l\'ordre.', ['salle'],
+      SALLE_PORTES(R.salle).split('\n\n').slice(1).join('\n\n'), ['Les quatre portes ouvertes.'], null, SUITES_PORTES);
+    carte(e, 'decors', `${R.donjon} : objets de salle`, 'Bloc à pousser, statue, lumière, pot et coffres, dans le thème du donjon.', ['bloc', 'statue', 'coffre'],
+      ELEM + `\n\nThème du donjon : ${R.salle}`,
+      ['Un bloc à pousser, taillé dans la même pierre que les murs de la salle.', 'Une statue gardienne menaçante sur socle.', `Une source de lumière : ${R.lumiere}.`, 'Un pot fermé qu\'on peut casser.', 'Un coffre fermé.', 'Le même coffre ouvert, vide.']);
+    // Spirit et son nouvel objet
+    const [snom, sdesc, sf, sd, sp] = R.spirit;
+    carte(e, 'perso', snom, `Le nouveau mouvement de Spirit avec l'objet du ${R.donjon}.`, RS,
+      `${SPIRIT}\n\n${VUES}\n\n${FOND_P}\n\n${sdesc}.`, [`de face : ${sf}`, `de dos : ${sd}`, `de profil (tourné vers la droite) : ${sp}`].concat(snom.includes('Lunettes') ? ['portrait pour les dialogues : buste et tête de face, lunettes sur les yeux, sourire malin'] : []),
+      `Joins aussi l'objet créé avec la carte « objets » de cette étape.`);
+    carte(e, 'objets', `Objets : ${R.donjon}`, 'L\'objet du donjon et ce qui va avec.', ['ampli', 'manette'], OBJET, R.objets);
+  }
+
+  // ================================================================== FINAL
+  carte('fin', 'boss', 'Le Roi Clickbait', 'Le boss final, en trois temps, et ce qu\'il en reste.', ['reine', 'monstres'],
+    `${MONSTRE}\n\nC'est le boss final : créature imposante, très détaillée, qui occupera la moitié de l'écran.`,
+    ['Le Roi Clickbait vu de face : une créature gonflée, faite de fenêtres publicitaires empilées et de titres déchirés (aucun texte lisible), couronne de néon violet clignotant, grand sourire sans dents, deux yeux jaunes énormes, cape de bannières.',
+     'Le Roi Clickbait qui attaque : bras levés, des dizaines de petites fenêtres pub qui jaillissent autour de lui.',
+     'Le Roi Clickbait, deuxième phase : deux fois plus gros, fissures violettes partout, couronne brisée, une bouche immense.',
+     'Buzz : ce qui reste du Roi une fois dégonflé, un petit lutin tout rond et un peu triste, couronne de travers, yeux jaunes humides. Il n\'a plus rien de menaçant.']);
+  carte('fin', 'decors', 'La Tour du Clickbait', 'Le dernier donjon.', ['salle'],
+    salleVide('le sommet d\'une tour de néon violet et de métal noir, murs couverts de fenêtres publicitaires éteintes, sol de dalles noires brillantes, lueurs violettes et roses.'), ['La salle vide, murs continus sans porte.']);
+  carte('fin', 'decors', 'Le Cratère du Clickbait', 'Les abords de la tour.', ['decor-plaine', 'entree'], ELEM,
+    ['L\'entrée de la Tour du Clickbait : une tour de néon violet et de métal noir qui s\'élance vers le ciel, porte gigantesque, vue de face plongeante, large de 4 cases.', 'Un rocher noir volcanique veiné de violet.', 'Une fenêtre pub géante plantée dans le sol, écran fissuré, sans texte.', 'Une coulée de rumeur violette au sol (danger).']);
+  carte('fin', 'interface', 'Écran de fin', 'L\'illustration qui clôt l\'aventure.', ['titre', 'spirit-officiel', 'flash'],
+    `Format paysage 16:9. Même rendu que l'écran titre joint. Aucun texte.`,
+    ['Spirit au centre, bras levés, tenant la Source reconstituée qui brille en blanc et cyan. Autour de lui les huit Gardiens (un hibou, une tortue, un renard robot, un fennec, une loutre, un calamar, une grenouille, un mammouth) qui applaudissent, devant le QG illuminé, feu d\'artifice bleu dans le ciel du soir. Buzz, le petit lutin, dans un coin, timide.']);
+
+  // ------------------------------------------------------------------ affichage
+  const ETAPES = [['tout', 'Tout'], ['d1', 'Donjon 1'], ['qg', 'Parvis du QG'], ['r2', 'Forêt des Forums'], ['r3', 'Monts Hardware'], ['r4', 'Désert du Lag'], ['r5', 'Lac des Streams'], ['r6', 'Cité des Bulles'], ['r7', 'Marais Rétro'], ['r8', 'Toundra du Cloud'], ['fin', 'Final']];
+  const CATS = [['tout', 'Tout'], ['perso', 'Spirit'], ['objets', 'Objets'], ['ennemis', 'Ennemis'], ['boss', 'Boss'], ['pnj', 'Gardiens et habitants'], ['decors', 'Décors'], ['interface', 'Interface']];
+  const lire = (k, d) => { try { const v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); } catch (e) { return d; } };
+  const ecrire = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} };
+  let etape = lire('cat-etape', 'd1'), cat = lire('cat-cat', 'tout');
+  const faites = new Set(lire('cat-faites', []));
+
+  function puces(conteneur, liste, actuel, choisir) {
+    const box = document.getElementById(conteneur);
+    const avant = box.querySelector('.compte');
+    for (const [k, nom] of liste) {
+      const b = document.createElement('button');
+      b.className = 'puce'; b.type = 'button'; b.textContent = nom; b.dataset.k = k;
+      b.setAttribute('aria-pressed', String(k === actuel));
+      b.addEventListener('click', () => { choisir(k); box.querySelectorAll('.puce').forEach((x) => x.setAttribute('aria-pressed', String(x.dataset.k === k))); afficher(); });
+      box.insertBefore(b, avant || null);
+    }
+  }
+  puces('etapes', ETAPES, etape, (k) => { etape = k; ecrire('cat-etape', k); });
+  puces('categories', CATS, cat, (k) => { cat = k; ecrire('cat-cat', k); });
+
+  function elCarte(c) {
+    const a = document.createElement('article');
+    a.className = 'carte' + (faites.has(c.id) ? ' faite' : '');
+    const refs = c.refs.map((r) => `<a class="vignette" href="refs/${r}.webp" target="_blank" rel="noopener"><img src="refs/${r}.webp" alt="${REFS[r]}" loading="lazy"><span>${REFS[r]}</span></a>`).join('');
+    a.innerHTML = `
+      <div class="entete"><span class="code">${c.id}</span><h3></h3><span class="nb">${c.n} image${c.n > 1 ? 's' : ''}</span></div>
+      <p class="pourquoi"></p>
+      <div class="joindre"><span class="etiq">À joindre</span><div class="vignettes">${refs}</div>${c.note ? '<div class="note-ref"></div>' : ''}</div>
+      <div class="prompts"></div>
+      <div class="actions"><button type="button" class="fait" aria-pressed="${faites.has(c.id)}">${faites.has(c.id) ? 'Fait' : 'Marquer comme fait'}</button></div>`;
+    a.querySelector('h3').textContent = c.titre;
+    a.querySelector('.pourquoi').textContent = c.pourquoi;
+    if (c.note) a.querySelector('.note-ref').textContent = c.note;
+    const zone = a.querySelector('.prompts');
+    c.prompts.forEach((texte, i) => {
+      const bloc = document.createElement('div'); bloc.className = 'bloc-prompt';
+      const nom = c.prompts.length > 1 ? `Étape ${i + 1} sur ${c.prompts.length}` : 'Prompt';
+      bloc.innerHTML = `<span class="etiq"></span><pre class="prompt"></pre><div class="actions"><button type="button" class="copier">Copier</button></div>`;
+      bloc.querySelector('.etiq').textContent = nom;
+      const pre = bloc.querySelector('.prompt'); pre.textContent = texte;
+      const bc = bloc.querySelector('.copier');
+      bc.addEventListener('click', () => {
+        const ok = () => { bc.textContent = 'Copié'; setTimeout(() => { bc.textContent = 'Copier'; }, 1600); };
+        const selection = () => { const r = document.createRange(); r.selectNodeContents(pre); const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r); bc.textContent = 'Texte sélectionné : Ctrl+C'; };
+        try { navigator.clipboard.writeText(texte).then(ok, selection); } catch (e) { selection(); }
+      });
+      zone.appendChild(bloc);
+    });
+    const bf = a.querySelector('.fait');
+    bf.addEventListener('click', () => {
+      if (faites.has(c.id)) faites.delete(c.id); else faites.add(c.id);
+      ecrire('cat-faites', [...faites]);
+      const f = faites.has(c.id);
+      bf.setAttribute('aria-pressed', String(f)); bf.textContent = f ? 'Fait' : 'Marquer comme fait';
+      a.classList.toggle('faite', f); compter();
+    });
+    return a;
+  }
+
+  function visibles() { return cartes.filter((c) => (etape === 'tout' || c.etape === etape) && (cat === 'tout' || c.cat === cat)); }
+  function compter() {
+    const v = visibles(), nImg = v.reduce((s, c) => s + c.n, 0), f = v.filter((c) => faites.has(c.id)).length;
+    document.getElementById('compte').textContent = `${v.length} prompts · ${nImg} images · ${f} faits`;
+  }
+  function afficher() {
+    const main = document.getElementById('liste'); main.innerHTML = '';
+    const v = visibles();
+    for (const [k, nom] of CATS.slice(1)) {
+      const dans = v.filter((c) => c.cat === k);
+      if (!dans.length) continue;
+      const s = document.createElement('section'); s.className = 'categorie';
+      s.innerHTML = `<h2>${nom} <span>${dans.length} prompt${dans.length > 1 ? 's' : ''}</span></h2><div class="grille"></div>`;
+      const g = s.querySelector('.grille'); for (const c of dans) g.appendChild(elCarte(c));
+      main.appendChild(s);
+    }
+    if (!v.length) main.innerHTML = '<p class="vide">Rien dans cette combinaison. Choisis une autre étape ou une autre catégorie.</p>';
+    compter();
+  }
+  afficher();
+})();
+</script>
