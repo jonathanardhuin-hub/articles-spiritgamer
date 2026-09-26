@@ -32,11 +32,11 @@ SG.DONJON1 = {
       plan: [
         '################',
         '#..............#',
-        '#..vv......vv..#',
-        '#..vv......vv..#',
+        '#...o......o...#',
         '#..............#',
-        '#..vv......vv..#',
-        '#..vv......vv..#',
+        '#..............#',
+        '#..............#',
+        '#...o......o...#',
         '#..............#',
         '################',
       ],
@@ -50,7 +50,7 @@ SG.DONJON1 = {
         '################',
         '#..............#',
         '#....o....o....#',
-        '#....o.I..o....#',
+        '#....o....o....#',
         '#..............#',
         '#......B.......#',
         '#.p..........p.#',
@@ -66,11 +66,11 @@ SG.DONJON1 = {
       plan: [
         '################',
         '#..............#',
-        '#.F.....v....F.#',
-        '#.......v......#',
-        '#.......v......#',
-        '#.......v......#',
-        '#.F.....v....F.#',
+        '#.F..........F.#',
+        '#.....o..o.....#',
+        '#..............#',
+        '#.....o..o.....#',
+        '#.F..........F.#',
         '#..............#',
         '################',
       ],
@@ -508,9 +508,7 @@ Object.assign(SG.Jeu.prototype, {
     // blocs mobiles : position de départ, ou sur la plaque si l'énigme est résolue
     this.blocs = [];
     S.plan.forEach((ligne, r) => [...ligne].forEach((ch, c) => { if (ch === 'B') this.blocs.push({ c, r, anim: 0, dc: 0, dr: 0 }); }));
-    if (S.condition === 'bloc' && D.resolues.includes(k)) {
-      S.plan.forEach((ligne, r) => [...ligne].forEach((ch, c) => { if (ch === 'I') { this.blocs[0].c = c; this.blocs[0].r = r; } }));
-    }
+    if (S.condition === 'bloc' && D.resolues.includes(k) && this.blocs[0]) { this.blocs[0].r -= 1; this.blocs[0].pousse = true; }
     this.cristalFrappe = D.resolues.includes(k) && S.condition === 'cristal';
     // braseros
     this.feux = [];
@@ -642,7 +640,7 @@ Object.assign(SG.Jeu.prototype, {
       if (this.caseSalle(Math.floor(s.x / SG.T), Math.floor((s.y - 8) / SG.T)) === 'I') this.resoudre(k);
     }
     if (S.condition === 'bloc' && !D.resolues.includes(k)) {
-      for (const b of this.blocs) if (S.plan[b.r][b.c] === 'I' && b.anim <= 0) this.resoudre(k);
+      for (const b of this.blocs) if (b.pousse && b.anim <= 0) this.resoudre(k);
     }
     for (const b of this.blocs) b.anim = Math.max(0, b.anim - dt * 4);
     // pousser un bloc, ouvrir une porte verrouillée
@@ -658,7 +656,7 @@ Object.assign(SG.Jeu.prototype, {
           const b = this.blocs.find((q) => q.c === fc && q.r === fr);
           const nc = fc + d.x, nr = fr + d.y, cible = this.caseSalle(nc, nr);
           const libre = (cible === '.' || cible === 'I') && !this.dirPorte(nc, nr) && !this.monstres.some((m) => Math.floor(m.x / SG.T) === nc && Math.floor((m.y - 5) / SG.T) === nr);
-          if (b && libre && !(S.condition === 'bloc' && D.resolues.includes(k))) { b.c = nc; b.r = nr; b.dc = d.x; b.dr = d.y; b.anim = 1; SG.Son.effet('porte'); }
+          if (b && libre && !(S.condition === 'bloc' && D.resolues.includes(k))) { b.c = nc; b.r = nr; b.dc = d.x; b.dr = d.y; b.anim = 1; b.pousse = true; SG.Son.effet('porte'); }
         }
       } else this.pousse = 0;
       const dp = this.dirPorte(fc, fr);
@@ -834,7 +832,10 @@ Object.assign(SG.Jeu.prototype, {
       else if (ch === 'X') liste.push({ y, dessiner: (ctx) => SG.dessinCristal(ctx, x, y, this.cristalFrappe, this.t) });
     }
     for (const b of this.blocs || []) {
-      const x = b.c * T + 40 - b.dc * b.anim * T, y = b.r * T + T - b.dr * b.anim * T;
+      const tremble = this.pousse > 0.05 && SG.dist(this.spirit.x, this.spirit.y, b.c * T + 40, b.r * T + 40) < 130 ? Math.sin(this.t * 70) * 2.5 : 0;
+      const x = b.c * T + 40 - b.dc * b.anim * T + tremble, y = b.r * T + T - b.dr * b.anim * T;
+      // traces de frottement au sol : le bloc a déjà bougé, il peut bouger encore
+      if (!b.pousse) liste.push({ y: -50, dessiner: (ctx) => SG.tracesBloc(ctx, b.c * T + 40, b.r * T + 40) });
       liste.push({ y, dessiner: (ctx) => SG.dessinBloc(ctx, x, y) });
     }
     // portes (toujours derrière les personnages : dessinées sur le fond)
@@ -887,6 +888,14 @@ SG.dessinImageOu = function (nom, ctx, x, y, secours, opts) {
   const im = SG.img[nom];
   if (im && im.width) { SG.dessinerPied(ctx, im, x, y, opts); return; }
   secours();
+};
+SG.tracesBloc = function (ctx, x, y) {
+  ctx.save();
+  ctx.strokeStyle = 'rgba(190,180,230,0.35)'; ctx.lineWidth = 3; ctx.lineCap = 'round';
+  for (const dx of [-26, -8, 10, 28]) {
+    ctx.beginPath(); ctx.moveTo(x + dx, y - 44); ctx.lineTo(x + dx + 2, y - 78); ctx.stroke();
+  }
+  ctx.restore();
 };
 SG.dessinBloc = function (ctx, x, y) {
   SG.dessinImageOu('bloc', ctx, x, y, () => {

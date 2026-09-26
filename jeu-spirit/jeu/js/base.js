@@ -4,7 +4,8 @@
 const SG = {};
 SG.W = 1280;          // largeur logique de l'écran
 SG.H = 720;           // hauteur logique de l'aire de jeu
-SG.BANDE = 0;         // bandeau du haut (désactivé : informations affichées par-dessus le jeu)
+SG.VERSION = 37;      // à augmenter à chaque mise en ligne : les anciennes sauvegardes sont effacées
+SG.BANDE = 116;       // bandeau d'informations au-dessus de l'aire de jeu
 SG.HT = SG.H + SG.BANDE;
 SG.decalY = 0;
 SG.T = 80;            // taille d'une case
