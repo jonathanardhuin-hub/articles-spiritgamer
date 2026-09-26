@@ -129,6 +129,18 @@ SG.Spirit = class {
   }
 };
 
+// dessine une image d'effet centrée, tournée et mise à l'échelle ; lumiere = mode additif (fond noir invisible)
+SG.dessinerEffet = function (ctx, im, x, y, ang, echelle, alpha, lumiere) {
+  if (!im || !im.width) return;
+  const w = im.width / SG.ECHELLE_IMG * echelle, h = im.height / SG.ECHELLE_IMG * echelle;
+  ctx.save();
+  ctx.translate(x, y); ctx.rotate(ang);
+  ctx.globalAlpha = SG.clamp(alpha, 0, 1);
+  if (lumiere) ctx.globalCompositeOperation = 'lighter';
+  ctx.drawImage(im, -w / 2, -h / 2, w, h);
+  ctx.restore();
+};
+
 SG.ombre = function (ctx, x, y, r, alpha) {
   ctx.save();
   ctx.fillStyle = `rgba(0,0,0,${alpha ?? 0.22})`;
@@ -438,41 +450,28 @@ SG.Projectile = class {
     if (this.ami) {
       for (const m of jeu.monstres) {
         if (!m.mort && SG.boitesSeTouchent(this.boite(), m.corps())) {
-          if (m.toucher(jeu, 1, this.x - this.vx, this.y - this.vy)) { this.fini = true; jeu.effets.push(new SG.Eclat(this.x, this.y, '#7fe8ff')); return; }
+          if (m.toucher(jeu, 1, this.x - this.vx, this.y - this.vy)) { this.fini = true; jeu.effets.push(new SG.Eclat(this.x, this.y)); return; }
         }
       }
       for (const p of jeu.projectiles) {
-        if (!p.ami && !p.fini && SG.boitesSeTouchent(this.boite(), p.boite())) { p.fini = true; jeu.effets.push(new SG.Eclat(p.x, p.y, '#ddd')); }
+        if (!p.ami && !p.fini && SG.boitesSeTouchent(this.boite(), p.boite())) { p.fini = true; jeu.effets.push(new SG.Eclat(p.x, p.y)); }
       }
     } else if (SG.boitesSeTouchent(this.boite(), jeu.spirit.corps())) {
       jeu.spirit.blesser(jeu, jeu.degats(this.degats), this.x - this.vx, this.y - this.vy);
       this.fini = true;
     }
   }
-  quandBloque(jeu) { jeu.effets.push(new SG.Eclat(this.x, this.y, '#bbb')); }
+  quandBloque(jeu) { jeu.effets.push(new SG.Eclat(this.x, this.y)); }
 };
 
 // l'onde lointaine de Spirit (quand ses cœurs sont pleins)
 SG.OndeLointaine = class extends SG.Projectile {
   constructor(x, y, dir) { super(x, y, dir, 720); this.r = 26; this.ami = true; }
-  quandBloque(jeu) { jeu.effets.push(new SG.Eclat(this.x, this.y, '#7fe8ff')); }
+  quandBloque(jeu) { jeu.effets.push(new SG.Eclat(this.x, this.y)); }
   dessiner(ctx) {
     const d = SG.DIRS[this.dir];
-    const ang = Math.atan2(d.y, d.x);
-    ctx.save();
-    ctx.translate(this.x, this.y);
-    ctx.rotate(ang);
-    for (let i = 0; i < 3; i++) {
-      const r = 24 + i * 12 + Math.sin(this.t * 30 + i) * 2;
-      ctx.strokeStyle = i === 0 ? '#ffffff' : i === 1 ? '#7fe8ff' : '#2a8cff';
-      ctx.lineWidth = 10 - i * 2;
-      ctx.globalAlpha = 1 - i * 0.15;
-      ctx.shadowColor = '#2ad4ff'; ctx.shadowBlur = 12;
-      ctx.beginPath();
-      ctx.arc(-i * 12, 0, r, -0.9, 0.9);
-      ctx.stroke();
-    }
-    ctx.restore();
+    const pulse = 1 + Math.sin(this.t * 25) * 0.05;
+    SG.dessinerEffet(ctx, SG.img['fx-onde-loin'], this.x - d.x * 20, this.y - d.y * 20, Math.atan2(d.y, d.x), 0.75 * pulse, 1, false);
   }
 };
 
@@ -516,77 +515,33 @@ SG.Pierre = class extends SG.Projectile {
 
 // ---------------------------------------------------------------- effets visuels
 SG.OndeProche = class {
-  constructor(x, y, dir) { this.x = x; this.y = y; this.dir = dir; this.t = 0; this.duree = 0.25; this.fini = false; }
+  constructor(x, y, dir) { this.x = x; this.y = y; this.dir = dir; this.t = 0; this.duree = 0.26; this.fini = false; }
   maj(jeu, dt) { this.t += dt; if (this.t > this.duree) this.fini = true; }
   dessiner(ctx) {
     const d = SG.DIRS[this.dir];
     const u = this.t / this.duree;
-    ctx.save();
-    ctx.translate(this.x, this.y);
-    ctx.rotate(Math.atan2(d.y, d.x));
-    for (let i = 0; i < 3; i++) {
-      const r = 20 + u * 70 + i * 16;
-      ctx.globalAlpha = Math.max(0, 1 - u) * (1 - i * 0.25);
-      ctx.strokeStyle = i === 1 ? '#7fe8ff' : '#ffffff';
-      ctx.lineWidth = 8 - i * 2;
-      ctx.beginPath();
-      ctx.arc(0, 0, r, -0.75, 0.75);
-      ctx.stroke();
-    }
-    ctx.restore();
+    const e = 0.45 + u * 0.55;
+    SG.dessinerEffet(ctx, SG.img['fx-onde-proche'], this.x + d.x * (20 + u * 50), this.y + d.y * (20 + u * 50), Math.atan2(d.y, d.x), e, 1 - u * u, false);
   }
 };
 
 // fumée noire et violette quand un monstre est vaincu
 SG.Fumee = class {
-  constructor(x, y, taille) {
-    this.x = x; this.y = y; this.t = 0; this.duree = 0.7; this.fini = false;
-    const n = 9;
-    this.bulles = [];
-    for (let i = 0; i < n; i++) {
-      const a = Math.random() * Math.PI * 2, v = SG.hasard(30, 90) * taille / 80;
-      this.bulles.push({ x: 0, y: 0, vx: Math.cos(a) * v, vy: Math.sin(a) * v - 40, r: SG.hasard(14, 26) * taille / 80, c: Math.random() < 0.35 ? '#6a2bb0' : '#1b1426' });
-    }
-    this.etincelles = [];
-    for (let i = 0; i < 8; i++) {
-      const a = Math.random() * Math.PI * 2, v = SG.hasard(120, 260);
-      this.etincelles.push({ x: 0, y: 0, vx: Math.cos(a) * v, vy: Math.sin(a) * v });
-    }
-  }
-  maj(jeu, dt) {
-    this.t += dt;
-    for (const b of this.bulles) { b.x += b.vx * dt; b.y += b.vy * dt; b.r *= 1 + dt * 0.8; }
-    for (const e of this.etincelles) { e.x += e.vx * dt; e.y += e.vy * dt; e.vx *= 0.92; e.vy *= 0.92; }
-    if (this.t > this.duree) this.fini = true;
-  }
+  constructor(x, y, taille) { this.x = x; this.y = y; this.t = 0; this.duree = 0.6; this.fini = false; this.taille = taille / 90; this.ang = Math.random() * Math.PI * 2; }
+  maj(jeu, dt) { this.t += dt; if (this.t > this.duree) this.fini = true; }
   dessiner(ctx) {
     const u = this.t / this.duree;
-    ctx.save();
-    ctx.translate(this.x, this.y);
-    ctx.globalAlpha = Math.max(0, 1 - u);
-    for (const b of this.bulles) { ctx.fillStyle = b.c; ctx.beginPath(); ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2); ctx.fill(); }
-    ctx.fillStyle = '#e6c8ff';
-    for (const e of this.etincelles) ctx.fillRect(e.x - 3, e.y - 3, 6, 6);
-    ctx.restore();
+    const e = this.taille * (0.4 + Math.sqrt(u) * 0.8);
+    SG.dessinerEffet(ctx, SG.img['fx-fumee'], this.x, this.y - u * 20, this.ang + u * 0.5, e, 1 - u * u, false);
   }
 };
 
 SG.Eclat = class {
-  constructor(x, y, couleur) { this.x = x; this.y = y; this.c = couleur; this.t = 0; this.fini = false; }
-  maj(jeu, dt) { this.t += dt; if (this.t > 0.25) this.fini = true; }
+  constructor(x, y) { this.x = x; this.y = y; this.t = 0; this.fini = false; this.ang = Math.random() * Math.PI; }
+  maj(jeu, dt) { this.t += dt; if (this.t > 0.22) this.fini = true; }
   dessiner(ctx) {
-    const u = this.t / 0.25;
-    ctx.save();
-    ctx.globalAlpha = 1 - u;
-    ctx.strokeStyle = this.c; ctx.lineWidth = 4;
-    for (let i = 0; i < 6; i++) {
-      const a = i / 6 * Math.PI * 2;
-      ctx.beginPath();
-      ctx.moveTo(this.x + Math.cos(a) * 8 * u, this.y + Math.sin(a) * 8 * u);
-      ctx.lineTo(this.x + Math.cos(a) * 28 * u, this.y + Math.sin(a) * 28 * u);
-      ctx.stroke();
-    }
-    ctx.restore();
+    const u = this.t / 0.22;
+    SG.dessinerEffet(ctx, SG.img['fx-etincelle'], this.x, this.y, this.ang, 0.35 + u * 0.35, 1 - u, false);
   }
 };
 
@@ -642,37 +597,19 @@ SG.Butin = class {
 };
 
 SG.dessinerCoeur = function (ctx, x, y, taille, remplissage) {
-  // remplissage : 0 à 1 (par quarts)
-  const s = taille / 32;
-  const chemin = () => {
-    ctx.beginPath();
-    ctx.moveTo(0, 10 * s);
-    ctx.bezierCurveTo(-18 * s, -2 * s, -14 * s, -18 * s, 0, -8 * s);
-    ctx.bezierCurveTo(14 * s, -18 * s, 18 * s, -2 * s, 0, 10 * s);
-    ctx.closePath();
-  };
+  const plein = SG.img.coeur, vide = SG.img['coeur-vide'];
+  if (!plein || !plein.width) return;
+  const w = taille, h = taille * plein.height / plein.width;
+  ctx.drawImage(vide, x - w / 2, y - h / 2, w, h);
+  if (remplissage <= 0) return;
   ctx.save();
-  ctx.translate(x, y);
-  chemin();
-  ctx.fillStyle = '#3a1a24';
-  ctx.fill();
-  if (remplissage > 0) {
-    ctx.save();
-    chemin(); ctx.clip();
-    ctx.fillStyle = '#ff3d6e';
+  if (remplissage < 1) {
     // les quarts se remplissent dans le sens des aiguilles d'une montre
-    ctx.beginPath();
-    ctx.moveTo(0, -2 * s);
-    ctx.arc(0, -2 * s, 30 * s, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * remplissage);
-    ctx.closePath();
-    ctx.fill();
-    ctx.fillStyle = 'rgba(255,255,255,0.45)';
-    ctx.beginPath(); ctx.ellipse(-7 * s, -8 * s, 4 * s, 2.5 * s, -0.6, 0, Math.PI * 2); ctx.fill();
-    ctx.restore();
+    ctx.beginPath(); ctx.moveTo(x, y);
+    ctx.arc(x, y, taille, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * remplissage);
+    ctx.closePath(); ctx.clip();
   }
-  chemin();
-  ctx.lineWidth = 3 * s; ctx.strokeStyle = '#111';
-  ctx.stroke();
+  ctx.drawImage(plein, x - w / 2, y - h / 2, w, h);
   ctx.restore();
 };
 
@@ -690,54 +627,9 @@ SG.dessinerPixel = function (ctx, x, y, taille, couleur) {
 };
 
 SG.dessinerButin = function (ctx, type, x, y, echelle) {
-  if (type === 'coeur') SG.dessinerCoeur(ctx, x, y, 34 * echelle, 1);
-  else if (type === 'pixel') SG.dessinerPixel(ctx, x, y, 18 * echelle, '#35d6ff');
-  else if (type === 'pixels5') SG.dessinerPixel(ctx, x, y, 24 * echelle, '#ff4fd8');
-  else if (type === 'fragment') {
-    ctx.save();
-    ctx.translate(x, y);
-    SG.dessinerCoeur(ctx, 0, 0, 40 * echelle, 0.25);
-    ctx.restore();
-  }
-};
-
-// flammes animées posées sur les feux de la grotte
-SG.Feu = class {
-  constructor(x, y, taille) { this.x = x; this.y = y; this.taille = taille; this.p = []; this.t = Math.random() * 10; }
-  maj(dt) {
-    this.t += dt;
-    const n = this.taille > 1 ? 3 : 1;
-    for (let i = 0; i < n; i++) {
-      if (Math.random() < 0.5) this.p.push({
-        x: SG.hasard(-14, 14) * this.taille, y: 0, vx: SG.hasard(-10, 10), vy: -SG.hasard(40, 90) * this.taille,
-        vie: 0, duree: SG.hasard(0.3, 0.6), r: SG.hasard(4, 8) * this.taille,
-      });
-    }
-    if (Math.random() < 0.08 * this.taille) this.p.push({ x: SG.hasard(-8, 8), y: 0, vx: SG.hasard(-30, 30), vy: -SG.hasard(90, 160), vie: 0, duree: SG.hasard(0.8, 1.4), r: 2.5, braise: true });
-    for (const q of this.p) { q.vie += dt; q.x += (q.vx + Math.sin(this.t * 7 + q.y * 0.05) * 12) * dt; q.y += q.vy * dt; }
-    this.p = this.p.filter((q) => q.vie < q.duree);
-  }
-  dessiner(ctx) {
-    ctx.save();
-    ctx.globalCompositeOperation = 'lighter';
-    // lueur qui respire
-    const a = 0.16 + Math.sin(this.t * 11) * 0.03 + Math.sin(this.t * 17) * 0.02;
-    const R = 90 * this.taille;
-    const g = ctx.createRadialGradient(this.x, this.y - 10, 0, this.x, this.y - 10, R);
-    g.addColorStop(0, `rgba(255,170,70,${a})`); g.addColorStop(1, 'rgba(255,100,20,0)');
-    ctx.fillStyle = g; ctx.fillRect(this.x - R, this.y - 10 - R, R * 2, R * 2);
-    for (const q of this.p) {
-      const u = q.vie / q.duree;
-      if (q.braise) {
-        ctx.fillStyle = `rgba(255,200,90,${1 - u})`;
-        ctx.fillRect(this.x + q.x - 1.5, this.y + q.y - 1.5, 3, 3);
-        continue;
-      }
-      const r = q.r * (1 - u * 0.7);
-      const c = u < 0.3 ? [255, 200, 90] : u < 0.6 ? [255, 130, 30] : [200, 60, 20];
-      ctx.fillStyle = `rgba(${c[0]},${c[1]},${c[2]},${0.32 * (1 - u)})`;
-      ctx.beginPath(); ctx.arc(this.x + q.x, this.y + q.y, r, 0, Math.PI * 2); ctx.fill();
-    }
-    ctx.restore();
-  }
+  const im = { coeur: 'coeur', pixel: 'pixel-bleu', pixels5: 'pixel-rose', fragment: 'fragment', receptacle: 'coeur-or' }[type];
+  const i = SG.img[im];
+  if (!i || !i.width) return;
+  const w = i.width / SG.ECHELLE_IMG * echelle, h = i.height / SG.ECHELLE_IMG * echelle;
+  ctx.drawImage(i, x - w / 2, y - h / 2, w, h);
 };

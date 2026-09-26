@@ -190,7 +190,7 @@ SG.Jeu = class {
   // l'onde touche monstres, buissons et herbes dans la zone
   frapperZone(zone, degats, sx, sy) {
     for (const m of this.monstres) if (!m.mort && SG.boitesSeTouchent(zone, m.corps())) m.toucher(this, degats, sx, sy);
-    for (const p of this.projectiles) if (!p.ami && SG.boitesSeTouchent(zone, p.boite())) { p.fini = true; this.effets.push(new SG.Eclat(p.x, p.y, '#ddd')); }
+    for (const p of this.projectiles) if (!p.ami && SG.boitesSeTouchent(zone, p.boite())) { p.fini = true; this.effets.push(new SG.Eclat(p.x, p.y)); }
     if (this.ecran === 'grotte') return;
     const e = SG.MONDE[this.ecran];
     const c0 = Math.floor(zone.x / SG.T), c1 = Math.floor((zone.x + zone.w) / SG.T);
@@ -556,6 +556,11 @@ SG.Jeu = class {
     for (const p of this.projectiles) p.dessiner(ctx);
     for (const e of this.effets) e.dessiner(ctx);
     if (this.ecran === 'grotte') this.dessinerLumiereGrotte(ctx);
+    else {
+      const g = ctx.createRadialGradient(640, 360, 380, 640, 360, 820);
+      g.addColorStop(0, 'rgba(0,0,0,0)'); g.addColorStop(1, 'rgba(0,20,10,0.35)');
+      ctx.fillStyle = g; ctx.fillRect(0, 0, SG.W, SG.H);
+    }
   }
 
   dessinerFlammes(ctx) {
@@ -588,7 +593,10 @@ SG.Jeu = class {
           case 'M': if (this.caseEn(c - 1, r) !== 'M') { im = I['amas-rochers']; dx = 40; dy = 4; } break;
           case 'E': im = I['falaise-grotte']; dy = 2; retourne = false; break;
         }
-        if (im) liste.push({ y: y + dy - 1, dessiner: (ctx) => SG.dessinerPied(ctx, im, x + dx, y + dy, { retourne }) });
+        if (im) {
+          const r = ch === 'T' || ch === 'S' ? 58 : ch === 'M' ? 70 : ch === 'E' ? 0 : 30;
+          liste.push({ y: y + dy - 1, dessiner: (ctx) => { if (r) SG.ombre(ctx, x + dx, y + dy - 2, r, 0.28); SG.dessinerPied(ctx, im, x + dx, y + dy, { retourne }); } });
+        }
       }
     }
     return e;
@@ -601,26 +609,23 @@ SG.Jeu = class {
     const k = Math.min(2, this.echelle);
     const cv = document.createElement('canvas');
     cv.width = SG.W * k; cv.height = SG.H * k;
-    const ctx = cv.getContext('2d');
+    let ctx = cv.getContext('2d');
     ctx.scale(k, k);
     const alea = SG.graine(cle.charCodeAt(0) * 97 + cle.charCodeAt(2) * 13 + 5);
     const T = SG.T;
-    // herbe
-    ctx.fillStyle = '#6cc257';
-    ctx.fillRect(0, 0, SG.W, SG.H);
-    for (let i = 0; i < 90; i++) {
-      ctx.fillStyle = alea() < 0.5 ? 'rgba(90,180,70,0.6)' : 'rgba(130,210,100,0.5)';
-      ctx.beginPath();
-      ctx.ellipse(alea() * SG.W, alea() * SG.H, 30 + alea() * 60, 14 + alea() * 24, 0, 0, Math.PI * 2);
-      ctx.fill();
-    }
-    const brins = (x, y) => {
-      ctx.strokeStyle = '#3f9a3a'; ctx.lineWidth = 3; ctx.lineCap = 'round';
-      ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x - 3, y - 9); ctx.moveTo(x + 5, y); ctx.lineTo(x + 7, y - 10); ctx.moveTo(x + 10, y); ctx.lineTo(x + 13, y - 7); ctx.stroke();
+    const motif = (nom, echelle) => {
+      const im = SG.img['sol-' + nom];
+      const p = ctx.createPattern(im, 'repeat');
+      p.setTransform(new DOMMatrix().scale(echelle / SG.ECHELLE_IMG));
+      return p;
     };
-    for (let i = 0; i < 70; i++) brins(alea() * SG.W, alea() * SG.H);
+    // herbe : texture adoucie pour que les personnages ressortent
+    ctx.fillStyle = motif('herbe', 0.5);
+    ctx.fillRect(0, 0, SG.W, SG.H);
+    ctx.fillStyle = 'rgba(95,175,70,0.38)';
+    ctx.fillRect(0, 0, SG.W, SG.H);
     // taches : chemin et eau, en blocs arrondis soudés entre eux
-    const tache = (car, contour, fond, clair) => {
+    const tache = (car, contour, fond, clair, texture) => {
       const cases = [];
       for (let r = 0; r < SG.ROWS; r++) for (let c = 0; c < SG.COLS; c++) if (e.carte[r][c] === car) cases.push([c, r]);
       const est = (c, r) => {
@@ -632,6 +637,16 @@ SG.Jeu = class {
       };
       const passe = (marge, couleur) => {
         ctx.fillStyle = couleur;
+        if (car === '~') {
+          // l'eau prend une forme arrondie : des disques soudés entre eux
+          for (const [c, r] of cases) {
+            ctx.beginPath(); ctx.arc(c * T + 40, r * T + 40, 50 + marge, 0, Math.PI * 2); ctx.fill();
+            if (est(c + 1, r)) ctx.fillRect(c * T + 40, r * T + 40 - 34 - marge, T, 68 + marge * 2);
+            if (est(c, r + 1)) ctx.fillRect(c * T + 40 - 34 - marge, r * T + 40, 68 + marge * 2, T);
+            if (est(c + 1, r) && est(c, r + 1) && est(c + 1, r + 1)) ctx.fillRect(c * T + 40, r * T + 40, T, T);
+          }
+          return;
+        }
         for (const [c, r] of cases) {
           const x = c * T, y = r * T;
           ctx.beginPath(); ctx.roundRect(x + 8 - marge, y + 8 - marge, T - 16 + marge * 2, T - 16 + marge * 2, 26 + marge); ctx.fill();
@@ -650,7 +665,18 @@ SG.Jeu = class {
         }
       };
       passe(6, contour);
-      passe(0, fond);
+      if (texture) {
+        // la forme sert de pochoir pour la texture
+        const cv2 = document.createElement('canvas'); cv2.width = cv.width; cv2.height = cv.height;
+        const c2 = cv2.getContext('2d'); c2.scale(k, k);
+        const ctxAvant = ctx; ctx = c2; passe(0, '#fff'); ctx = ctxAvant;
+        c2.globalCompositeOperation = 'source-in';
+        c2.fillStyle = texture; c2.fillRect(0, 0, SG.W, SG.H);
+        // ombre intérieure le long du bord
+        c2.globalCompositeOperation = 'source-atop';
+        c2.shadowColor = 'rgba(0,0,0,0.45)'; c2.shadowBlur = 14;
+        ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.drawImage(cv2, 0, 0); ctx.restore();
+      } else passe(0, fond);
       if (clair) {
         ctx.save(); ctx.globalAlpha = 0.5;
         for (const [c, r] of cases) {
@@ -659,84 +685,8 @@ SG.Jeu = class {
         ctx.restore();
       }
     };
-    // chemin : bord sombre, bande creusée, centre plus clair, puis cailloux et fissures
-    tache(':', '#4a3120', '#b98d55', null);
-    const cheminCases = [];
-    for (let r = 0; r < SG.ROWS; r++) for (let c = 0; c < SG.COLS; c++) if (e.carte[r][c] === ':') cheminCases.push([c, r]);
-    const estChemin = (c, r) => {
-      const cc = SG.clamp(c, 0, SG.COLS - 1), rr = SG.clamp(r, 0, SG.ROWS - 1);
-      return e.carte[rr][cc] === ':';
-    };
-    const centre = (marge, couleur) => {
-      ctx.fillStyle = couleur;
-      for (const [c, r] of cheminCases) {
-        const x = c * T, y = r * T, m = 8 + marge;
-        ctx.beginPath(); ctx.roundRect(x + m, y + m, T - m * 2, T - m * 2, Math.max(8, 26 - marge)); ctx.fill();
-        if (estChemin(c + 1, r)) ctx.fillRect(x + 40, y + m, T, T - m * 2);
-        if (estChemin(c, r + 1)) ctx.fillRect(x + m, y + 40, T - m * 2, T);
-        if (estChemin(c - 1, r)) ctx.fillRect(x - 40, y + m, T, T - m * 2);
-        if (estChemin(c, r - 1)) ctx.fillRect(x + m, y - 40, T - m * 2, T);
-      }
-    };
-    centre(7, '#d2a867');
-    // taches et traces de roues
-    ctx.save();
-    for (const [c, r] of cheminCases) {
-      for (let i = 0; i < 3; i++) {
-        ctx.fillStyle = alea() < 0.5 ? 'rgba(150,105,55,0.35)' : 'rgba(245,215,150,0.45)';
-        ctx.beginPath(); ctx.ellipse(c * T + 12 + alea() * 56, r * T + 12 + alea() * 56, 5 + alea() * 12, 3 + alea() * 6, alea() * 3, 0, Math.PI * 2); ctx.fill();
-      }
-      if (alea() < 0.35) {
-        ctx.strokeStyle = 'rgba(90,60,30,0.55)'; ctx.lineWidth = 2; ctx.lineCap = 'round';
-        const x = c * T + 20 + alea() * 40, y = r * T + 20 + alea() * 40;
-        ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + 8, y + 5); ctx.lineTo(x + 13, y + 2); ctx.lineTo(x + 20, y + 8); ctx.stroke();
-      }
-    }
-    // cailloux avec contour, ombre et reflet
-    for (const [c, r] of cheminCases) {
-      const n = 1 + Math.floor(alea() * 3);
-      for (let i = 0; i < n; i++) {
-        const x = c * T + 14 + alea() * 52, y = r * T + 14 + alea() * 52, w = 4 + alea() * 6, h = w * (0.6 + alea() * 0.3);
-        ctx.fillStyle = 'rgba(70,45,20,0.35)';
-        ctx.beginPath(); ctx.ellipse(x + 1.5, y + 2.5, w, h, 0, 0, Math.PI * 2); ctx.fill();
-        ctx.fillStyle = SG.choisir(['#9c8f86', '#b3a597', '#8a7b70']);
-        ctx.strokeStyle = '#2a1d14'; ctx.lineWidth = 1.8;
-        ctx.beginPath(); ctx.ellipse(x, y, w, h, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
-        ctx.fillStyle = 'rgba(255,255,255,0.45)';
-        ctx.beginPath(); ctx.ellipse(x - w * 0.3, y - h * 0.35, w * 0.35, h * 0.25, 0, 0, Math.PI * 2); ctx.fill();
-      }
-    }
-    ctx.restore();
-    tache('~', '#123a6b', '#3b8fe0', '#a8e2ff');
-    // brins d'herbe qui débordent sur le bord des chemins
-    for (let r = 0; r < SG.ROWS; r++) {
-      for (let c = 0; c < SG.COLS; c++) {
-        if (e.carte[r][c] !== ':') continue;
-        const bords = [[0, -1, 40, 4], [0, 1, 40, 76], [-1, 0, 4, 40], [1, 0, 76, 40]];
-        for (const [dc, dr, bx, by] of bords) {
-          const cc = c + dc, rr = r + dr;
-          if (cc < 0 || rr < 0 || cc >= SG.COLS || rr >= SG.ROWS || e.carte[rr][cc] === ':') continue;
-          for (let i = 0; i < 2; i++) {
-            const x = c * T + bx + (dr ? (alea() - 0.5) * 60 : 0), y = r * T + by + (dc ? (alea() - 0.5) * 60 : 0);
-            ctx.strokeStyle = '#3f9a3a'; ctx.lineWidth = 3; ctx.lineCap = 'round';
-            ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x - 3 + dc * 6, y - 8 + dr * 6); ctx.moveTo(x + 4, y); ctx.lineTo(x + 6 + dc * 6, y - 9 + dr * 6); ctx.stroke();
-          }
-        }
-      }
-    }
-    // fleurs
-    for (let r = 0; r < SG.ROWS; r++) {
-      for (let c = 0; c < SG.COLS; c++) {
-        if (e.carte[r][c] !== ',') continue;
-        for (let i = 0; i < 5; i++) {
-          const x = c * T + 12 + alea() * 56, y = r * T + 16 + alea() * 50;
-          ctx.fillStyle = SG.choisir(['#ffffff', '#ffd93b', '#ff7ab8', '#9fd8ff']);
-          ctx.strokeStyle = '#1a1a1a'; ctx.lineWidth = 1.5;
-          for (let p = 0; p < 5; p++) { const a = p / 5 * Math.PI * 2; ctx.beginPath(); ctx.arc(x + Math.cos(a) * 5, y + Math.sin(a) * 5, 4, 0, Math.PI * 2); ctx.fill(); ctx.stroke(); }
-          ctx.fillStyle = '#ffb000'; ctx.beginPath(); ctx.arc(x, y, 3, 0, Math.PI * 2); ctx.fill();
-        }
-      }
-    }
+    tache(':', '#4a3120', null, null, motif('terre', 0.5));
+    tache('~', '#0e3560', null, null, motif('eau', 0.5));
     this.fonds[cle] = cv;
     return cv;
   }
@@ -750,7 +700,7 @@ SG.Jeu = class {
       SG.dessinerCoeur(ctx, 40 + i * 44, 42, 38, reste);
     }
     // pixels
-    SG.dessinerPixel(ctx, 42, 92, 18, '#35d6ff');
+    SG.dessinerButin(ctx, 'pixel', 42, 92, 0.85);
     SG.texte(ctx, '× ' + this.pixels, 62, 102, 26, '#fff', 'left');
     if (this.fragments % 4) SG.texte(ctx, 'Fragments ' + (this.fragments % 4) + '/4', 140, 102, 20, '#ffd0dd', 'left');
     // emplacements A et B
@@ -833,7 +783,7 @@ SG.Jeu = class {
     else SG.texte(ctx, 'Aucun objet', 300, 330, 24, '#8899aa', 'center');
     SG.dessinerCoeur(ctx, 180, 440, 40, 0.25 * (this.fragments % 4));
     SG.texte(ctx, `Fragments de cœur : ${this.fragments % 4}/4`, 220, 450, 22, '#fff', 'left');
-    SG.dessinerPixel(ctx, 180, 495, 20, '#35d6ff');
+    SG.dessinerButin(ctx, 'pixel', 180, 495, 0.9);
     SG.texte(ctx, `Pixels : ${this.pixels}`, 220, 505, 22, '#fff', 'left');
     const opts = ['Reprendre', SG.Son.muet ? 'Activer le son' : 'Couper le son', 'Plein écran', 'Retour au titre'];
     opts.forEach((o, i) => SG.boutonMenu(ctx, o, 950, 250 + i * 70, i === this.menuChoix));

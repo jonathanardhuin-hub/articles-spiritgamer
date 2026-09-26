@@ -38,6 +38,8 @@ SG.IMAGES = [
   'gresille', 'cornu-face-g', 'cornu-face-d', 'cornu-dos-g', 'cornu-dos-d',
   'cornu-profil', 'cornu-profil-a', 'cornu-profil-b',
   'cp-face', 'cp-face-g', 'cp-face-d', 'cp-dos', 'cp-dos-g', 'cp-dos-d', 'cp-profil', 'cp-profil-a',
+  'coeur', 'coeur-vide', 'coeur-or', 'fragment', 'pixel-bleu', 'pixel-rose',
+  'fx-fumee', 'fx-etincelle', 'fx-onde-proche', 'fx-onde-loin', 'sol-herbe', 'sol-terre', 'sol-eau',
 ];
 SG.img = {};
 

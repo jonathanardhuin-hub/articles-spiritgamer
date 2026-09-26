@@ -59,6 +59,17 @@ LISTE = {
     'cp-dos-d': ('ennemis/crache-pierres-dos-pas-d.png', 'w', 86, ''),
     'cp-profil': ('ennemis/crache-pierres-profil.png', 'w', 106, ''),
     'cp-profil-a': ('ennemis/crache-pierres-profil-foulee.png', 'w', 106, ''),
+    # Objets à ramasser
+    'coeur': ('objets/coeur.png', 'w', 40, ''),
+    'coeur-or': ('objets/coeur-or.png', 'w', 70, ''),
+    'fragment': ('objets/fragment.png', 'w', 44, ''),
+    'pixel-bleu': ('objets/pixel-bleu.png', 'w', 30, ''),
+    'pixel-rose': ('objets/pixel-rose.png', 'w', 38, ''),
+    # Effets (fond noir : dessinés en mode lumière)
+    'fx-fumee': ('effets/fumee.png', 'w', 150, ''),
+    'fx-etincelle': ('effets/etincelle.webp', 'w', 90, ''),
+    'fx-onde-proche': ('effets/onde-proche.webp', 'w', 150, ''),
+    'fx-onde-loin': ('effets/onde-loin.webp', 'w', 140, ''),
 }
 
 def main():
@@ -69,10 +80,29 @@ def main():
             im = fermer_bouche(im)
         elif opt == 'bouche-profil':
             im = fermer_bouche(im, profil=True)
+        if src.startswith('effets/') and src.endswith('.webp'):
+            # effet sur fond noir : le noir devient transparent (la luminosité donne l'opacité)
+            import numpy as np
+            a = np.array(im).astype(float)
+            al = a[..., :3].max(axis=2) / 255.0
+            al = np.clip((al - 0.06) / 0.94, 0, 1)
+            rgb = np.where(al[..., None] > 0.01, a[..., :3] / np.maximum(al[..., None], 0.01), 0)
+            im = Image.fromarray(np.dstack([rgb.clip(0, 255), al * 255]).astype('uint8'), 'RGBA')
         cible = taille * ECHELLE
         s = cible / (im.height if axe == 'h' else im.width)
         im = im.resize((max(1, round(im.width * s)), max(1, round(im.height * s))), Image.LANCZOS)
         im.save(os.path.join(SORTIE, nom + '.webp'), 'WEBP', quality=88, method=6)
+    # textures de sol, répétées en mosaïque (256 pixels logiques)
+    for n in ('herbe', 'terre', 'eau'):
+        t = Image.open(os.path.join(IMG, 'sols', n + '.webp')).convert('RGB')
+        t.resize((512, 512), Image.LANCZOS).save(os.path.join(SORTIE, 'sol-' + n + '.webp'), 'WEBP', quality=85, method=6)
+    # cœur vide pour l'affichage de la vie
+    c = Image.open(os.path.join(IMG, 'objets/coeur.png')).convert('RGBA')
+    c = c.resize((80, round(c.height * 80 / c.width)), Image.LANCZOS)
+    import numpy as np
+    a = np.array(c).astype(float)
+    a[..., :3] = a[..., :3] * 0.22 + np.array([40, 10, 20]) * 0.3
+    Image.fromarray(a.clip(0, 255).astype('uint8')).save(os.path.join(SORTIE, 'coeur-vide.webp'), 'WEBP', quality=88)
     # la grotte : image plein écran
     g = Image.open(os.path.join(IMG, 'decor/grotte-interieur.webp')).convert('RGB')
     g.resize((1600, 900), Image.LANCZOS).save(os.path.join(SORTIE, 'grotte.webp'), 'WEBP', quality=85, method=6)
