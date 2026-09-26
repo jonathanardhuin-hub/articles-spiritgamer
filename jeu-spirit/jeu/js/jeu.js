@@ -191,7 +191,13 @@ SG.Jeu = class {
   frapperZone(zone, degats, sx, sy) {
     for (const m of this.monstres) if (!m.mort && SG.boitesSeTouchent(zone, m.corps())) m.toucher(this, degats, sx, sy);
     for (const p of this.projectiles) if (!p.ami && SG.boitesSeTouchent(zone, p.boite())) { p.fini = true; this.effets.push(new SG.Eclat(p.x, p.y)); }
-    if (this.ecran === 'grotte') return;
+    this.couperDecor(zone);
+  }
+
+  // coupe les buissons et hautes herbes dans la zone ; renvoie le nombre de cases coupées
+  couperDecor(zone) {
+    if (this.ecran === 'grotte') return 0;
+    let n = 0;
     const e = SG.MONDE[this.ecran];
     const c0 = Math.floor(zone.x / SG.T), c1 = Math.floor((zone.x + zone.w) / SG.T);
     const r0 = Math.floor(zone.y / SG.T), r1 = Math.floor((zone.y + zone.h) / SG.T);
@@ -202,6 +208,7 @@ SG.Jeu = class {
         const centre = { x: c * SG.T + 10, y: r * SG.T + 10, w: 60, h: 60 };
         if (!SG.boitesSeTouchent(zone, centre)) continue;
         this.coupes.add(c + ',' + r);
+        n++;
         this.effets.push(new SG.Feuilles(c * SG.T + 40, r * SG.T + 50));
         SG.Son.effet('feuilles');
         const k = c + ',' + r;
@@ -210,15 +217,16 @@ SG.Jeu = class {
           const b = new SG.Butin(secret, c * SG.T + 40, r * SG.T + 62, true);
           b.cleSecret = this.ecran + ':' + k;
           this.butins.push(b);
-        } else if (Math.random() < 0.2) {
-          this.lacherObjet(c * SG.T + 40, r * SG.T + 62);
+        } else if (Math.random() < 0.3) {
+          this.lacherObjet(c * SG.T + 40, r * SG.T + 62, true);
         }
       }
     }
+    return n;
   }
 
-  lacherObjet(x, y) {
-    const r = Math.random();
+  lacherObjet(x, y, garanti) {
+    const r = garanti ? Math.random() * 0.62 : Math.random();
     const manque = this.vie < this.vieMax;
     if (r < (manque ? 0.22 : 0.08)) this.butins.push(new SG.Butin('coeur', x, y));
     else if (r < 0.55) this.butins.push(new SG.Butin('pixel', x, y));

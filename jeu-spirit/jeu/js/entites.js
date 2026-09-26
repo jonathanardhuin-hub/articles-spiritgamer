@@ -141,6 +141,36 @@ SG.dessinerEffet = function (ctx, im, x, y, ang, echelle, alpha, lumiere) {
   ctx.restore();
 };
 
+// distorsion : la scène déjà dessinée est reprise et grossie à l'intérieur d'un anneau (onde de choc)
+SG.distorsion = function (ctx, x, y, rayon, epaisseur, force, angle, ouverture) {
+  const cv = ctx.canvas, k = SG.jeu ? SG.jeu.echelle : 1;
+  const r0 = Math.max(0, rayon - epaisseur / 2), r1 = rayon + epaisseur / 2;
+  ctx.save();
+  ctx.beginPath();
+  if (ouverture) {
+    ctx.arc(x, y, r1, angle - ouverture, angle + ouverture);
+    ctx.arc(x, y, r0, angle + ouverture, angle - ouverture, true);
+  } else {
+    ctx.arc(x, y, r1, 0, Math.PI * 2);
+    ctx.arc(x, y, r0, 0, Math.PI * 2, true);
+  }
+  ctx.closePath();
+  ctx.clip();
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  const cx = x * k, cy = y * k, f = 1 + force;
+  ctx.drawImage(cv, cx - cx * f, cy - cy * f, cv.width * f, cv.height * f);
+  ctx.restore();
+  // léger liseré lumineux sur le bord extérieur
+  ctx.save();
+  ctx.globalCompositeOperation = 'lighter';
+  ctx.strokeStyle = `rgba(140,230,255,${0.25 * Math.min(1, force * 8)})`;
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  if (ouverture) ctx.arc(x, y, r1, angle - ouverture, angle + ouverture); else ctx.arc(x, y, r1, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.restore();
+};
+
 SG.ombre = function (ctx, x, y, r, alpha) {
   ctx.save();
   ctx.fillStyle = `rgba(0,0,0,${alpha ?? 0.22})`;
@@ -455,6 +485,8 @@ SG.Projectile = class {
     this.x += this.vx * dt; this.y += this.vy * dt;
     if (this.x < -40 || this.x > SG.W + 40 || this.y < -40 || this.y > SG.H + 40) { this.fini = true; return; }
     // les projectiles passent au-dessus de l'eau et des herbes, mais pas des obstacles hauts
+    // l'onde lointaine coupe herbes et buissons sur son passage (un buisson l'arrête)
+    if (this.ami) jeu.couperDecor(this.boite());
     if (jeu.obstacleHaut(this.x, this.y + 30)) { this.fini = true; this.quandBloque(jeu); return; }
     if (this.ami) {
       for (const m of jeu.monstres) {
@@ -476,11 +508,14 @@ SG.Projectile = class {
 // l'onde lointaine de Spirit (quand ses cœurs sont pleins)
 SG.OndeLointaine = class extends SG.Projectile {
   constructor(x, y, dir) { super(x, y, dir, 720); this.r = 26; this.ami = true; }
-  quandBloque(jeu) { jeu.effets.push(new SG.Eclat(this.x, this.y)); }
   dessiner(ctx) {
     const d = SG.DIRS[this.dir];
+    const ang = Math.atan2(d.y, d.x);
+    // bulle de distorsion qui file, avec un sillage
+    SG.distorsion(ctx, this.x, this.y, 18, 30, 0.14, 0, 0);
+    SG.distorsion(ctx, this.x - d.x * 34, this.y - d.y * 34, 12, 16, 0.08, 0, 0);
     const pulse = 1 + Math.sin(this.t * 25) * 0.05;
-    SG.dessinerEffet(ctx, SG.img['fx-onde-loin'], this.x - d.x * 20, this.y - d.y * 20, Math.atan2(d.y, d.x), 0.75 * pulse, 1, false);
+    SG.dessinerEffet(ctx, SG.img['fx-onde-loin'], this.x - d.x * 16, this.y - d.y * 16, ang, 0.5 * pulse, 0.45, true);
   }
 };
 
@@ -524,13 +559,20 @@ SG.Pierre = class extends SG.Projectile {
 
 // ---------------------------------------------------------------- effets visuels
 SG.OndeProche = class {
-  constructor(x, y, dir) { this.x = x; this.y = y; this.dir = dir; this.t = 0; this.duree = 0.26; this.fini = false; }
+  constructor(x, y, dir) { this.x = x; this.y = y; this.dir = dir; this.t = 0; this.duree = 0.3; this.fini = false; }
   maj(jeu, dt) { this.t += dt; if (this.t > this.duree) this.fini = true; }
   dessiner(ctx) {
     const d = SG.DIRS[this.dir];
     const u = this.t / this.duree;
-    const e = 0.45 + u * 0.55;
-    SG.dessinerEffet(ctx, SG.img['fx-onde-proche'], this.x + d.x * (20 + u * 50), this.y + d.y * (20 + u * 50), Math.atan2(d.y, d.x), e, 1 - u * u, false);
+    const ang = Math.atan2(d.y, d.x);
+    // deux anneaux de distorsion qui partent de la bouche de Spirit
+    for (let i = 0; i < 2; i++) {
+      const v = u - i * 0.25;
+      if (v <= 0) continue;
+      SG.distorsion(ctx, this.x, this.y, 18 + v * 95, 16 - v * 6, 0.09 * (1 - v), ang, 0.85);
+    }
+    // une trace de l'onde dessinée, très discrète
+    SG.dessinerEffet(ctx, SG.img['fx-onde-proche'], this.x + d.x * (25 + u * 45), this.y + d.y * (25 + u * 45), ang, 0.4 + u * 0.4, 0.3 * (1 - u), true);
   }
 };
 
