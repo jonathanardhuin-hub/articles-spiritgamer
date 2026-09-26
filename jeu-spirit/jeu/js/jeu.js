@@ -620,8 +620,6 @@ SG.Jeu = class {
       return;
     }
     SG.decalY = SG.BANDE;
-    ctx.setTransform(k, 0, 0, k, 0, 0);
-    this.dessinerBande(ctx);
     ctx.setTransform(k, 0, 0, k, 0, SG.BANDE * k);
     ctx.save(); ctx.beginPath(); ctx.rect(0, 0, SG.W, SG.H); ctx.clip();
     if (this.etat === 'transition' && this.transition.type === 'glisse') {
@@ -631,10 +629,12 @@ SG.Jeu = class {
       ctx.drawImage(tr.avant, -d.x * SG.W * e, -d.y * SG.H * e, SG.W, SG.H);
       ctx.drawImage(tr.apres, d.x * SG.W * (1 - e), d.y * SG.H * (1 - e), SG.W, SG.H);
       ctx.restore();
+      this.dessinerHUD(ctx);
       return;
     }
     this.dessinerScene(ctx);
     ctx.restore();
+    this.dessinerHUD(ctx);
     if (this.etat === 'transition' && this.transition.type === 'fondu') {
       const tr = this.transition, u = tr.t / tr.duree;
       ctx.fillStyle = `rgba(0,0,0,${1 - Math.abs(u * 2 - 1)})`;
@@ -934,6 +934,48 @@ SG.Jeu = class {
     }
     // bouton carte et pause, rappel clavier
     SG.texte(ctx, 'Entrée : objets   Tab : carte', SG.W - 20, 112, 15, '#7f9cc4', 'right');
+  }
+
+  dessinerHUD(ctx) {
+    // cœurs
+    const n = this.vieMax / 4;
+    for (let i = 0; i < n; i++) {
+      const reste = SG.clamp((this.vie - i * 4) / 4, 0, 1);
+      SG.dessinerCoeur(ctx, 40 + i * 44, 42, 38, reste);
+    }
+    // pixels
+    SG.dessinerButin(ctx, 'pixel', 42, 92, 0.85);
+    SG.texte(ctx, '× ' + this.pixels, 62, 102, 26, '#fff', 'left');
+    if (this.fragments % 4) SG.texte(ctx, 'Fragments ' + (this.fragments % 4) + '/4', 140, 102, 20, '#ffd0dd', 'left');
+    // clés du donjon
+    if (this.estDonjon()) {
+      const D = this.etatDonjon();
+      SG.dessinerIcone(ctx, 'cle', 44, 140, 34);
+      SG.texte(ctx, '× ' + D.cles, 66, 150, 24, '#fff', 'left');
+      if (D.cleBoss) SG.dessinerIcone(ctx, 'cleBoss', 130, 140, 40);
+    }
+    // emplacements A et B, comme dans Zelda : pastille ronde claire, lettre blanche bien visible
+    const case_ = (cx, lettre, type) => {
+      const r = 46, cy = 58;
+      ctx.save();
+      ctx.fillStyle = 'rgba(4,12,30,0.75)';
+      ctx.beginPath(); ctx.arc(cx, cy, r + 8, 0, 7); ctx.fill();
+      ctx.lineWidth = 5; ctx.strokeStyle = '#2ad4ff';
+      ctx.beginPath(); ctx.arc(cx, cy, r + 4, 0, 7); ctx.stroke();
+      if (type) {
+        const g = ctx.createRadialGradient(cx, cy, 4, cx, cy, r);
+        g.addColorStop(0, '#ffffff'); g.addColorStop(0.7, '#d8f4ff'); g.addColorStop(1, '#8fd8ff');
+        ctx.fillStyle = g; ctx.beginPath(); ctx.arc(cx, cy, r - 2, 0, 7); ctx.fill();
+        SG.dessinerIcone(ctx, type, cx, cy + 2, 70);
+      }
+      // lettre dans une pastille en bas à gauche
+      ctx.fillStyle = '#0a2a5a'; ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 3;
+      ctx.beginPath(); ctx.arc(cx - r + 6, cy + r - 6, 19, 0, 7); ctx.fill(); ctx.stroke();
+      ctx.restore();
+      SG.texte(ctx, lettre, cx - r + 6, cy + r + 4, 28, '#ffffff', 'center', '#000', 4, true);
+    };
+    case_(SG.W - 190, 'B', this.objetB);
+    case_(SG.W - 70, 'A', this.ampli ? 'ampli' : null);
   }
 
   dessinerObjetBrandi(ctx) {
