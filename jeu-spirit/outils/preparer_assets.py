@@ -133,6 +133,16 @@ def main():
             al = np.clip((al - 0.06) / 0.94, 0, 1)
             rgb = np.where(al[..., None] > 0.01, a[..., :3] / np.maximum(al[..., None], 0.01), 0)
             im = Image.fromarray(np.dstack([rgb.clip(0, 255), al * 255]).astype('uint8'), 'RGBA')
+        if nom == 'entree-terrier':
+            # le bas de l'image se fond dans le sol
+            import numpy as np
+            a = np.array(im).astype(float)
+            h = a.shape[0]
+            debut = int(h * 0.62)
+            f = np.ones(h)
+            f[debut:] = np.linspace(1, 0, h - debut) ** 1.5
+            a[..., 3] *= f[:, None]
+            im = Image.fromarray(a.astype('uint8'), 'RGBA')
         cible = taille * ECHELLE
         s = cible / (im.height if axe == 'h' else im.width)
         im = im.resize((max(1, round(im.width * s)), max(1, round(im.height * s))), Image.LANCZOS)

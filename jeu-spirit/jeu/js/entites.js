@@ -13,6 +13,8 @@ SG.boitePieds = (e, x, y) => ({ x: (x ?? e.x) - e.pw / 2, y: (y ?? e.y) - e.ph, 
 
 SG.deplacer = function (jeu, e, dx, dy) {
   let bloque = false;
+  // déjà coincé dans un obstacle (porte refermée derrière soi) : on laisse sortir
+  if (jeu.collision(SG.boitePieds(e), e)) { e.x += dx; e.y += dy; return false; }
   if (dx) {
     const nx = e.x + dx;
     if (!jeu.collision(SG.boitePieds(e, nx, e.y), e)) e.x = nx; else bloque = true;

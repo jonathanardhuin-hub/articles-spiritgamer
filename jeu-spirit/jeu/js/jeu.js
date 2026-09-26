@@ -346,10 +346,12 @@ SG.Jeu = class {
     const cle = this.voisin(dir);
     const avant = this.capturer();
     const s = this.spirit;
-    if (dir === 'gauche') s.x = SG.W - s.pw / 2 - 2;
-    if (dir === 'droite') s.x = s.pw / 2 + 2;
-    if (dir === 'haut') s.y = SG.H - 4;
-    if (dir === 'bas') s.y = s.ph + 4;
+    // dans un donjon, on entre d'une case pour ne pas rester dans l'encadrement de la porte
+    const m = this.estDonjon(cle) ? SG.T + 6 : 0;
+    if (dir === 'gauche') s.x = SG.W - s.pw / 2 - 2 - m;
+    if (dir === 'droite') s.x = s.pw / 2 + 2 + m;
+    if (dir === 'haut') s.y = SG.H - 4 - m;
+    if (dir === 'bas') s.y = s.ph + 4 + m;
     s.recul = null;
     this.entrerEcran(cle);
     const apres = this.capturer();
@@ -732,7 +734,7 @@ SG.Jeu = class {
         const graine = (c * 31 + r * 17 + this.ecran.length) % 7;
         let im = null, dx = 0, dy = 0, retourne = graine % 2 === 0;
         switch (ch) {
-          case 'T': im = I.arbre; dy = 6; break;
+          case 'T': im = I['arbre-sombre']; dy = 10; dx = (graine - 3) * 3; break;
           case 'S': im = I['arbre-sombre']; dy = r === SG.ROWS - 1 ? 45 : 10; dx = (graine - 3) * 3; break;
           case 'b': im = I.buisson; dy = -4; break;
           case 'h': im = I.herbes; dy = -8; break;
