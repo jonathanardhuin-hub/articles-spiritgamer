@@ -96,7 +96,7 @@ SG.Jeu = class {
     const e = SG.MONDE[cle];
     for (const [type, c, r] of e.ennemis || []) {
       const m = SG.creerMonstre(type, c * SG.T + 40, r * SG.T + 62);
-      m.apparition = SG.hasard(0.4, 0.9);
+      m.apparition = m.dureeApparition = SG.hasard(0.6, 1.1);
       this.placerLibre(m);
       this.monstres.push(m);
     }
@@ -670,19 +670,53 @@ SG.Jeu = class {
           if (c === SG.COLS - 1 && est(c + 1, r)) ctx.fillRect(x + 40, y + 8 - marge, T, T - 16 + marge * 2);
         }
       };
-      passe(6, contour);
-      if (texture) {
-        // la forme sert de pochoir pour la texture
-        const cv2 = document.createElement('canvas'); cv2.width = cv.width; cv2.height = cv.height;
-        const c2 = cv2.getContext('2d'); c2.scale(k, k);
-        const ctxAvant = ctx; ctx = c2; passe(0, '#fff'); ctx = ctxAvant;
-        c2.globalCompositeOperation = 'source-in';
-        c2.fillStyle = texture; c2.fillRect(0, 0, SG.W, SG.H);
-        // ombre intérieure le long du bord
-        c2.globalCompositeOperation = 'source-atop';
-        c2.shadowColor = 'rgba(0,0,0,0.45)'; c2.shadowBlur = 14;
-        ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.drawImage(cv2, 0, 0); ctx.restore();
-      } else passe(0, fond);
+      // pochoir de la forme
+      const cv2 = document.createElement('canvas'); cv2.width = cv.width; cv2.height = cv.height;
+      const c2 = cv2.getContext('2d'); c2.scale(k, k);
+      const ctxAvant = ctx; ctx = c2; passe(0, '#fff'); ctx = ctxAvant;
+      // bord adouci : la forme est floutée, pas de trait
+      const cv3 = document.createElement('canvas'); cv3.width = cv.width; cv3.height = cv.height;
+      const c3 = cv3.getContext('2d');
+      c3.filter = `blur(${(car === '~' ? 2 : 5) * k}px)`;
+      c3.drawImage(cv2, 0, 0);
+      c3.filter = 'none';
+      if (car === '~') {
+        // berge : bande de terre humide sous l'eau
+        const cb = document.createElement('canvas'); cb.width = cv.width; cb.height = cv.height;
+        const b2 = cb.getContext('2d'); b2.scale(k, k);
+        ctx = b2; passe(10, '#fff'); ctx = ctxAvant;
+        const b3 = document.createElement('canvas'); b3.width = cv.width; b3.height = cv.height;
+        const b4 = b3.getContext('2d'); b4.filter = `blur(${6 * k}px)`; b4.drawImage(cb, 0, 0); b4.filter = 'none';
+        b4.globalCompositeOperation = 'source-in'; b4.setTransform(k, 0, 0, k, 0, 0);
+        b4.fillStyle = motif('terre', 0.5); b4.fillRect(0, 0, SG.W, SG.H);
+        b4.fillStyle = 'rgba(40,25,10,0.35)'; b4.fillRect(0, 0, SG.W, SG.H);
+        ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.drawImage(b3, 0, 0); ctx.restore();
+      }
+      c3.globalCompositeOperation = 'source-in';
+      c3.setTransform(k, 0, 0, k, 0, 0);
+      c3.fillStyle = texture; c3.fillRect(0, 0, SG.W, SG.H);
+      if (car === '~') {
+        // eau plus sombre au bord, plus claire au centre
+        c3.globalCompositeOperation = 'source-atop';
+        c3.shadowColor = 'rgba(0,30,60,0.6)'; c3.shadowBlur = 18 * k;
+      }
+      ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.drawImage(cv3, 0, 0); ctx.restore();
+      // touffes d'herbe qui débordent sur le bord, pour fondre la limite
+      const tuf = SG.img.herbes;
+      for (const [c, r] of cases) {
+        for (const [dc, dr] of [[0, -1], [0, 1], [-1, 0], [1, 0]]) {
+          const cc = c + dc, rr = r + dr;
+          if (cc < 0 || rr < 0 || cc >= SG.COLS || rr >= SG.ROWS) continue;
+          if (est(cc, rr) || SG.CASES_PLEINES.has(e.carte[rr][cc]) && e.carte[rr][cc] !== 'b') continue;
+          const n = 1 + Math.floor(alea() * 2);
+          for (let i = 0; i < n; i++) {
+            const bx = c * T + 40 + dc * (car === '~' ? 44 : 36) + (dr ? (alea() - 0.5) * 70 : (alea() - 0.5) * 8);
+            const by = r * T + 40 + dr * (car === '~' ? 44 : 36) + (dc ? (alea() - 0.5) * 70 : (alea() - 0.5) * 8) + 12;
+            const ech = 0.28 + alea() * 0.18;
+            SG.dessinerPied(ctx, tuf, bx, by, { echelle: ech, retourne: alea() < 0.5 });
+          }
+        }
+      }
       if (clair) {
         ctx.save(); ctx.globalAlpha = 0.5;
         for (const [c, r] of cases) {

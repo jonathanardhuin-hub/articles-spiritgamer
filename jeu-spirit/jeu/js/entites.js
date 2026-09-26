@@ -159,7 +159,8 @@ SG.Monstre = class {
     this.flash = 0;
     this.recul = null;
     this.mort = false;
-    this.apparition = 0.5;   // le monstre surgit d'un petit nuage
+    this.apparition = 0.5;   // le monstre surgit d'un nuage de Bruit
+    this.dureeApparition = 0.5;
     this.t = Math.random() * 3;
   }
   corps() { return { x: this.x - this.cw / 2, y: this.y - this.ch, w: this.cw, h: this.ch }; }
@@ -195,18 +196,16 @@ SG.Monstre = class {
     const s = jeu.spirit;
     if (SG.boitesSeTouchent(this.corps(), s.corps())) s.blesser(jeu, jeu.degats(this.degatsContact), this.x, this.y);
   }
-  dessinerApparition(ctx) {
-    const t = 1 - this.apparition / 0.5;
-    ctx.save();
-    ctx.globalAlpha = 1 - t;
-    ctx.fillStyle = '#2a1840';
-    for (let i = 0; i < 5; i++) {
-      const a = i / 5 * Math.PI * 2 + t * 2;
-      ctx.beginPath();
-      ctx.arc(this.x + Math.cos(a) * 20 * t, this.y - 30 + Math.sin(a) * 12 * t, 26 * (1 - t * 0.5), 0, Math.PI * 2);
-      ctx.fill();
+  // apparition : le monstre se condense dans un nuage de Bruit (voir aussi les variantes par monstre)
+  dessinerApparition(ctx, dessinMonstre) {
+    const t = SG.clamp(1 - this.apparition / this.dureeApparition, 0, 1);
+    // le nuage de fumée se contracte vers le centre en tournant
+    const e = 0.9 * (1 - t * 0.7) * (this.cw / 70);
+    SG.dessinerEffet(ctx, SG.img['fx-fumee'], this.x, this.y - this.ch * 0.45, t * 2.5, e, t < 0.8 ? 0.95 : (1 - t) * 4.7, false);
+    // le monstre apparaît dans la seconde moitié
+    if (t > 0.45 && dessinMonstre) {
+      ctx.save(); ctx.globalAlpha = (t - 0.45) / 0.55; dessinMonstre(); ctx.restore();
     }
-    ctx.restore();
   }
   dessinerFlash(ctx, dessin) {
     // clignotement blanc quand il est touché
@@ -270,7 +269,17 @@ SG.Gresille = class extends SG.Monstre {
     } else super.quandMeurt(jeu);
   }
   dessiner(ctx) {
-    if (this.apparition > 0) { this.dessinerApparition(ctx); return; }
+    if (this.apparition > 0) {
+      // la Grésille remonte du sol : d'abord une flaque sombre, puis elle se gonfle
+      const t = SG.clamp(1 - this.apparition / this.dureeApparition, 0, 1);
+      SG.ombre(ctx, this.x, this.y, 30 * this.echelle * Math.min(1, t * 2), 0.45);
+      if (t > 0.3) {
+        const u = (t - 0.3) / 0.7;
+        const sy = 0.15 + 0.85 * (1 - Math.pow(1 - u, 2)) + Math.sin(u * Math.PI) * 0.15;
+        SG.dessinerPied(ctx, SG.img.gresille, this.x, this.y, { echelle: this.echelle, sy, sx: 1 / Math.sqrt(sy) });
+      }
+      return;
+    }
     let sx = 1, sy = 1;
     const u = this.phase === 'tasse' ? 1 - this.tPhase / 0.22 : this.phase === 'atterrit' ? this.tPhase / 0.18 : 0;
     if (this.phase === 'tasse' || this.phase === 'atterrit') { sy = 1 - 0.28 * Math.sin(Math.PI * u * 0.5 + (this.phase === 'atterrit' ? Math.PI / 2 : 0)); }
@@ -339,7 +348,7 @@ SG.Cornu = class extends SG.Monstre {
     return I[['cornu-profil-a', 'cornu-profil', 'cornu-profil-b', 'cornu-profil'][pas]];
   }
   dessiner(ctx) {
-    if (this.apparition > 0) { this.dessinerApparition(ctx); return; }
+    if (this.apparition > 0) { this.dessinerApparition(ctx, () => SG.dessinerPied(ctx, this.image(), this.x, this.y, { retourne: this.dir === 'gauche' })); return; }
     const pas = Math.floor(this.marche * 5) % 2;
     let x = this.x, y = this.y + (pas ? -2 : 0);
     if (this.arme > 0) { const d = SG.DIRS[this.dir]; x -= d.x * 6; y -= d.y * 4; }  // il recule pour armer
@@ -403,7 +412,7 @@ SG.CrachePierres = class extends SG.Monstre {
     return I[pas % 2 ? 'cp-profil' : 'cp-profil-a'];
   }
   dessiner(ctx) {
-    if (this.apparition > 0) { this.dessinerApparition(ctx); return; }
+    if (this.apparition > 0) { this.dessinerApparition(ctx, () => SG.dessinerPied(ctx, this.image(), this.x, this.y, { retourne: this.dir === 'gauche' })); return; }
     let sy = 1;
     if (this.prepare > 0) sy = 1 + 0.08 * Math.sin((0.5 - this.prepare) / 0.5 * Math.PI); // il gonfle avant de cracher
     SG.ombre(ctx, this.x, this.y, 40);
