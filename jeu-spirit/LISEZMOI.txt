@@ -1,0 +1,34 @@
+SPIRIT ET LE ROI CLICKBAIT - sauvegarde du projet
+==================================================
+
+CONTENU DU DOSSIER
+- jeu/                 Le jeu complet, prêt à être mis en ligne (index.html + js/ + assets/).
+- images/              Toutes les images d'origine générées avec ChatGPT, rangées par catégorie.
+  images/sources/      Les images telles que ChatGPT les a livrées (avant découpe).
+- outils/              Les scripts qui découpent les images et préparent le dossier jeu/assets.
+- univers.md           L'histoire, les régions, les donjons, les monstres.
+- objets.md            À quoi sert chaque objet.
+- images-a-generer.md  Les prompts ChatGPT de la phase en cours.
+
+JOUER SUR SON ORDINATEUR
+Les navigateurs bloquent un jeu ouvert directement depuis le disque (double-clic sur index.html).
+Il faut le lancer par un petit serveur local :
+  - Windows : installer Python (python.org), ouvrir le dossier "jeu", taper "cmd" dans la barre
+    d'adresse de l'explorateur, puis dans la fenêtre noire : python -m http.server 8000
+  - Ouvrir ensuite http://localhost:8000 dans le navigateur.
+
+METTRE LE JEU SUR SPIRITGAMER.FR
+Envoyer le contenu du dossier "jeu" sur l'hébergement (par exemple dans un dossier /jeu-spirit/
+à la racine du site, via le gestionnaire de fichiers de l'hébergeur ou un logiciel FTP).
+Le jeu est alors accessible à l'adresse https://spiritgamer.fr/jeu-spirit/
+Pour l'afficher dans un article WordPress, ajouter un bloc "HTML personnalisé" contenant :
+  <iframe src="/jeu-spirit/" style="width:100%;aspect-ratio:16/9;border:0" allowfullscreen></iframe>
+
+TOUCHES
+Flèches ou ZQSD : bouger    Espace : attaquer / parler / ouvrir
+C : objet du bouton B       Entrée : objets    Tab : carte    F : plein écran    M : son
+Sur téléphone : joystick à gauche, boutons A et B à droite.
+
+La sauvegarde de la partie est enregistrée dans le navigateur du joueur.
+
+Le code source est aussi sur GitHub : dépôt articles-spiritgamer, branche claude/wonderful-albattani-oq4m40.
