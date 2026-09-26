@@ -740,11 +740,16 @@ Object.assign(SG.Jeu.prototype, {
       // l'image est calée pour que son sol corresponde exactement à la grille de la salle (cases 1 à 14, lignes 1 à 7)
       ctx.drawImage(im, -42, -41, 1365, 811);
       // les ouvertures sans porte sont murées avec un morceau du mur voisin
-      const ouv = { haut: [560, 0, 160, 82, 360, 0], bas: [560, 638, 160, 82, 360, 638], gauche: [0, 312, 82, 96, 0, 152], droite: [1198, 312, 82, 96, 1198, 152] };
+      // chaque morceau : [x, y, largeur, hauteur, source x, source y] ; tout l'encadrement de la porte est recouvert
+      const ouv = {
+        haut: [[503, 0, 274, 92, 223, 0]],
+        bas: [[503, 628, 274, 92, 223, 628]],
+        gauche: [[0, 224, 92, 124, 0, 96], [0, 348, 92, 126, 0, 476]],
+        droite: [[1188, 224, 92, 124, 1188, 96], [1188, 348, 92, 126, 1188, 476]],
+      };
       for (const dir in ouv) {
         if (this.porteVers(dir)) continue;
-        const [x, y, w, h, sx, sy] = ouv[dir];
-        ctx.drawImage(cv, sx * k, sy * k, w * k, h * k, x, y, w, h);
+        for (const [x, y, w, h, sx, sy] of ouv[dir]) ctx.drawImage(cv, sx * k, sy * k, w * k, h * k, x, y, w, h);
       }
     } else {
       // dalles sombres veinées de violet
