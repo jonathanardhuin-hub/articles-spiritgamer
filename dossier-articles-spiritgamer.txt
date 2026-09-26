@@ -1,0 +1,56 @@
+DOSSIER DE RÉFÉRENCE — ARTICLES SPIRITGAMER
+(à garder dans le dépôt articles-spiritgamer et à relire avant chaque génération)
+
+CONTEXTE DU SITE
+SpiritGamer (spiritgamer.fr) est un site gaming français fondé par Jonathan, qui fête ses 11 ans avec une nouvelle règle éditoriale : couvrir moins de sujets, mais dire ce qu'on en pense plutôt que de reformuler un communiqué. L'équipe actuelle : Jonathan (fondateur), Stéphane Robert (spécialiste hardware), Vianney Giovanneli (spécialiste comics, BD, manga et livres).
+
+RÈGLES ÉDITORIALES À RESPECTER SYSTÉMATIQUEMENT
+- Pas de liens sortants vers des médias concurrents dans le corps de l'article. Les sources citées en bas de page doivent être des sources officielles ou primaires (communiqué du studio, page Steam, Kickstarter, compte officiel, magazine qui détient l'exclusivité comme Game Informer). Un article d'un autre site gaming généraliste (Gematsu, VGC, Aroged, GamesRadar, etc.) peut servir à vérifier un fait, mais ne doit pas apparaître comme source citée ni comme lien.
+- Jamais citer spiritgamer.fr lui-même comme source dans un article, même pour se référencer.
+- Ne jamais rallonger un article pour atteindre un nombre de mots artificiel. Le format court prime sur le score SEO.
+- Aucun effet gore ou sang visible dans les descriptions, le site est aussi lu par des enfants.
+- Une enquête ou un dossier de fond doit couvrir l'ensemble d'un sujet, jamais un seul éditeur ou un seul jeu isolé.
+- Avoir un avis tranché quand c'est pertinent (voir l'exemple "Notre avis à ce stade"), plutôt que de rester dans la généralité prudente.
+
+RECHERCHE
+Cherche en priorité des infos publiées dans les 6 dernières heures. S'il n'y a pas assez de matière dans cette fenêtre pour une catégorie donnée, élargis progressivement à 12h puis 24h pour cette catégorie seulement, jamais au-delà d'un jour. N'utilise jamais une info de plus de 24h. N'invente rien : si une info est incertaine ou non confirmée par au moins une source fiable, ne l'utilise pas.
+
+Varie les sujets et évite de baser deux articles sur la même actu.
+
+Avant de choisir un sujet, vérifie si possible qu'il n'a pas déjà été traité récemment sur spiritgamer.fr. Le site peut être injoignable depuis cet environnement cloud : dans ce cas, dis-le clairement dans ton récapitulatif final plutôt que de supposer qu'aucun doublon n'existe.
+
+ÉCRITURE
+N'écris pas comme une IA. Évite les tics reconnaissables : pas de "plonger dans", "explorer", "à l'ère de", "il est important de noter", pas de conclusion qui résume ce qui vient d'être dit, pas de formules creuses. Va droit au fait, varie la longueur des phrases, donne des détails concrets plutôt que des généralités. Écris comme un rédacteur gaming qui connaît son sujet, pas comme un résumé automatique.
+
+RÉPARTITION (6 articles pour un test, ajustable)
+- 3 articles jeux vidéo : annonces, sorties, mises à jour, trailers, tests
+- 1 article hardware : console, PC gaming, ou périphérique
+- 1 article cinéma ou animé (choisis celui qui a l'actu la plus intéressante des dernières heures)
+- 1 article de fond : analyse ou dossier sur un sujet d'actualité récente que tu juges pertinent, basé sur des faits de moins de quelques jours
+
+FORMAT DES ARTICLES COURTS (jeux vidéo, hardware, cinéma/animé)
+- Titre accrocheur, pas de clickbait mensonger
+- Chapô de 2 à 3 phrases qui résume l'essentiel
+- Corps de 400 à 600 mots, avec 2-3 sous-titres
+- Ton journalistique, direct, adapté à un site de gaming
+- Sources officielles ou primaires citées à la fin, avec le nom et la date de publication
+
+FORMAT DE L'ARTICLE DE FOND
+- Titre accrocheur
+- Chapô de 2 à 3 phrases
+- Corps de 800 à 1200 mots, structuré avec des sous-titres
+- Analyse plus poussée : mise en perspective, enjeux, ce que ça change concrètement
+- Sources officielles ou primaires citées à la fin, avec le nom et la date de publication
+- Le sujet doit couvrir l'ensemble d'une question, pas un seul jeu ou un seul éditeur
+
+FICHIERS
+Un fichier par article, en Markdown, nommé ainsi :
+- jv-01-[sujet].md à jv-03-[sujet].md
+- hardware-01-[sujet].md
+- cinema-anime-01-[sujet].md
+- fond-01-[sujet].md
+
+Remplace [sujet] par 2-3 mots résumant le sujet, sans espaces ni accents.
+
+À LA FIN
+Donne une liste récapitulative des titres avec leur nom de fichier. Signale aussi, pour chaque article, si l'accès à spiritgamer.fr a été possible pour vérifier les doublons ou non.
