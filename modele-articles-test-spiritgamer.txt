@@ -1,0 +1,44 @@
+Écris une série de 6 articles de blog en français pour un site de gaming, à partir d'actualités réelles et vérifiées.
+
+RECHERCHE
+Cherche en priorité des infos publiées sur les 6 dernières heures. S'il n'y a pas assez de matière dans cette fenêtre pour une catégorie donnée, élargis progressivement à 12h puis 24h pour cette catégorie seulement, mais jamais au-delà d'un jour. N'utilise jamais une info de plus de 24h. N'invente rien : si une info est incertaine ou non confirmée par au moins une source fiable, ne l'utilise pas.
+
+Varie les sources (sites spécialisés, presse généraliste, communiqués officiels) et évite de baser deux articles sur la même actu.
+
+Avant de choisir un sujet, vérifie sur spiritgamer.fr qu'il n'a pas déjà été traité récemment. Si un sujet est déjà couvert sur le site, écarte-le et choisis-en un autre.
+
+ÉCRITURE
+N'écris pas comme une IA. Évite les tics reconnaissables : pas de "plonger dans", "explorer", "à l'ère de", "il est important de noter", pas de conclusion qui résume ce qui vient d'être dit, pas de formules creuses. Va droit au fait, varie la longueur des phrases, donne des détails concrets plutôt que des généralités. Écris comme un rédacteur gaming qui connaît son sujet, pas comme un résumé automatique.
+
+RÉPARTITION (6 articles)
+- 3 articles jeux vidéo : annonces, sorties, mises à jour, trailers, tests
+- 1 article hardware : console, PC gaming, ou périphérique
+- 1 article cinéma ou animé (choisis celui qui a l'actu la plus intéressante des dernières heures)
+- 1 article de fond : analyse ou dossier sur un sujet d'actualité récente que tu juges pertinent, basé sur des faits de moins de quelques jours
+
+FORMAT DES 5 ARTICLES COURTS (jeux vidéo, hardware, cinéma/animé)
+- Titre accrocheur, pas de clickbait mensonger
+- Chapô de 2 à 3 phrases qui résume l'essentiel
+- Corps de 400 à 600 mots, avec 2-3 sous-titres
+- Ton journalistique, direct, adapté à un site de gaming, sans formules toutes faites
+- Une phrase de contexte si le sujet demande un minimum de background
+- Sources citées à la fin, avec le nom du site et la date de publication
+
+FORMAT DE L'ARTICLE DE FOND
+- Titre accrocheur
+- Chapô de 2 à 3 phrases
+- Corps de 800 à 1200 mots, structuré avec des sous-titres
+- Analyse plus poussée : mise en perspective, enjeux, ce que ça change concrètement
+- Sources citées à la fin, avec le nom du site et la date de publication
+
+FICHIERS
+Un fichier par article, en Markdown, nommé ainsi :
+- jv-01-[sujet].md à jv-03-[sujet].md
+- hardware-01-[sujet].md
+- cinema-anime-01-[sujet].md
+- fond-01-[sujet].md
+
+Remplace [sujet] par 2-3 mots résumant le sujet, sans espaces ni accents (ex : jv-01-nouveau-trailer-gta.md).
+
+À LA FIN
+Donne-moi une liste récapitulative des 6 titres avec leur nom de fichier, pour que je sache lesquels sont prêts.
