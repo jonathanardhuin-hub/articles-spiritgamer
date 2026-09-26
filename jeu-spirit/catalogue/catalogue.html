@@ -258,6 +258,10 @@
     `Format paysage 16:9. Vue de profil, comme un jeu de plateforme en 2D. Toon HD, contours épais. Rien ne doit ressembler au donjon de pierre. Aucun personnage, aucun texte.`,
     ['Une longue gaine technique horizontale : parois tapissées d\'énormes câbles tressés noirs et bleus qui courent d\'un bout à l\'autre, passerelle métallique plate au premier plan sur toute la largeur, une échelle à chaque extrémité (une à gauche, une à droite) qui monte vers le plafond, petites lumières cyan tous les deux mètres.']);
 
+  carte('d1', 'perso', 'Spirit tombe et Spirit KO', 'Pour la chute dans un trou et l\'écran de fin de partie.', RS,
+    `${SPIRIT}\n\n${FOND_P}`,
+    ['Spirit qui tombe, vu de face : bras levés, jambes repliées, yeux en panique, comme aspiré vers le bas.', 'Spirit KO, assis par terre vu de face, jambes écartées, yeux en spirale, petites étoiles au-dessus de la tête. Aucune blessure.', 'Spirit qui se relève, un genou au sol, main sur le casque, air déterminé.']);
+
   // ================================================================== PARVIS DU QG
   carte('qg', 'decors', 'Le Parvis du QG : bâtiments', 'Le village de départ et sa boutique.', ['decor-plaine', 'arbre'],
     ELEM + `\n\nUnivers : la place devant le QG de SpiritGamer, moderne et chaleureuse, néons bleus.`,
@@ -285,7 +289,7 @@
   // ================================================================== RÉGIONS 2 à 8
   const REGIONS = [
     {
-      e: 'r2', cave: 'une vieille salle serveur oubliée, envahie par les racines de la forêt, câbles couverts de mousse, voyants verts', tunnel: 'un tunnel étroit creusé entre les racines, câbles tressés au plafond', mecas: ['Un mur fêlé vu de dessus, dans le thème du donjon : grande fissure en étoile.', "Le même mur après l'explosion : un trou rond et sombre au milieu, débris sur les bords.", 'Un interrupteur à câble au sol, éteint (prise débranchée).', 'Le même interrupteur branché, qui brille en cyan.', 'Un câble électrifié qui barre le sol, étincelles violettes (danger).'], nom: 'Forêt des Forums', donjon: 'Labyrinthe des Fils',
+      e: 'r2', habitant: 'Sève, la marchande de la forêt : une hérissonne en tablier de mousse, panier de champignons', grotte: 'grotte creusée sous un vieil arbre, racines au plafond, champignons lumineux', cave: 'une vieille salle serveur oubliée, envahie par les racines de la forêt, câbles couverts de mousse, voyants verts', tunnel: 'un tunnel étroit creusé entre les racines, câbles tressés au plafond', mecas: ['Un mur fêlé vu de dessus, dans le thème du donjon : grande fissure en étoile.', "Le même mur après l'explosion : un trou rond et sombre au milieu, débris sur les bords.", 'Un interrupteur à câble au sol, éteint (prise débranchée).', 'Le même interrupteur branché, qui brille en cyan.', 'Un câble électrifié qui barre le sol, étincelles violettes (danger).'], nom: 'Forêt des Forums', donjon: 'Labyrinthe des Fils',
       monstres: [
         ['Sylvain corrompu', 'un arbre mort qui marche sur deux grosses racines en guise de jambes, écorce noire fendue de violet, deux yeux jaunes dans un creux du tronc, branches griffues en guise de bras', 'jambes'],
         ['Traqueur', 'un archer humanoïde encapuchonné, cape sombre en lambeaux, visage invisible dans l\'ombre sauf deux yeux jaunes, arc noir fissuré de violet', 'jambes', 'une flèche d\'ombre noire et violette, vue exactement de profil, pointe vers la droite, format paysage'],
@@ -304,7 +308,7 @@
       objets: ['Un Pétard Confettis : un gros pétard cylindrique bleu et rose à bandes, mèche courte, confettis peints dessus.', 'Le même pétard posé debout, mèche allumée avec une petite étincelle jaune.', 'Une explosion de confettis vue de dessus : un nuage rond de confettis multicolores et d\'étoiles blanches, sans flammes, sans fumée noire.', 'La Manette Pro : la Manette jointe en version améliorée, coque dorée et bleue, voyants cyan.', 'Un sac à pétards en toile bleue, rempli, cordon doré.'],
     },
     {
-      e: 'r3', cave: 'une salle des machines sous la forge, chaudières rougeoyantes, tuyaux, passerelles de métal', tunnel: 'une conduite de ventilation géante, grilles au sol, souffle chaud orange', mecas: ['Un brasero de forge éteint, braises grises.', 'Le même brasero allumé, grande flamme orange.', 'Une grille de sol froide.', 'La même grille brûlante, rougeoyante (danger).', 'Un tapis roulant de forge, rouleaux et bande noire, vu de dessus.'], nom: 'Monts Hardware', donjon: 'Forge Surchauffée',
+      e: 'r3', habitant: 'Boulon, le forgeron : un castor costaud en tablier de cuir, gants épais, clé à molette', grotte: 'grotte minière, étais de bois, filons de cristal bleu', cave: 'une salle des machines sous la forge, chaudières rougeoyantes, tuyaux, passerelles de métal', tunnel: 'une conduite de ventilation géante, grilles au sol, souffle chaud orange', mecas: ['Un brasero de forge éteint, braises grises.', 'Le même brasero allumé, grande flamme orange.', 'Une grille de sol froide.', 'La même grille brûlante, rougeoyante (danger).', 'Un tapis roulant de forge, rouleaux et bande noire, vu de dessus.'], nom: 'Monts Hardware', donjon: 'Forge Surchauffée',
       monstres: [
         ['Golem de ferraille', 'un colosse fait de plaques de métal rouillé et de pièces d\'ordinateur boulonnées, gros poings, un seul œil jaune au centre du torse, fissures violettes', 'jambes'],
         ['Harpie de fer', 'une créature ailée aux ailes faites de lames de ventilateur en métal noir, serres acérées, masque de métal avec deux yeux jaunes', 'ailes'],
@@ -323,7 +327,7 @@
       objets: ['La Lanterne RGB : une lanterne de métal sombre dont la vitre brille en dégradé rouge, vert et bleu.', 'Le Micro Pro : un micro-tige de casque en métal chromé avec un liseré cyan, plus imposant que celui de Spirit.'],
     },
     {
-      e: 'r4', cave: 'une réserve de bobines de film, étagères de boîtes rondes, lumière de projecteur poussiéreuse', tunnel: 'un couloir technique derrière l\'écran de cinéma, rideaux noirs, câbles', mecas: ['Une torche murale de cinéma éteinte.', 'La même torche allumée.', 'Un grand écran de projection encastré, éteint.', 'Le même écran allumé qui montre une flèche lumineuse (sans texte).', 'Un rideau de velours noir fermé qui bloque un passage.'], nom: 'Désert du Lag', donjon: 'Salle Obscure',
+      e: 'r4', habitant: 'Mirza, la marchande nomade : une chamelle drapée de tissus, sacoches pleines', grotte: 'grotte fraîche dans la falaise, peintures rupestres de caméras (sans texte), sable au sol', cave: 'une réserve de bobines de film, étagères de boîtes rondes, lumière de projecteur poussiéreuse', tunnel: 'un couloir technique derrière l\'écran de cinéma, rideaux noirs, câbles', mecas: ['Une torche murale de cinéma éteinte.', 'La même torche allumée.', 'Un grand écran de projection encastré, éteint.', 'Le même écran allumé qui montre une flèche lumineuse (sans texte).', 'Un rideau de velours noir fermé qui bloque un passage.'], nom: 'Désert du Lag', donjon: 'Salle Obscure',
       monstres: [
         ['Spectre du Lag', 'une silhouette fantomatique qui flotte, faite de sable noir et de pixels qui se décalent, deux yeux jaunes, contours qui tremblent', 'flotte'],
         ['Ensablé', 'une créature enfouie dans le sable, carapace de pierre sombre, grande gueule sans dents visibles, yeux jaunes', 'sable'],
@@ -342,7 +346,7 @@
       objets: ['Le Câble Grappin : un pistolet-enrouleur de câble réseau bleu, crochet de métal au bout.', 'Le crochet du grappin seul, vu de profil, pointe vers la droite (projectile).'],
     },
     {
-      e: 'r5', cave: 'une salle des pompes à moitié inondée, gros tuyaux, vannes, eau qui ruisselle, lumière verte', tunnel: 'un tunnel aquatique, eau jusqu\'aux chevilles, parois de pierre bleu-vert', mecas: ['Une vanne à volant fermée.', 'La même vanne ouverte, eau qui jaillit.', "Une dalle de sol immergée sous une fine couche d'eau.", "Un courant d'eau vu de dessus, flèches d'écume qui indiquent le sens.", 'Une plateforme flottante carrée en bois.'], nom: 'Lac des Streams', donjon: 'Arène Engloutie',
+      e: 'r5', habitant: 'Capitaine Plouf : un vieux pélican en ciré jaune, pipe éteinte, casquette de marin', grotte: 'grotte marine, flaques, coquillages, lumière de l\'eau qui ondule au plafond', cave: 'une salle des pompes à moitié inondée, gros tuyaux, vannes, eau qui ruisselle, lumière verte', tunnel: 'un tunnel aquatique, eau jusqu\'aux chevilles, parois de pierre bleu-vert', mecas: ['Une vanne à volant fermée.', 'La même vanne ouverte, eau qui jaillit.', "Une dalle de sol immergée sous une fine couche d'eau.", "Un courant d'eau vu de dessus, flèches d'écume qui indiquent le sens.", 'Une plateforme flottante carrée en bois.'], nom: 'Lac des Streams', donjon: 'Arène Engloutie',
       monstres: [
         ['Triton à trident', 'un guerrier aquatique à écailles noires et violettes, nageoires tranchantes, trident de métal noir, yeux jaunes', 'jambes'],
         ['Méduse électrique', 'une méduse sombre et translucide traversée d\'éclairs violets, longs filaments', 'flotte'],
@@ -361,7 +365,7 @@
       objets: ['La Planche Wi-Fi : une planche flottante blanche et bleue, trois arcs Wi-Fi cyan lumineux dessinés dessus.', 'Le Micro d\'Or : un micro-tige de casque en or brillant, liseré cyan.'],
     },
     {
-      e: 'r6', cave: 'une réserve de livres, cartons empilés, étagères qui ploient, lampe suspendue', tunnel: 'un passage entre deux rayonnages géants, livres empilés au sol', mecas: ['Une dalle de sol intacte.', "La même dalle fissurée qui commence à s'effriter.", 'La même dalle effondrée : trou sombre (danger).', 'Une pile de livres géants qui bloque un passage (on la renverse avec les Baskets Turbo).', 'Un lutrin avec un gros livre ouvert (sans texte lisible).'], nom: 'Cité des Bulles', donjon: 'Bibliothèque des Bulles',
+      e: 'r6', habitant: 'Mme Feuillet, la libraire : une chatte grise à lunettes en demi-lune, pile de livres', grotte: 'cave voûtée sous la ville, briques, vieux cartons de BD', cave: 'une réserve de livres, cartons empilés, étagères qui ploient, lampe suspendue', tunnel: 'un passage entre deux rayonnages géants, livres empilés au sol', mecas: ['Une dalle de sol intacte.', "La même dalle fissurée qui commence à s'effriter.", 'La même dalle effondrée : trou sombre (danger).', 'Une pile de livres géants qui bloque un passage (on la renverse avec les Baskets Turbo).', 'Un lutrin avec un gros livre ouvert (sans texte lisible).'], nom: 'Cité des Bulles', donjon: 'Bibliothèque des Bulles',
       monstres: [
         ['Ombre d\'encre', 'une flaque d\'encre noire qui se dresse en silhouette de monstre, gouttes qui tombent, yeux jaunes', 'rampe'],
         ['Gargouille', 'une gargouille de pierre sombre ailée, cornes, griffes, fissures violettes, yeux jaunes', 'ailes'],
@@ -380,7 +384,7 @@
       objets: ['Les Baskets Turbo : une paire de baskets bleues avec des éclairs cyan sur les côtés et des semelles lumineuses.'],
     },
     {
-      e: 'r7', cave: 'l\'intérieur d\'une cartouche de jeu géante, circuits verts, puces noires, contacts dorés', tunnel: 'un tuyau vert géant couché, vu de l\'intérieur, rivets', mecas: ["Un bloc de métal lourd, gris, riveté (on le déplace avec l'Aimant).", 'Des pics de métal sortis du sol (danger).', 'Les mêmes pics rentrés dans le sol.', 'Un levier mural baissé.', 'Le même levier levé.'], nom: 'Marais Rétro', donjon: 'Château 8 bits',
+      e: 'r7', habitant: 'Pixou, le vieux joueur : un raton laveur en sweat rétro, manette à fil autour du cou', grotte: 'grotte humide, vieilles bornes d\'arcade éteintes couvertes de lianes (sans texte)', cave: 'l\'intérieur d\'une cartouche de jeu géante, circuits verts, puces noires, contacts dorés', tunnel: 'un tuyau vert géant couché, vu de l\'intérieur, rivets', mecas: ["Un bloc de métal lourd, gris, riveté (on le déplace avec l'Aimant).", 'Des pics de métal sortis du sol (danger).', 'Les mêmes pics rentrés dans le sol.', 'Un levier mural baissé.', 'Le même levier levé.'], nom: 'Marais Rétro', donjon: 'Château 8 bits',
       monstres: [
         ['Feu follet', 'une flamme bleu-violet flottante avec un visage de braise, yeux jaunes', 'flotte'],
         ['Sorcier des marais', 'un sorcier voûté en robe de mousse sombre, bâton tordu, masque de bois, yeux jaunes', 'jambes', 'une boule de vase verte et violette (projectile)'],
@@ -399,7 +403,7 @@
       objets: ['L\'Aimant : un gros aimant en fer à cheval rouge et bleu, pointes argentées, petits arcs d\'énergie cyan.'],
     },
     {
-      e: 'r8', cave: 'une chambre froide de serveurs, baies givrées, stalactites, lumière bleue pâle', tunnel: 'un tunnel de glace, parois translucides, givre au sol', mecas: ['Un pan de mur normal, dans le thème du donjon.', 'Le même pan de mur vu avec les Lunettes de Vérif : translucide, contours cyan en pointillés (faux mur).', 'Une dalle de glace glissante vue de dessus.', "Un bloc de glace à pousser (il glisse jusqu'au mur).", "Une étagère d'archives prise dans la glace."], nom: 'Toundra du Cloud', donjon: 'Archives Gelées',
+      e: 'r8', habitant: 'Yéti Doux : un grand yéti timide en écharpe, tasse de chocolat chaud', grotte: 'grotte de glace, stalactites, reflets bleus', cave: 'une chambre froide de serveurs, baies givrées, stalactites, lumière bleue pâle', tunnel: 'un tunnel de glace, parois translucides, givre au sol', mecas: ['Un pan de mur normal, dans le thème du donjon.', 'Le même pan de mur vu avec les Lunettes de Vérif : translucide, contours cyan en pointillés (faux mur).', 'Une dalle de glace glissante vue de dessus.', "Un bloc de glace à pousser (il glisse jusqu'au mur).", "Une étagère d'archives prise dans la glace."], nom: 'Toundra du Cloud', donjon: 'Archives Gelées',
       monstres: [
         ['Chevalier de givre', 'un chevalier en armure de glace sombre, épée de glace, heaume fermé avec deux yeux jaunes, fissures violettes dans la glace', 'jambes'],
         ['Loup de glace', 'un loup spectral fait de glace translucide bleu nuit, fissures violettes, yeux jaunes', 'quadrupede'],
@@ -467,6 +471,11 @@
     carte(e, 'donjons', `${R.donjon} : sous-sols`, 'La cave où repose l\'objet du donjon, et le passage souterrain. Vus de profil, rien à voir avec le donjon.', ['decor-plaine', 'spirit-profil'],
       `Format paysage 16:9. Vue de profil, comme un jeu de plateforme en 2D : sol en bas, plafond en haut, murs sur les côtés. Toon HD, contours épais. Rien ne doit ressembler aux salles du donjon. Le sol est plat et dégagé au premier plan sur toute la largeur. Aucun personnage, aucun texte.`,
       [`La cave de l'objet : ${R.cave}. Une échelle descend du plafond à gauche, un socle vide au centre.`, `Le passage souterrain : ${R.tunnel}. Une échelle à chaque extrémité.`]);
+    carte(e, 'pnj', `Habitant de la ${R.nom}`, 'Le personnage de la région qui vend, donne une quête ou un indice.', ['ermite', 'flash', 'portrait-flash'], PNJ,
+      [`${R.habitant}, debout de face, entier.`, `Portrait du même personnage : buste et tête de face, même cadrage que le portrait joint.`]);
+    carte(e, 'decors', `${R.nom} : grotte secrète`, 'L\'intérieur des grottes cachées de la région (fragment de cœur, Pixels, habitant).', ['grotte'],
+      `Format paysage 16:9. Même rendu et même cadrage que la grotte jointe : vue de dessus comme dans les Zelda en 2D, sol dégagé au centre, sortie en bas au milieu. Toon HD, contours épais. Aucun personnage, aucun texte.`,
+      [`Une ${R.grotte}.`]);
     // Spirit et son nouvel objet
     const [snom, sdesc, sf, sd, sp] = R.spirit;
     carte(e, 'perso', snom, `Le nouveau mouvement de Spirit avec l'objet du ${R.donjon}.`, RS,
@@ -476,6 +485,10 @@
   }
 
   // ================================================================== FINAL
+  carte('r4', 'perso', 'Spirit tiré par le Grappin', 'Quand le câble l\'emporte au-dessus d\'un ravin.', RS, `${SPIRIT}\n\n${FOND_P}`,
+    ['Spirit vu de profil (tourné vers la droite), en l\'air, bras tendus devant lui qui tiennent le Câble Grappin, jambes flottant derrière, casque bien en place, air concentré.']);
+  carte('r8', 'perso', 'Spirit glisse sur la glace', 'Sur les sols glacés des Archives.', RS, `${SPIRIT}\n\n${VUES}\n\n${FOND_P}`,
+    P3('bras écartés, jambes raides, légèrement déséquilibré', 'bras écartés, jambes raides', 'bras en moulinet, penché en arrière'));
   carte('fin', 'boss', 'Le Roi Clickbait', 'Le boss final, en trois temps, et ce qu\'il en reste.', ['reine', 'monstres'],
     `${MONSTRE}\n\nC'est le boss final : créature imposante, très détaillée, qui occupera la moitié de l'écran.`,
     ['Le Roi Clickbait vu de face : une créature gonflée, faite de fenêtres publicitaires empilées et de titres déchirés (aucun texte lisible), couronne de néon violet clignotant, grand sourire sans dents, deux yeux jaunes énormes, cape de bannières.',
@@ -498,9 +511,36 @@
     `Format paysage 16:9. Même rendu que l'écran titre joint. Aucun texte.`,
     ['Spirit au centre, bras levés, tenant la Source reconstituée qui brille en blanc et cyan. Autour de lui les huit Gardiens (un hibou, une tortue, un renard robot, un fennec, une loutre, un calamar, une grenouille, un mammouth) qui applaudissent, devant le QG illuminé, feu d\'artifice bleu dans le ciel du soir. Buzz, le petit lutin, dans un coin, timide.']);
 
+  // ================================================================== EFFETS
+  const EFFET = `Même rendu que les effets joints : toon HD, formes nettes, couleurs lumineuses. Effet seul, centré, vu de dessus comme dans les Zelda en 2D. Fond uni gris moyen (#808080), aucun texte. Jamais de sang ni de flammes rouges réalistes.`;
+  carte('d1', 'effets', 'Effets du Terrier', 'Ce qui manque encore à l\'écran pendant les combats et les énigmes.', ['projectiles', 'ampli'], EFFET,
+    ['Des étoiles d\'étourdissement : trois petites étoiles jaunes qui tournent en cercle (pour les ennemis frappés par la Manette).', 'Un grand nuage de fumée violette et noire avec des étincelles, pour la disparition d\'un boss.', 'Un petit éclat de lumière cyan en étoile, pour une grille qui s\'ouvre ou une énigme réussie.', 'Un nuage de poussière grise, pour un bloc qui glisse.']);
+  carte('r2', 'effets', 'Effets de la Forêt et du Labyrinthe', 'Explosion, électricité, feuilles.', ['projectiles'], EFFET,
+    ['Un éclair électrique violet court et nerveux (câbles électrifiés).', 'Une gerbe de débris de pierre qui volent (mur qui explose).', 'Des feuilles mortes qui tourbillonnent.']);
+  carte('r3', 'effets', 'Effets des Monts et de la Forge', 'Chaleur et lumière.', ['projectiles'], EFFET,
+    ['Un halo de lumière arc-en-ciel doux (lumière de la Lanterne RGB), rond, bords très flous.', 'Une bouffée de vapeur blanche.', 'Des braises orange qui s\'envolent.']);
+  carte('r4', 'effets', 'Effets du Désert et de la Salle Obscure', 'Sable et téléportation.', ['projectiles'], EFFET,
+    ['Un tourbillon de sable.', 'Un effet de téléportation : silhouette de pixels qui se disperse en carrés violets.', 'Un faisceau de projecteur conique jaune pâle.']);
+  carte('r5', 'effets', 'Effets du Lac et de l\'Arène', 'L\'eau.', ['projectiles'], EFFET,
+    ['Une éclaboussure d\'eau ronde vue de dessus.', 'Un sillage d\'écume en V derrière la Planche Wi-Fi.', 'Une décharge électrique bleue en cercle (méduse).']);
+  carte('r6', 'effets', 'Effets de la Cité et de la Bibliothèque', 'Encre et vitesse.', ['projectiles'], EFFET,
+    ['Une éclaboussure d\'encre noire.', 'Des traînées de vitesse cyan (Baskets Turbo), horizontales.', 'Un nuage de pages de livre qui volent (sans texte lisible).']);
+  carte('r7', 'effets', 'Effets du Marais et du Château', 'Magnétisme et glitch.', ['projectiles'], EFFET,
+    ['Des arcs magnétiques cyan et rouges entre deux points (Aimant).', 'Un bloc d\'image qui se décale en tranches colorées (glitch).', 'Une bulle de vase qui éclate.']);
+  carte('r8', 'effets', 'Effets de la Toundra et des Archives', 'Glace et vérité.', ['projectiles'], EFFET,
+    ['Des éclats de glace qui volent.', 'Une onde cyan en pointillés qui révèle (Lunettes de Vérif).', 'De la neige qui tombe, flocons épars.']);
+  carte('fin', 'effets', 'Effets de la fin', 'Pour le combat final et la victoire.', ['projectiles', 'titre'], EFFET,
+    ['Une pluie de petites fenêtres pub qui explosent en confettis gris.', 'Le Roi Clickbait qui se dégonfle : un nuage en forme de ballon qui éclate en paillettes violettes.', 'Un feu d\'artifice bleu et cyan.']);
+  carte('d1', 'interface', 'Écran de fin de partie et choix du mode', 'Quand tu perds tous tes cœurs, et au début pour choisir Héros ou Découverte.', ['titre', 'ui', 'spirit-officiel'],
+    `Format paysage 16:9 pour la première image, carré pour les deux autres. Même rendu que l'écran titre joint. Aucun texte.`,
+    ['Écran de fin de partie : Spirit assis par terre, épuisé, sous un ciel violet sombre, son casque de travers, les yeux du Roi Clickbait qui brillent au loin.', 'Illustration du mode Héros : Spirit en posture de combat, onde sonore puissante, ennemis menaçants autour.', 'Illustration du mode Découverte : Spirit souriant qui marche tranquillement dans la Plaine avec Flash le hibou à ses côtés.']);
+  carte('qg', 'interface', 'Boutique', 'L\'écran d\'achat chez Mona.', ['ui'],
+    `Même habillage que le cadre joint : néon bleu cyan, métal sombre, coins ornés. Aucun texte, aucun chiffre.`,
+    ['Un comptoir de boutique vu de face, en bois sombre avec liseré cyan, trois emplacements vides pour poser des articles, format paysage 3:1.', 'Une petite étiquette de prix vide, en métal sombre bordée de cyan, avec un Pixel bleu dessiné à gauche.']);
+
   // ------------------------------------------------------------------ affichage
   const ETAPES = [['tout', 'Tout'], ['pro', 'Prologue'], ['d1', 'Donjon 1'], ['qg', 'Parvis du QG'], ['r2', 'Forêt + Donjon 2'], ['r3', 'Monts + Donjon 3'], ['r4', 'Désert + Donjon 4'], ['r5', 'Lac + Donjon 5'], ['r6', 'Cité + Donjon 6'], ['r7', 'Marais + Donjon 7'], ['r8', 'Toundra + Donjon 8'], ['fin', 'Tour finale']];
-  const CATS = [['tout', 'Tout'], ['perso', 'Spirit'], ['objets', 'Objets'], ['ennemis', 'Ennemis'], ['boss', 'Boss'], ['pnj', 'Gardiens et habitants'], ['donjons', 'Donjons'], ['decors', 'Décors extérieurs'], ['interface', 'Interface']];
+  const CATS = [['tout', 'Tout'], ['perso', 'Spirit'], ['objets', 'Objets'], ['ennemis', 'Ennemis'], ['boss', 'Boss'], ['pnj', 'Gardiens et habitants'], ['effets', 'Effets'], ['donjons', 'Donjons'], ['decors', 'Décors extérieurs'], ['interface', 'Interface']];
   const lire = (k, d) => { try { const v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); } catch (e) { return d; } };
   const ecrire = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} };
   let etape = lire('cat-etape', 'd1'), cat = lire('cat-cat', 'tout');
