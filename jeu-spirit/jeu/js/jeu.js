@@ -449,8 +449,8 @@ SG.Jeu = class {
       });
       return;
     }
-    if (s.x < 4 && this.voisin('gauche')) this.glisserVers('gauche');
-    else if (s.x > SG.W - 4 && this.voisin('droite')) this.glisserVers('droite');
+    if (s.x - s.pw / 2 < 2 && this.voisin('gauche')) this.glisserVers('gauche');
+    else if (s.x + s.pw / 2 > SG.W - 2 && this.voisin('droite')) this.glisserVers('droite');
     else if (s.y - s.ph < 2 && this.voisin('haut')) this.glisserVers('haut');
     else if (s.y > SG.H - 2 && this.voisin('bas')) this.glisserVers('bas');
     else { s.x = SG.clamp(s.x, s.pw / 2, SG.W - s.pw / 2); s.y = SG.clamp(s.y, s.ph, SG.H); }
