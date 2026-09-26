@@ -201,18 +201,26 @@
      'L\'irruption : au milieu de la foule, une fenêtre publicitaire géante s\'ouvre dans le ciel, rouge et violette, et le Roi Clickbait en sort (créature gonflée faite de fenêtres pub empilées, couronne de néon violet, grand sourire, yeux jaunes). La foule recule, effrayée.',
      'La Source brisée : la sphère de lumière éclate en huit fragments lumineux qui s\'envolent dans huit directions, le Roi Clickbait bras levés au premier plan, en contre-jour.',
      'Le Bruit prend corps : la place déserte et sombre, des silhouettes de monstres de pierre sombre aux fissures violettes et aux yeux jaunes surgissent des écrans cassés.',
-     'Pendant ce temps, dans une petite loge cachée derrière la scène : Spirit dort sur un vieux canapé, son casque sur les oreilles, une console posée sur le ventre, lumière douce d\'écran. Il n\'entend rien.',
-     'Le réveil : Spirit assis sur le canapé, la main sur le casque, l\'air étonné, une petite onde cyan qui sort du micro comme un signal qu\'il capte.']);
-  carte('pro', 'decors', 'La loge de Spirit (où il vit)', 'La première salle jouable : là où Spirit se réveille, avant de partir dans le Réseau.', ['salle', 'decor-plaine'],
-    `Format paysage 16:9, dimensions exactes 1672 × 941 pixels. Une pièce vue de dessus comme dans les Zelda en 2D, murs tout autour avec le même cadrage que la salle jointe (un neuvième de la hauteur en haut et en bas, un seizième de la largeur sur les côtés), une porte au milieu du mur du bas. Toon HD, contours épais, ambiance chaleureuse et un peu en désordre. Aucun personnage, aucun texte.`,
-    ['La loge de Spirit derrière la scène du QG : parquet, tapis bleu rond au centre, murs bleu nuit avec des affiches de jeux sans texte, lumière douce. Le long des murs seulement (le centre reste dégagé pour marcher) : un vieux canapé gris en haut à gauche, un bureau avec trois écrans et une chaise gamer en haut à droite, une étagère pleine de consoles et de figurines à droite, un mini-frigo, un carton de pizza vide.']);
+     'Pendant ce temps, dans sa loge cachée derrière la scène (un bureau de passionné : long bureau noir à trois écrans, fauteuils gamer bordeaux, bibliothèques pleines de figurines, un balai de sorcier qui flotte sous le plafond) : Spirit dort dans un fauteuil gamer, son casque sur les oreilles, une manette posée sur le ventre, lumière douce des écrans. Il n\'entend rien.',
+     'Le réveil : Spirit assis dans le fauteuil gamer, la main sur le casque, l\'air étonné, une petite onde cyan qui sort du micro comme un signal qu\'il capte.']);
+  carte('pro', 'decors', 'La loge de Spirit (où il vit)', 'La première salle jouable, inspirée de ton bureau. Joins aussi 3 de tes photos de bureau (vue du bureau aux écrans, vue des bibliothèques, vue de la porte).', ['salle', 'decor-plaine'],
+    `Format paysage 16:9, dimensions exactes 1672 × 941 pixels. Une pièce vue de dessus comme dans les Zelda en 2D, avec le même cadrage que la salle jointe : murs tout autour (un neuvième de la hauteur en haut et en bas, un seizième de la largeur sur les côtés), les meubles collés aux murs et vus du dessus avec leur face avant visible. Toon HD, contours épais, ambiance chaleureuse de fin de soirée, lumière douce des écrans et des appliques. Inspire-toi des photos de bureau jointes pour les meubles, les couleurs et l'ambiance, mais redessine tout dans le style du jeu. Remplace tous les logos, personnages et objets de licences connues par des créations originales. Aucun texte lisible. Aucun personnage.`,
+    [`La loge de Spirit, un bureau de passionné de jeux vidéo et de figurines :
+– Mur du haut : un long bureau noir avec trois écrans (un grand écran noir à gauche, un petit écran au milieu, un grand écran incurvé allumé à droite qui affiche un jeu), un tapis de souris rose à motifs, un petit ventilateur noir, une bouteille de soda ; une imprimante grise au bout gauche du bureau ; au-dessus, une étagère blanche avec un casque de soldat de science-fiction vert à visière dorée et des figurines ; deux appliques murales blanches ajourées qui diffusent une lumière chaude ; un grand poster de jeu vidéo très coloré à droite, sans texte.
+– Devant le bureau : deux fauteuils gamer rouge bordeaux et beige.
+– Mur de gauche : quatre grandes bibliothèques en bois clair remplies de figurines dans des vitrines, de boîtes de construction et de livres en bas ; de lourds rideaux gris foncé derrière.
+– Mur de droite : un petit bureau noir encombré (lampe, calendrier, présentoirs, post-it de couleur) et une chaise noire.
+– Mur du bas : au milieu, une porte en accordéon en bois brun foncé avec des panneaux de verre dépoli, un paillasson noir devant (c'est la sortie) ; à droite de la porte, des étagères murales en bois clair avec des figurines à grosse tête, une coupe dorée, un petit train jouet et un vase avec des branches de cerisier en fleur.
+– Plafond : un balai de sorcier en bois qui flotte au-dessus de la pièce, suspendu à deux chaînettes dorées.
+– Sol : parquet de pin clair.
+Le centre de la pièce reste dégagé pour marcher.`]);
   carte('pro', 'decors', 'Le passage vers le Réseau', 'Ce que Spirit traverse en quittant sa loge pour arriver dans la Plaine.', ['salle', 'titre'],
     ELEM,
     ['Une porte de loge en bois bleu nuit, entrouverte, un filet de lumière cyan qui passe dessous.',
      'Un portail lumineux vu de face : une fenêtre de lumière cyan et blanche aux bords qui scintillent, comme une page qui s\'ouvre, assez grande pour que Spirit la traverse.']);
   carte('pro', 'perso', 'Spirit endormi et réveillé', 'Pour la scène jouable du réveil dans la loge.', RS,
     `${SPIRIT}\n\n${FOND_P}`,
-    ['Spirit endormi, allongé sur le dos vu du dessus légèrement plongeant, bras pendant, bouche entrouverte, une petite bulle de sommeil (sans lettres Z), casque sur les oreilles.',
+    ['Spirit endormi, affalé en arrière comme dans un fauteuil (le fauteuil n\'est pas dessiné), vu de face, bras pendants, bouche entrouverte, une petite bulle de sommeil (sans lettres Z), casque sur les oreilles.',
      'Spirit assis vu de face, qui s\'étire, bras levés, yeux mi-clos, bâillement.',
      'Spirit debout vu de face, la main sur l\'écouteur de son casque, sourcils levés, comme s\'il entendait un signal lointain.']);
 
