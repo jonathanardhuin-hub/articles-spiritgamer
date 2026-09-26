@@ -714,7 +714,8 @@ Object.assign(SG.Jeu.prototype, {
     ctx.scale(k, k);
     const im = SG.img['salle-donjon'];
     if (im && im.width) {
-      ctx.drawImage(im, 0, 0, SG.W, SG.H);
+      // l'image est calée pour que son sol corresponde exactement à la grille de la salle (cases 1 à 14, lignes 1 à 7)
+      ctx.drawImage(im, -42, -41, 1365, 811);
     } else {
       // dalles sombres veinées de violet
       const alea = SG.graine(cle.length * 31 + cle.charCodeAt(3) * 7 + cle.charCodeAt(5));
