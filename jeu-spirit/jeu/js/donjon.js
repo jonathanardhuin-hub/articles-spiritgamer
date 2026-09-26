@@ -66,11 +66,11 @@ SG.DONJON1 = {
       plan: [
         '################',
         '#..............#',
-        '#.F....vv....F.#',
-        '#......vv......#',
-        '#......vv......#',
-        '#......vv......#',
-        '#.F....vv....F.#',
+        '#.F.....v....F.#',
+        '#.......v......#',
+        '#.......v......#',
+        '#.......v......#',
+        '#.F.....v....F.#',
         '#..............#',
         '################',
       ],
@@ -526,11 +526,15 @@ Object.assign(SG.Jeu.prototype, {
       }
     } else {
       SG.Son.jouerMusique('donjon');
-      for (const [type, c, r] of S.ennemis || []) {
+      if (!this.mortsDonjon) this.mortsDonjon = {};
+      const morts = this.mortsDonjon[k] || [];
+      (S.ennemis || []).forEach(([type, c, r], i) => {
+        if (morts.includes(i)) return;
         const m = SG.creerMonstre(type, c * SG.T + 40, r * SG.T + 62);
+        m.indexSpawn = i; m.salleSpawn = cle;
         this.placerLibre(m);
         this.monstres.push(m);
-      }
+      });
     }
     this.sallePleine = this.monstres.length > 0;
     this.sauver();
@@ -739,8 +743,7 @@ Object.assign(SG.Jeu.prototype, {
     const sv = SG.img['salle-vide'];
     if (sv && sv.width) {
       // salle sans porte : son sol intérieur (152..1521 × 152..785) tombe exactement sur la grille de jeu
-      const sx = 1120 / 1369, sy = 560 / 633;
-      ctx.drawImage(sv, 80 - 152 * sx, 80 - 152 * sy, 1672 * sx, 941 * sy);
+      SG.cadre(ctx, sv, 0, 0, SG.W, SG.H, 152, 80);
     } else if (im && im.width) {
       // l'image est calée pour que son sol corresponde exactement à la grille de la salle (cases 1 à 14, lignes 1 à 7)
       ctx.drawImage(im, -42, -41, 1365, 811);
@@ -793,7 +796,7 @@ Object.assign(SG.Jeu.prototype, {
           pile.push([x + 1, y], [x - 1, y], [x, y + 1], [x, y - 1]);
         }
         const gx = c0 * T, gy = r0 * T, gw = (c1 - c0 + 1) * T, gh = (r1 - r0 + 1) * T;
-        ctx.drawImage(gf, gx, gy, gw, gh);
+        SG.cadre(ctx, gf, gx, gy, gw, gh, Math.round(gf.width * 0.3), 24);
         // bord supérieur plus sombre : le sol surplombe le trou
         const og = ctx.createLinearGradient(0, gy, 0, gy + 22);
         og.addColorStop(0, 'rgba(0,0,0,0.6)'); og.addColorStop(1, 'rgba(0,0,0,0)');
@@ -942,17 +945,27 @@ SG.dessinCristal = function (ctx, x, y, frappe, t) {
 SG.dessinPorte = function (ctx, dir, p, ouverte, volets) {
   if (!p) return;
   const type = p.type;
-  let nom = 'porte-ouverte';
-  if (!ouverte) nom = (volets || type === 'o' || type.startsWith('enigme') || type === 'sortie') ? 'grille' : type === 'boss' ? 'porte-boss' : 'porte-cle';
+  let nom = 'battant-ouvert';
+  if (!ouverte) nom = (volets || type === 'o' || type.startsWith('enigme') || type === 'sortie') ? 'battant-grille' : type === 'boss' ? 'battant-boss' : 'battant-cle';
   const im = SG.img[nom];
-  if (!im || !im.width) return;
-  // module de porte façon Zelda : dessiné pour le mur du haut, puis tourné pour les autres murs
-  const w = 280, h = w * im.height / im.width;
-  const centre = { haut: [640, 0, 0], bas: [640, SG.H, Math.PI], gauche: [0, 360, -Math.PI / 2], droite: [SG.W, 360, Math.PI / 2] }[dir];
+  // l'ouverture est découpée dans l'épaisseur du mur (80 pixels), comme dans Zelda
+  const L = dir === 'haut' || dir === 'bas' ? 150 : 110;
+  const centre = { haut: [640, 40, 0], bas: [640, SG.H - 40, Math.PI], gauche: [40, 360, -Math.PI / 2], droite: [SG.W - 40, 360, Math.PI / 2] }[dir];
   ctx.save();
   ctx.translate(centre[0], centre[1]);
   ctx.rotate(centre[2]);
-  // le bas du module (côté salle) dépasse de 40 pixels dans la salle
-  ctx.drawImage(im, -w / 2, 120 - h, w, h);
+  // repère : le mur va de y = -40 (extérieur) à y = +40 (côté salle)
+  ctx.fillStyle = '#05030a';
+  ctx.fillRect(-L / 2, -40, L, 80);
+  if (im && im.width) ctx.drawImage(im, -L / 2 + 6, -40, L - 12, 82);
+  // montants de pierre : ombre et contour pour l'encastrer
+  ctx.strokeStyle = '#0b0814'; ctx.lineWidth = 5;
+  ctx.beginPath(); ctx.moveTo(-L / 2, 40); ctx.lineTo(-L / 2, -40); ctx.lineTo(L / 2, -40); ctx.lineTo(L / 2, 40); ctx.stroke();
+  const g = ctx.createLinearGradient(-L / 2, 0, -L / 2 + 18, 0);
+  g.addColorStop(0, 'rgba(0,0,0,0.55)'); g.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.fillStyle = g; ctx.fillRect(-L / 2, -40, 18, 80);
+  const g2 = ctx.createLinearGradient(L / 2, 0, L / 2 - 18, 0);
+  g2.addColorStop(0, 'rgba(0,0,0,0.55)'); g2.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.fillStyle = g2; ctx.fillRect(L / 2 - 18, -40, 18, 80);
   ctx.restore();
 };

@@ -105,8 +105,13 @@ SG.Jeu = class {
     }
     SG.Son.jouerMusique('plaine');
     const e = SG.MONDE[cle];
-    for (const [type, c, r] of e.ennemis || []) {
+    // quitter le donjon fait revenir ses ennemis ; dehors, un ennemi vaincu revient après 2 minutes
+    this.mortsDonjon = {};
+    const mortsIci = (this.mortsDehors && this.mortsDehors[cle]) || {};
+    for (const [i, [type, c, r]] of (e.ennemis || []).entries()) {
+      if (mortsIci[i] !== undefined && this.t - mortsIci[i] < 120) continue;
       const m = SG.creerMonstre(type, c * SG.T + 40, r * SG.T + 62);
+      m.indexSpawn = i;
       m.apparition = 0; // apparition désactivée en attendant les images de faille
       this.placerLibre(m);
       this.monstres.push(m);
@@ -402,6 +407,19 @@ SG.Jeu = class {
     }
     s.maj(this, dt);
     for (const m of this.monstres) if (!m.mort) m.maj(this, dt);
+    // mémoriser les ennemis vaincus : ils ne reviennent pas tout de suite
+    for (const m of this.monstres) {
+      if (!m.mort || m.indexSpawn === undefined || m.compte) continue;
+      m.compte = true;
+      if (this.estDonjon()) {
+        const k = this.salleCle();
+        if (!this.mortsDonjon) this.mortsDonjon = {};
+        (this.mortsDonjon[k] = this.mortsDonjon[k] || []).push(m.indexSpawn);
+      } else {
+        if (!this.mortsDehors) this.mortsDehors = {};
+        (this.mortsDehors[this.ecran] = this.mortsDehors[this.ecran] || {})[m.indexSpawn] = this.t;
+      }
+    }
     this.monstres = this.monstres.filter((m) => !m.mort);
     for (const p of this.projectiles) p.maj(this, dt);
     this.projectiles = this.projectiles.filter((p) => !p.fini);
