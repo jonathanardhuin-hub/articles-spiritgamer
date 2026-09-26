@@ -44,21 +44,42 @@ L'ordre est celui de la progression principale. L'objet de chaque donjon ouvre l
 | 8 | La Toundra du Cloud | Archives | Mémo, le mammouth archiviste | Les Archives Gelées | Lunettes de Vérif | Voir les faux murs et les chemins cachés | La Rumeur (invisible sans les lunettes) |
 | 9 | Le Cratère du Clickbait | | | La Tour du Clickbait | | | Le Roi Clickbait |
 
-## Ennemis par région
+## Ennemis
 
-Comme dans le Zelda NES, une même créature peut revenir dans une autre couleur, plus résistante.
+Deux familles, comme dans Zelda où les ennemis du monde extérieur ne sont pas ceux des donjons.
 
-| Région | Ennemis |
+**Dans le monde extérieur : des créatures ensorcelées.** Le bruit du Roi Clickbait a rendu agressives les bêtes du Réseau. Un nuage violet flotte autour d'elles (dessiné dans le code). Touchées par l'onde de Spirit, elles sont libérées : le nuage éclate en confettis et la bête s'enfuit hors de l'écran.
+
+| Région | Créatures |
 |---|---|
-| Plaine des Pixels | Pop-ups (fenêtres volantes), Spamlings (enveloppes qui sautillent), Clics (petits curseurs qui foncent) |
-| Forêt des Forums | Trollinets, Fils-serpents, Hiboux-rumeurs (lancent des bulles de ragots) |
-| Monts Hardware | Scarabugs (insectes mécaniques), Ventilos, Câbles-serpents |
-| Désert du Lag | Laggers (fantômes qui se déplacent par saccades), Sabliers (sablier de chargement qui roule), Mirages |
-| Lac des Streams | Poissons-spoil, Bulles de chat, Crabes-captcha |
-| Cité des Bulles | Taches d'encre, Onomatopées vivantes (BAM, POW), Cases animées |
-| Marais Rétro | Slimes 8 bits, Chauves-souris pixel, Moustiques-glitch |
-| Toundra du Cloud | Cookies traqueurs, Pingouins-bots, Nuages-captcha |
-| Cratère du Clickbait | Versions d'élite des ennemis précédents |
+| Plaine des Pixels | Gloups (gelées qui sautillent et se divisent en deux), Taupikos (taupes qui surgissent du sol, lancent un caillou et replongent), Bourdons (foncent en ligne droite) |
+| Forêt des Forums | Champignons grognons (chargent), Gobelinots au lance-pierre, Araignées pendues à leur fil |
+| Monts Hardware | Rochelets (petits golems qui roulent), Chauves-souris, Bouquetins qui chargent |
+| Désert du Lag | Scarabées dorés, Cactus sauteurs, Serpents des sables qui surgissent du sol |
+| Lac des Streams | Grenouilles cracheuses d'eau, Poissons sauteurs, Crabes |
+| Cité des Bulles | Pigeons qui piquent, Chats de gouttière agiles, Rats à roulettes |
+| Marais Rétro | Gelées violettes, Moustiques, Crapauds sauteurs |
+| Toundra du Cloud | Pingouins glisseurs, Petits yétis, Loups des neiges |
+
+**Dans les donjons : les sbires numériques du Clickbait.** Ils éclatent en confettis quand l'onde les touche.
+
+| Donjon | Sbires |
+|---|---|
+| 1. Terrier des Pop-ups | Pop-ups (fenêtres volantes), Spamlings (enveloppes qui sautillent), Clics (curseurs qui foncent) |
+| 2. Labyrinthe des Fils | Trollinets, Fils-serpents, Hiboux-rumeurs |
+| 3. Forge Surchauffée | Scarabugs, Ventilos, Câbles-serpents |
+| 4. Salle Obscure | Laggers, Sabliers, Mirages |
+| 5. Arène Engloutie | Poissons-spoil, Bulles de chat, Crabes-captcha |
+| 6. Bibliothèque des Bulles | Taches d'encre, Onomatopées vivantes (BAM, POW), Cases animées |
+| 7. Château 8 bits | Slimes 8 bits, Chauves-souris pixel, Moustiques-glitch |
+| 8. Archives Gelées | Cookies traqueurs, Pingouins-bots, Nuages-captcha |
+| Tour du Clickbait | Versions d'élite des sbires précédents |
+
+## Ton et difficulté
+
+- **Graphisme mignon, jeu exigeant.** Le jeu vise les joueurs adultes autant que les enfants : ennemis qui font vraiment mal, boss avec de vraies phases à apprendre, énigmes sans solution soufflée, secrets bien cachés.
+- **Jamais de sang ni de gore**, quelle que soit la difficulté.
+- **Deux modes au choix en début de partie** : « Héros » (le mode normal, exigeant) et « Découverte » (dégâts divisés par deux, indices disponibles auprès des Gardiens), pour que les plus jeunes lecteurs puissent aussi finir l'aventure.
 
 ## Durée visée
 
