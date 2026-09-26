@@ -762,6 +762,11 @@ SG.Jeu = class {
     // emplacements A et B
     const case_ = (x, lettre, contenu) => {
       SG.cadre(ctx, SG.img['ui-portrait'], x, 12, 82, 80, 200, 20);
+      if (contenu) {
+        const g = ctx.createRadialGradient(x + 41, 52, 2, x + 41, 52, 30);
+        g.addColorStop(0, 'rgba(200,240,255,0.9)'); g.addColorStop(1, 'rgba(40,110,180,0)');
+        ctx.fillStyle = g; ctx.fillRect(x + 16, 28, 50, 48);
+      }
       if (contenu) SG.dessinerPied(ctx, contenu, x + 41, 74, { echelle: 0.62 });
       SG.texte(ctx, lettre, x + 16, 34, 20, '#7fe8ff', 'left', null, null, true);
     };
@@ -902,6 +907,13 @@ SG.Jeu = class {
       ctx.save(); if (!im) ctx.globalAlpha = 0.45;
       SG.cadre(ctx, SG.img['ui-portrait'], x, y, taille, taille, 200, 26);
       ctx.restore();
+      if (im) {
+        // fond clair derrière l'objet pour qu'il ressorte
+        const g = ctx.createRadialGradient(x + taille / 2, y + taille / 2, 4, x + taille / 2, y + taille / 2, taille * 0.42);
+        g.addColorStop(0, 'rgba(200,240,255,0.95)'); g.addColorStop(0.6, 'rgba(120,200,240,0.55)'); g.addColorStop(1, 'rgba(40,110,180,0)');
+        ctx.fillStyle = g;
+        ctx.beginPath(); ctx.roundRect(x + 22, y + 22, taille - 44, taille - 44, 8); ctx.fill();
+      }
       if (im) {
         // objet centré dans la case, nom sous la case
         SG.dessinerEffet(ctx, im, x + taille / 2, y + taille / 2, 0, 0.95, 1, false);
