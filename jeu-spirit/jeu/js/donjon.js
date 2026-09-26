@@ -25,7 +25,7 @@ SG.DONJON1 = {
         '#F............F#',
         '################',
       ],
-      ennemis: [['popup', 4, 4], ['popup', 11, 4]],
+      ennemis: [],
     },
     '0,3': {
       nom: 'La Salle des Spams',
