@@ -188,6 +188,14 @@ SG.Jeu = class {
         if ((this.estDonjon() ? SG.CASES_SALLE_PLEINES : SG.CASES_PLEINES).has(ch)) return true;
       }
     }
+    // dans un donjon, statues, braseros et blocs dépassent de leur case vers le haut : on s'arrête avant, sans marcher sur leur tête
+    if (this.estDonjon()) {
+      const y1 = b.y + b.h + 28, r = Math.floor((y1 - 0.01) / SG.T);
+      for (let c = Math.floor(b.x / SG.T); c <= Math.floor((b.x + b.w - 0.01) / SG.T); c++) {
+        const ch = this.caseEn(c, r);
+        if (ch === 'o' || ch === 'F' || ch === 'B' || ch === 'p' || ch === 'C') return true;
+      }
+    }
     // dehors, le feuillage des arbres déborde de leur case : personne ne passe dessous
     if (!this.estDonjon()) {
       const x0 = b.x - 18, x1 = b.x + b.w + 18, y0 = b.y - 8, y1 = b.y + b.h + 66;

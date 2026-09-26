@@ -6,6 +6,7 @@
 // Légende des salles (16 × 9, bordure de murs incluse)
 //  #  mur          .  sol           v  trou (on ne marche pas dessus, les projectiles passent)
 //  o  statue       F  brasero       p  pot (l'onde le casse)     B  bloc à pousser
+//  G  gargouille à pousser (sur la plaque)
 //  I  plaque au sol                 X  cristal (à frapper)       C  place d'un coffre (voir coffre)
 SG.DONJON1 = {
   nom: 'Le Terrier des Pop-ups',
@@ -83,7 +84,7 @@ SG.DONJON1 = {
       plan: [
         '################',
         '#..............#',
-        '#.o..o....o..o.#',
+        '#.o..o..G.o..o.#',
         '#..............#',
         '#.......I......#',
         '#..............#',
@@ -508,8 +509,12 @@ Object.assign(SG.Jeu.prototype, {
     this.tSalle = 0;             // temps passé dans la salle : les grilles se ferment juste après l'entrée
     // blocs mobiles : position de départ, ou sur la plaque si l'énigme est résolue
     this.blocs = [];
-    S.plan.forEach((ligne, r) => [...ligne].forEach((ch, c) => { if (ch === 'B') this.blocs.push({ c, r, anim: 0, dc: 0, dr: 0 }); }));
+    S.plan.forEach((ligne, r) => [...ligne].forEach((ch, c) => { if (ch === 'B' || ch === 'G') this.blocs.push({ c, r, anim: 0, dc: 0, dr: 0, statue: ch === 'G' }); }));
     if (S.condition === 'bloc' && D.resolues.includes(k) && this.blocs[0]) { this.blocs[0].r -= 1; this.blocs[0].pousse = true; }
+    // énigme résolue : la gargouille est restée sur la plaque
+    if (S.condition === 'plaque' && D.resolues.includes(k) && this.blocs[0]) {
+      S.plan.forEach((ligne, r) => [...ligne].forEach((ch, c) => { if (ch === 'I') { this.blocs[0].c = c; this.blocs[0].r = r; this.blocs[0].pousse = true; } }));
+    }
     this.cristalFrappe = D.resolues.includes(k) && S.condition === 'cristal';
     // braseros
     this.feux = [];
@@ -581,7 +586,7 @@ Object.assign(SG.Jeu.prototype, {
     let ch = S.plan[r][c];
     const dp = this.dirPorte(c, r);
     if (dp) return this.porteOuverte(dp) ? '.' : '#';
-    if (ch === 'B') ch = '.';
+    if (ch === 'B' || ch === 'G') ch = '.';
     for (const b of this.blocs || []) if (b.c === c && b.r === r) return 'B';
     if (ch === 'p' && this.coupes.has(c + ',' + r)) return '.';
     const cf = S.coffre;
@@ -647,9 +652,9 @@ Object.assign(SG.Jeu.prototype, {
     }
     if (this.bossDialogue) { this.bossDialogue = false; this.dialogue(SG.TEXTES.donjon.bossDebut); return; }
     if (S.combat && this.sallePleine && this.monstres.length === 0 && !D.resolues.includes(k)) this.resoudre(k);
-    // plaque sous les pieds
+    // plaque : il faut y poser quelque chose de lourd (la gargouille), le poids de Spirit ne suffit pas
     if (S.condition === 'plaque' && !D.resolues.includes(k)) {
-      if (this.caseSalle(Math.floor(s.x / SG.T), Math.floor((s.y - 8) / SG.T)) === 'I') this.resoudre(k);
+      for (const b of this.blocs) if (b.anim <= 0 && S.plan[b.r][b.c] === 'I') this.resoudre(k);
     }
     if (S.condition === 'bloc' && !D.resolues.includes(k)) {
       for (const b of this.blocs) if (b.pousse && b.anim <= 0) this.resoudre(k);
@@ -670,7 +675,7 @@ Object.assign(SG.Jeu.prototype, {
     const a = C.axe();
     if (a.x || a.y) {
       const d = SG.DIRS[s.dir];
-      const fc = Math.floor((s.x + d.x * 34) / SG.T), fr = Math.floor((s.y - 11 + d.y * 24) / SG.T);
+      const fc = Math.floor((s.x + d.x * 34) / SG.T), fr = Math.floor((s.y - 11 + (d.y > 0 ? 46 : d.y * 24)) / SG.T);
       const ch = this.caseSalle(fc, fr);
       if (ch === 'B') {
         this.pousse += dt;
@@ -679,7 +684,7 @@ Object.assign(SG.Jeu.prototype, {
           const b = this.blocs.find((q) => q.c === fc && q.r === fr);
           const nc = fc + d.x, nr = fr + d.y, cible = this.caseSalle(nc, nr);
           const libre = (cible === '.' || cible === 'I') && !this.dirPorte(nc, nr) && !this.monstres.some((m) => Math.floor(m.x / SG.T) === nc && Math.floor((m.y - 5) / SG.T) === nr);
-          if (b && libre && !(S.condition === 'bloc' && D.resolues.includes(k))) { b.c = nc; b.r = nr; b.dc = d.x; b.dr = d.y; b.anim = 1; b.pousse = true; SG.Son.effet('porte'); }
+          if (b && libre && !((S.condition === 'bloc' || S.condition === 'plaque') && D.resolues.includes(k))) { b.c = nc; b.r = nr; b.dc = d.x; b.dr = d.y; b.anim = 1; b.pousse = true; SG.Son.effet('porte'); }
         }
       } else this.pousse = 0;
       const dp = this.dirPorte(fc, fr);
@@ -835,9 +840,11 @@ Object.assign(SG.Jeu.prototype, {
         if (S.plan[r - 1] && S.plan[r - 1][c] !== 'v') { ctx.fillStyle = g; ctx.fillRect(c * T, r * T, T, 26); }
       }
       if (ch === 'I') {
-        ctx.fillStyle = '#4a4160'; ctx.strokeStyle = '#120f1d'; ctx.lineWidth = 4;
-        ctx.beginPath(); ctx.roundRect(c * T + 10, r * T + 10, T - 20, T - 20, 8); ctx.fill(); ctx.stroke();
-        ctx.fillStyle = '#b04dff'; ctx.beginPath(); ctx.arc(c * T + 40, r * T + 40, 9, 0, 7); ctx.fill();
+        ctx.fillStyle = '#2a2440'; ctx.strokeStyle = '#0b0914'; ctx.lineWidth = 4;
+        ctx.beginPath(); ctx.roundRect(c * T + 6, r * T + 6, T - 12, T - 12, 10); ctx.fill(); ctx.stroke();
+        ctx.strokeStyle = '#8a4dff'; ctx.lineWidth = 3;
+        ctx.beginPath(); ctx.roundRect(c * T + 16, r * T + 16, T - 32, T - 32, 6); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(c * T + 40, r * T + 20); ctx.lineTo(c * T + 60, r * T + 40); ctx.lineTo(c * T + 40, r * T + 60); ctx.lineTo(c * T + 20, r * T + 40); ctx.closePath(); ctx.stroke();
       }
     }
     this.fonds[cle] = cv;
@@ -854,12 +861,18 @@ Object.assign(SG.Jeu.prototype, {
       else if (ch === 'C') liste.push({ y, dessiner: (ctx) => SG.dessinCoffre(ctx, x, y, D.coffres.includes(k)) });
       else if (ch === 'X') liste.push({ y, dessiner: (ctx) => SG.dessinCristal(ctx, x, y, this.cristalFrappe, this.t) });
     }
+    // plaque enfoncée par la gargouille : elle s'illumine
+    if (S.condition === 'plaque' && D.resolues.includes(k)) {
+      S.plan.forEach((ligne, r) => [...ligne].forEach((ch, c) => {
+        if (ch === 'I') liste.push({ y: -60, dessiner: (ctx) => { ctx.save(); ctx.shadowColor = '#5ff3ff'; ctx.shadowBlur = 24; ctx.strokeStyle = '#5ff3ff'; ctx.lineWidth = 4; ctx.beginPath(); ctx.roundRect(c * T + 8, r * T + 8, T - 16, T - 16, 10); ctx.stroke(); ctx.restore(); } });
+      }));
+    }
     for (const b of this.blocs || []) {
       const tremble = this.pousse > 0.05 && SG.dist(this.spirit.x, this.spirit.y, b.c * T + 40, b.r * T + 40) < 130 ? Math.sin(this.t * 70) * 2.5 : 0;
       const x = b.c * T + 40 - b.dc * b.anim * T + tremble, y = b.r * T + T - b.dr * b.anim * T;
       // traces de frottement au sol : le bloc a déjà bougé, il peut bouger encore
       if (!b.pousse) liste.push({ y: -50, dessiner: (ctx) => SG.tracesBloc(ctx, b.c * T + 40, b.r * T + 40) });
-      liste.push({ y, dessiner: (ctx) => SG.dessinBloc(ctx, x, y) });
+      liste.push({ y, dessiner: (ctx) => (b.statue ? SG.dessinStatue(ctx, x, y) : SG.dessinBloc(ctx, x, y)) });
     }
     // portes (toujours derrière les personnages : dessinées sur le fond)
     for (const dir of ['haut', 'bas', 'gauche', 'droite']) {
