@@ -40,8 +40,13 @@ SG.Jeu = class {
       const s = localStorage.getItem('spirit-sauvegarde');
       if (!s) return null;
       const d = JSON.parse(s);
-      // une sauvegarde d'une version précédente du jeu est effacée
-      if (d.version !== SG.VERSION) { localStorage.removeItem('spirit-sauvegarde'); return null; }
+      // après une mise à jour du jeu, seul le donjon repart de zéro (le reste de la partie est gardé)
+      if (d.version !== SG.VERSION) {
+        if (d.d1 && d.d1.fini) d.vieMax = Math.max(12, d.vieMax - 4);   // le cœur d'or du boss sera regagné
+        d.version = SG.VERSION; d.d1 = null; d.manette = false; d.objetB = null; d.source = 0; d.barriere = false;
+        if (typeof d.ecran === 'string' && d.ecran.startsWith('d1:')) { d.ecran = '0,0'; d.x = 8.5 * SG.T; d.y = 3.6 * SG.T; }
+        localStorage.setItem('spirit-sauvegarde', JSON.stringify(d));
+      }
       return d;
     } catch (e) { return null; }
   }

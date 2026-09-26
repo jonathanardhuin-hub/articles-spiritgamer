@@ -117,6 +117,7 @@ SG.Spirit = class {
     const vue = this.dir === 'bas' ? 'face' : this.dir === 'haut' ? 'dos' : 'profil';
     if (this.brandit) return I['spirit-brandit'];
     if (this.attaque > 0) return I['spirit-attaque-' + vue];
+    if (this.poussePose > 0 && I['spirit-pousse-' + vue] && I['spirit-pousse-' + vue].width) return I['spirit-pousse-' + vue];
     if (!this.bouge) return I['spirit-' + vue];
     const pas = Math.floor(this.tempsMarche * 8) % 4;
     if (vue === 'profil') return I[['spirit-profil-a', 'spirit-profil', 'spirit-profil-b', 'spirit-profil'][pas]];

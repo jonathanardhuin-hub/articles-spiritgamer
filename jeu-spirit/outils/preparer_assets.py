@@ -25,6 +25,9 @@ LISTE = {
     'spirit-attaque-dos': ('spirit-v2/attaque-dos.png', 'h', 110, ''),
     'spirit-attaque-profil': ('spirit-v2/attaque-profil.png', 'h', 110, ''),
     'spirit-brandit': ('spirit-v2/brandit.png', 'h', 128, ''),
+    'spirit-pousse-face': ('spirit-v2/pousse-face.png', 'h', 108, ''),
+    'spirit-pousse-dos': ('spirit-v2/pousse-dos.png', 'h', 98, ''),
+    'spirit-pousse-profil': ('spirit-v2/pousse-profil.png', 'h', 104, ''),
     'portrait-spirit': ('spirit-v2/portrait.png', 'h', 200, ''),
     'portrait-spirit-parle': ('spirit-v2/portrait-parle.png', 'h', 200, ''),
     # Personnages

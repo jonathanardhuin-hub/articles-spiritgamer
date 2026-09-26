@@ -643,6 +643,7 @@ Object.assign(SG.Jeu.prototype, {
       for (const b of this.blocs) if (b.pousse && b.anim <= 0) this.resoudre(k);
     }
     for (const b of this.blocs) b.anim = Math.max(0, b.anim - dt * 4);
+    if (s.poussePose > 0) s.poussePose -= dt;
     // pousser un bloc, ouvrir une porte verrouillée
     const a = C.axe();
     if (a.x || a.y) {
@@ -650,7 +651,7 @@ Object.assign(SG.Jeu.prototype, {
       const fc = Math.floor((s.x + d.x * 34) / SG.T), fr = Math.floor((s.y - 11 + d.y * 24) / SG.T);
       const ch = this.caseSalle(fc, fr);
       if (ch === 'B') {
-        this.pousse += dt;
+        this.pousse += dt; s.poussePose = 0.2;
         if (this.pousse > 0.35) {
           this.pousse = 0;
           const b = this.blocs.find((q) => q.c === fc && q.r === fr);
