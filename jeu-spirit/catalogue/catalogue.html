@@ -179,6 +179,10 @@
       style += `\n\nSpirit est la mascotte des images jointes (petit personnage blanc, casque-micro noir et bleu, tee-shirt bleu). Détail obligatoire, à ne jamais oublier : les lettres SG en cyan sur la face extérieure de chaque écouteur de son casque, bien lisibles, et le logo SG sur le devant de son tee-shirt.`;
       if (!refs.includes('spirit-officiel')) refs = refs.concat('spirit-officiel');
     }
+    // image avec plusieurs personnages : chacun est unique et bien séparé
+    if (style && /foule|Gardiens|autour|silhouettes|ennemis|habitants|personnages|à ses côtés|avec Flash/.test(style + items.join(' ')) && (cat === 'interface' || /Illustration|illustration/.test(style)) && !/Carte/.test(titre)) {
+      style += `\n\nPersonnages multiples : chaque personnage est unique, entier et bien séparé des autres. Aucun personnage ne fusionne avec un autre, aucun personnage n'est dessiné à l'intérieur d'un autre, pas de membres ni de têtes en trop, pas de corps qui se chevauchent au point de se confondre. Chacun a sa propre silhouette lisible.`;
+    }
     const liste = n === 1 ? items[0] : items.map((x, i) => `${i + 1}) ${x}`).join('\n');
     cartes.push({
       id: `${code}-${String(numero[code]).padStart(2, '0')}`, etape, cat, titre, pourquoi, refs, note,
