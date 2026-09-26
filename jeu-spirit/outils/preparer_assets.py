@@ -103,7 +103,7 @@ FACULTATIVES = {
     'coffre-ouvert': ('donjon1/coffre-ouvert.png', 'w', 78, ''),
     'cristal': ('donjon1/cristal.png', 'h', 96, ''),
     'cristal-actif': ('donjon1/cristal-actif.png', 'h', 96, ''),
-    'entree-terrier': ('donjon1/entree-terrier.png', 'w', 400, ''),
+    'entree-terrier': ('donjon1/entree-terrier.png', 'w', 560, ''),
     'manette': ('donjon1/manette.png', 'w', 70, ''),
     'cle': ('donjon1/cle.png', 'w', 60, ''),
     'cle-boss': ('donjon1/cle-boss.png', 'w', 70, ''),
@@ -135,14 +135,13 @@ def main():
             rgb = np.where(al[..., None] > 0.01, a[..., :3] / np.maximum(al[..., None], 0.01), 0)
             im = Image.fromarray(np.dstack([rgb.clip(0, 255), al * 255]).astype('uint8'), 'RGBA')
         if nom == 'entree-terrier':
-            # le bas de l'image se fond dans le sol
+            # les côtés se fondent dans la lisière d'arbres, le bas se pose en douceur sur l'herbe
             import numpy as np
             a = np.array(im).astype(float)
-            h = a.shape[0]
-            debut = int(h * 0.62)
-            f = np.ones(h)
-            f[debut:] = np.linspace(1, 0, h - debut) ** 1.5
-            a[..., 3] *= f[:, None]
+            h, w = a.shape[:2]
+            fx = np.clip(np.minimum(np.arange(w), w - 1 - np.arange(w)) / (w * 0.08), 0, 1)
+            fy = np.ones(h); d = int(h * 0.9); fy[d:] = np.linspace(1, 0.2, h - d)
+            a[..., 3] *= fx[None, :] * fy[:, None]
             im = Image.fromarray(a.astype('uint8'), 'RGBA')
         cible = taille * ECHELLE
         s = cible / (im.height if axe == 'h' else im.width)

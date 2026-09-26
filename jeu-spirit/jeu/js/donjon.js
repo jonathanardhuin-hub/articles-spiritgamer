@@ -881,31 +881,57 @@ SG.dessinCristal = function (ctx, x, y, frappe, t) {
   });
 };
 SG.dessinPorte = function (ctx, dir, p, ouverte, volets) {
-  if (!p) return;
+  if (!p || ouverte) return;
   const T = SG.T;
-  const r = dir === 'haut' ? { x: 7 * T, y: 0, w: 2 * T, h: T } : dir === 'bas' ? { x: 7 * T, y: SG.H - T, w: 2 * T, h: T }
-    : dir === 'gauche' ? { x: 0, y: 4 * T, w: T, h: T } : { x: SG.W - T, y: 4 * T, w: T, h: T };
+  // la porte couvre toute l'ouverture du mur, épaisseur comprise
+  const r = dir === 'haut' ? { x: 7 * T + 4, y: -6, w: 2 * T - 8, h: T + 14 } : dir === 'bas' ? { x: 7 * T + 4, y: SG.H - T - 8, w: 2 * T - 8, h: T + 14 }
+    : dir === 'gauche' ? { x: -6, y: 4 * T - 8, w: T + 14, h: T + 16 } : { x: SG.W - T - 8, y: 4 * T - 8, w: T + 14, h: T + 16 };
+  const type = p.type;
+  const t = performance.now() / 1000;
   ctx.save();
-  // ouverture sombre
-  ctx.fillStyle = '#07050d'; ctx.fillRect(r.x + 6, r.y + 6, r.w - 12, r.h - 12);
-  if (!ouverte) {
-    const type = p.type;
-    if (volets || type === 'o' || type.startsWith('enigme') || type === 'sortie') {
-      // barreaux de métal
-      ctx.fillStyle = '#5a5470'; ctx.strokeStyle = '#0d0b16'; ctx.lineWidth = 3;
-      const n = r.w > r.h ? 6 : 3;
-      for (let i = 0; i < n; i++) {
-        if (r.w > r.h) { const xx = r.x + 10 + i * (r.w - 20) / (n - 1) - 5; ctx.fillRect(xx, r.y + 6, 10, r.h - 12); ctx.strokeRect(xx, r.y + 6, 10, r.h - 12); }
-        else { const yy = r.y + 10 + i * (r.h - 20) / (n - 1) - 5; ctx.fillRect(r.x + 6, yy, r.w - 12, 10); ctx.strokeRect(r.x + 6, yy, r.w - 12, 10); }
-      }
-    } else {
-      // porte en bois cloutée, avec serrure (dorée pour la grande porte)
-      ctx.fillStyle = type === 'boss' ? '#4a1a4a' : '#6a3e1a'; ctx.strokeStyle = '#0d0b16'; ctx.lineWidth = 4;
-      ctx.fillRect(r.x + 6, r.y + 6, r.w - 12, r.h - 12); ctx.strokeRect(r.x + 6, r.y + 6, r.w - 12, r.h - 12);
-      ctx.fillStyle = type === 'boss' ? '#ffd23a' : '#c0c0c8';
-      ctx.beginPath(); ctx.arc(r.x + r.w / 2, r.y + r.h / 2 - 6, 9, 0, 7); ctx.fill(); ctx.stroke();
-      ctx.fillRect(r.x + r.w / 2 - 4, r.y + r.h / 2, 8, 14);
+  const nom = (volets || type === 'o' || type.startsWith('enigme') || type === 'sortie') ? 'grille' : type === 'boss' ? 'porte-boss' : 'porte-cle';
+  const im = SG.img[nom];
+  if (im && im.width) {
+    ctx.translate(r.x + r.w / 2, r.y + r.h / 2);
+    const rot = { haut: 0, bas: Math.PI, gauche: -Math.PI / 2, droite: Math.PI / 2 }[dir];
+    ctx.rotate(rot);
+    const w = dir === 'haut' || dir === 'bas' ? r.w : r.h, h = dir === 'haut' || dir === 'bas' ? r.h : r.w;
+    ctx.drawImage(im, -w / 2, -h / 2, w, h);
+    ctx.restore();
+  } else if (nom === 'grille') {
+    // grille de fer épaisse, lueur violette
+    ctx.fillStyle = 'rgba(10,5,20,0.85)'; ctx.fillRect(r.x, r.y, r.w, r.h);
+    ctx.shadowColor = '#b04dff'; ctx.shadowBlur = 12;
+    const hor = r.w > r.h, n = hor ? 6 : 4;
+    for (let i = 0; i < n; i++) {
+      ctx.fillStyle = '#8a86a8'; ctx.strokeStyle = '#0d0b16'; ctx.lineWidth = 3;
+      if (hor) { const xx = r.x + 8 + i * (r.w - 16) / (n - 1) - 6; ctx.fillRect(xx, r.y, 12, r.h); ctx.strokeRect(xx, r.y, 12, r.h); }
+      else { const yy = r.y + 8 + i * (r.h - 16) / (n - 1) - 6; ctx.fillRect(r.x, yy, r.w, 12); ctx.strokeRect(r.x, yy, r.w, 12); }
     }
+    ctx.shadowBlur = 0;
+    ctx.fillStyle = '#5a5470';
+    if (hor) { ctx.fillRect(r.x, r.y + r.h * 0.3, r.w, 8); ctx.fillRect(r.x, r.y + r.h * 0.7, r.w, 8); }
+    else { ctx.fillRect(r.x + r.w * 0.3, r.y, 8, r.h); ctx.fillRect(r.x + r.w * 0.7, r.y, 8, r.h); }
+    ctx.restore();
+  } else {
+    // porte en bois cerclée de fer, avec une serrure bien visible
+    const boss = type === 'boss';
+    ctx.shadowColor = boss ? '#ffd23a' : '#ffe9a0'; ctx.shadowBlur = 14 + Math.sin(t * 4) * 4;
+    ctx.fillStyle = boss ? '#4a1a4a' : '#7a4a1e'; ctx.strokeStyle = '#0d0b16'; ctx.lineWidth = 5;
+    ctx.beginPath(); ctx.roundRect(r.x, r.y, r.w, r.h, 8); ctx.fill(); ctx.stroke();
+    ctx.shadowBlur = 0;
+    ctx.strokeStyle = 'rgba(0,0,0,0.35)'; ctx.lineWidth = 3;
+    const hor = r.w > r.h;
+    for (let i = 1; i < 4; i++) { ctx.beginPath(); if (hor) { ctx.moveTo(r.x + i * r.w / 4, r.y + 4); ctx.lineTo(r.x + i * r.w / 4, r.y + r.h - 4); } else { ctx.moveTo(r.x + 4, r.y + i * r.h / 4); ctx.lineTo(r.x + r.w - 4, r.y + i * r.h / 4); } ctx.stroke(); }
+    ctx.fillStyle = boss ? '#c9a020' : '#5a5470';
+    if (hor) { ctx.fillRect(r.x, r.y + 10, r.w, 10); ctx.fillRect(r.x, r.y + r.h - 20, r.w, 10); }
+    else { ctx.fillRect(r.x + 10, r.y, 10, r.h); ctx.fillRect(r.x + r.w - 20, r.y, 10, r.h); }
+    // serrure dorée et icône de la clé
+    const cx = r.x + r.w / 2, cy = r.y + r.h / 2;
+    ctx.fillStyle = '#ffd23a'; ctx.strokeStyle = '#1a1000'; ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.arc(cx, cy, 20, 0, 7); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = '#1a1000'; ctx.beginPath(); ctx.arc(cx, cy - 4, 6, 0, 7); ctx.fill(); ctx.fillRect(cx - 3, cy, 6, 11);
+    ctx.restore();
+    SG.dessinerIcone(ctx, boss ? 'cleBoss' : 'cle', cx + (dir === 'gauche' ? 40 : dir === 'droite' ? -40 : 52), cy + (dir === 'haut' ? 34 : dir === 'bas' ? -34 : 44), 34);
   }
-  ctx.restore();
 };

@@ -680,7 +680,10 @@ SG.Jeu = class {
     if (this.estDonjon()) this.objetsSalle(liste);
     else if (this.ecran !== 'grotte') this.objetsDecor(liste);
     for (const b of this.butins) liste.push(b);
-    for (const m of this.monstres) liste.push(m);
+    for (const m of this.monstres) {
+      if (!this.estDonjon()) { liste.push(m); continue; }
+      liste.push({ y: m.y, dessiner: (c) => { c.save(); c.filter = 'drop-shadow(0 0 2px rgba(255,255,255,0.95)) drop-shadow(0 0 7px rgba(255,210,90,0.7))'; m.dessiner(c); c.restore(); } });
+    }
     for (const p of this.pnj) liste.push(p);
     if (this.spirit) liste.push(this.spirit);
     liste.sort((a, b) => a.y - b.y);
@@ -743,7 +746,7 @@ SG.Jeu = class {
           case 'P': im = I.panneau; dy = -6; retourne = false; break;
           case 'M': if (this.caseEn(c - 1, r) !== 'M') { im = I['amas-rochers']; dx = 40; dy = 4; } break;
           case 'E': im = I['falaise-grotte']; dy = 2; retourne = false; break;
-          case 'D': im = I['entree-terrier'] && I['entree-terrier'].width ? I['entree-terrier'] : I['falaise-grotte']; dy = 2; retourne = false; break;
+          case 'D': im = I['entree-terrier'] && I['entree-terrier'].width ? I['entree-terrier'] : I['falaise-grotte']; dy = 14; retourne = false; break;
           case 'X': liste.push({ y, dessiner: (ctx) => SG.dessinCristal(ctx, x, y, this.barriere, this.t) }); break;
           case 'G': liste.push({ y: y + 30, dessiner: (ctx) => SG.dessinBarriere(ctx, x, y, this.t) }); break;
         }
