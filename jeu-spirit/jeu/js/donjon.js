@@ -48,7 +48,7 @@ SG.DONJON1 = {
       nom: 'La Salle du Bloc',
       plan: [
         '################',
-        '#....oooooo....#',
+        '#..............#',
         '#....o....o....#',
         '#....o.I..o....#',
         '#..............#',
@@ -286,7 +286,9 @@ SG.Clic = class extends SG.Monstre {
     if (this.sonne > 0) { this.sonne -= dt; this.contact(jeu); return; }
     const s = jeu.spirit;
     if (!this.charge) {
-      if (Math.abs(s.x - this.x) < 30 || Math.abs(s.y - this.y) < 30) {
+      this.repos = Math.max(0, (this.repos || 0) - dt);
+      const loin = Math.hypot(s.x - this.x, s.y - this.y);
+      if (this.repos <= 0 && loin < 420 && (Math.abs(s.x - this.x) < 26 || Math.abs(s.y - this.y) < 26)) {
         this.dir = SG.dirDepuis(s.x - this.x, s.y - this.y);
         this.charge = true; SG.Son.effet('lance');
       } else {
@@ -296,8 +298,8 @@ SG.Clic = class extends SG.Monstre {
       }
     } else {
       const d = SG.DIRS[this.dir];
-      const v = jeu.mode === 'decouverte' ? 380 : 520;
-      if (SG.deplacer(jeu, this, d.x * v * dt, d.y * v * dt)) { this.charge = false; this.sonne = 0.7; }
+      const v = jeu.mode === 'decouverte' ? 300 : 400;
+      if (SG.deplacer(jeu, this, d.x * v * dt, d.y * v * dt)) { this.charge = false; this.sonne = 1.0; this.repos = 1.4; }
     }
     this.contact(jeu);
   }
@@ -502,6 +504,7 @@ Object.assign(SG.Jeu.prototype, {
     this.coupes = new Set();
     this.effets = []; this.projectiles = []; this.butins = []; this.monstres = []; this.pnj = [];
     this.pousse = 0;
+    this.entreeSalle = null;
     // blocs mobiles : position de départ, ou sur la plaque si l'énigme est résolue
     this.blocs = [];
     S.plan.forEach((ligne, r) => [...ligne].forEach((ch, c) => { if (ch === 'B') this.blocs.push({ c, r, anim: 0, dc: 0, dr: 0 }); }));
@@ -614,6 +617,20 @@ Object.assign(SG.Jeu.prototype, {
   // mise à jour propre au donjon, appelée à chaque image de jeu
   majDonjon(dt, C) {
     const S = this.salle(), k = this.salleCle(), D = this.etatDonjon(), s = this.spirit;
+    if (!this.entreeSalle) this.entreeSalle = { x: s.x, y: s.y };
+    if (s.chute > 0) {
+      s.chute -= dt;
+      if (s.chute <= 0) {
+        s.chute = 0;
+        s.x = this.entreeSalle.x; s.y = this.entreeSalle.y; s.invincible = 1.2;
+        this.perdreVie(this.degats(2));
+      }
+      return;
+    }
+    if (!s.recul || true) {
+      const cc = Math.floor(s.x / SG.T), rr = Math.floor((s.y - 10) / SG.T);
+      if (this.caseSalle(cc, rr) === 'v') { s.chute = 0.7; s.attaque = 0; s.recul = null; SG.Son.effet('fin'); return; }
+    }
     if (this.bossDialogue) { this.bossDialogue = false; this.dialogue(SG.TEXTES.donjon.bossDebut); return; }
     if (S.combat && this.sallePleine && this.monstres.length === 0 && !D.resolues.includes(k)) this.resoudre(k);
     // plaque sous les pieds
@@ -722,6 +739,13 @@ Object.assign(SG.Jeu.prototype, {
     if (im && im.width) {
       // l'image est calée pour que son sol corresponde exactement à la grille de la salle (cases 1 à 14, lignes 1 à 7)
       ctx.drawImage(im, -42, -41, 1365, 811);
+      // les ouvertures sans porte sont murées avec un morceau du mur voisin
+      const ouv = { haut: [560, 0, 160, 82, 360, 0], bas: [560, 638, 160, 82, 360, 638], gauche: [0, 312, 82, 96, 0, 152], droite: [1198, 312, 82, 96, 1198, 152] };
+      for (const dir in ouv) {
+        if (this.porteVers(dir)) continue;
+        const [x, y, w, h, sx, sy] = ouv[dir];
+        ctx.drawImage(cv, sx * k, sy * k, w * k, h * k, x, y, w, h);
+      }
     } else {
       // dalles sombres veinées de violet
       const alea = SG.graine(cle.length * 31 + cle.charCodeAt(3) * 7 + cle.charCodeAt(5));
@@ -758,8 +782,13 @@ Object.assign(SG.Jeu.prototype, {
           c0 = Math.min(c0, x); c1 = Math.max(c1, x); r0 = Math.min(r0, y); r1 = Math.max(r1, y);
           pile.push([x + 1, y], [x - 1, y], [x, y + 1], [x, y - 1]);
         }
-        const m = 12;
-        ctx.drawImage(gf, c0 * T - m, r0 * T - m, (c1 - c0 + 1) * T + 2 * m, (r1 - r0 + 1) * T + 2 * m);
+        const gx = c0 * T, gy = r0 * T, gw = (c1 - c0 + 1) * T, gh = (r1 - r0 + 1) * T;
+        ctx.drawImage(gf, gx, gy, gw, gh);
+        // bord supérieur plus sombre : le sol surplombe le trou
+        const og = ctx.createLinearGradient(0, gy, 0, gy + 22);
+        og.addColorStop(0, 'rgba(0,0,0,0.6)'); og.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.fillStyle = og; ctx.fillRect(gx, gy, gw, 22);
+        ctx.strokeStyle = 'rgba(10,5,20,0.9)'; ctx.lineWidth = 3; ctx.strokeRect(gx + 1, gy + 1, gw - 2, gh - 2);
       }
     }
     // trous et plaques
@@ -904,8 +933,8 @@ SG.dessinPorte = function (ctx, dir, p, ouverte, volets) {
   if (!p || ouverte) return;
   const T = SG.T;
   // la porte couvre toute l'ouverture du mur, épaisseur comprise
-  const r = dir === 'haut' ? { x: 7 * T + 4, y: -6, w: 2 * T - 8, h: T + 14 } : dir === 'bas' ? { x: 7 * T + 4, y: SG.H - T - 8, w: 2 * T - 8, h: T + 14 }
-    : dir === 'gauche' ? { x: -6, y: 4 * T - 8, w: T + 14, h: T + 16 } : { x: SG.W - T - 8, y: 4 * T - 8, w: T + 14, h: T + 16 };
+  const r = dir === 'haut' ? { x: 566, y: 4, w: 148, h: 74 } : dir === 'bas' ? { x: 566, y: 642, w: 148, h: 74 }
+    : dir === 'gauche' ? { x: 4, y: 318, w: 74, h: 84 } : { x: 1202, y: 318, w: 74, h: 84 };
   const type = p.type;
   const t = performance.now() / 1000;
   ctx.save();

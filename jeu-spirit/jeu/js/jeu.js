@@ -167,7 +167,7 @@ SG.Jeu = class {
           ch = this.caseEn(SG.clamp(c, 0, SG.COLS - 1), SG.clamp(r, 0, SG.ROWS - 1));
           if (!estSpirit) return true;
         }
-        if (ch === 'v' && entite && entite.vole) continue;
+        if (ch === 'v' && entite && (entite.vole || entite === this.spirit)) continue;
         if ((this.estDonjon() ? SG.CASES_SALLE_PLEINES : SG.CASES_PLEINES).has(ch)) return true;
       }
     }
@@ -338,7 +338,9 @@ SG.Jeu = class {
     c.width = this.canevas.width; c.height = Math.round(SG.H * this.echelle);
     const x = c.getContext('2d');
     x.setTransform(this.echelle, 0, 0, this.echelle, 0, 0);
+    this.cacherSpirit = true;
     this.dessinerScene(x);
+    this.cacherSpirit = false;
     return c;
   }
 
@@ -346,6 +348,7 @@ SG.Jeu = class {
     const cle = this.voisin(dir);
     const avant = this.capturer();
     const s = this.spirit;
+    const depart = { x: s.x, y: s.y };
     // dans un donjon, on entre d'une case pour ne pas rester dans l'encadrement de la porte
     const m = this.estDonjon(cle) ? SG.T + 6 : 0;
     if (dir === 'gauche') s.x = SG.W - s.pw / 2 - 2 - m;
@@ -355,7 +358,7 @@ SG.Jeu = class {
     s.recul = null;
     this.entrerEcran(cle);
     const apres = this.capturer();
-    this.transition = { type: 'glisse', dir, avant, apres, t: 0, duree: 0.55 };
+    this.transition = { type: 'glisse', dir, avant, apres, t: 0, duree: 0.55, depart, arrivee: { x: s.x, y: s.y } };
     this.etat = 'transition';
   }
 
@@ -640,6 +643,13 @@ SG.Jeu = class {
       const d = SG.DIRS[tr.dir];
       ctx.drawImage(tr.avant, -d.x * SG.W * e, -d.y * SG.H * e, SG.W, SG.H);
       ctx.drawImage(tr.apres, d.x * SG.W * (1 - e), d.y * SG.H * (1 - e), SG.W, SG.H);
+      // Spirit traverse d'un écran à l'autre
+      const s = this.spirit, x0 = s.x, y0 = s.y;
+      const ax = tr.depart.x - d.x * SG.W * e, ay = tr.depart.y - d.y * SG.H * e;
+      const bx = tr.arrivee.x + d.x * SG.W * (1 - e), by = tr.arrivee.y + d.y * SG.H * (1 - e);
+      s.x = SG.lerp(ax, bx, u); s.y = SG.lerp(ay, by, u); s.bouge = true; s.tempsMarche += 1 / 60;
+      s.dessiner(ctx);
+      s.x = x0; s.y = y0;
       ctx.restore();
       this.dessinerHUD(ctx);
       return;
@@ -685,7 +695,7 @@ SG.Jeu = class {
       liste.push({ y: m.y, dessiner: (c) => { c.save(); c.filter = 'drop-shadow(0 0 2px rgba(255,255,255,0.95)) drop-shadow(0 0 7px rgba(255,210,90,0.7))'; m.dessiner(c); c.restore(); } });
     }
     for (const p of this.pnj) liste.push(p);
-    if (this.spirit) liste.push(this.spirit);
+    if (this.spirit && !this.cacherSpirit) liste.push(this.spirit);
     liste.sort((a, b) => a.y - b.y);
     for (const o of liste) o.dessiner(ctx);
     if (this.estDonjon()) this.dessinerFlammes(ctx);
@@ -701,7 +711,7 @@ SG.Jeu = class {
     ctx.save();
     ctx.globalAlpha = 0.38;
     for (const m of this.monstres) if (!m.apparition || m.apparition <= 0) m.dessiner(ctx);
-    if (this.spirit) { ctx.globalAlpha = 0.5; this.spirit.dessiner(ctx); }
+    if (this.spirit && !this.cacherSpirit && !this.estDonjon()) { ctx.globalAlpha = 0.5; this.spirit.dessiner(ctx); }
     ctx.restore();
     for (const p of this.projectiles) p.dessiner(ctx);
     for (const e of this.effets) e.dessiner(ctx);

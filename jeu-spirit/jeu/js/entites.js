@@ -46,6 +46,7 @@ SG.Spirit = class {
 
   maj(jeu, dt) {
     const C = SG.Commandes;
+    if (this.chute > 0) return;
     this.invincible = Math.max(0, this.invincible - dt);
     this.recharge = Math.max(0, this.recharge - dt);
     if (this.recul) {
@@ -82,7 +83,7 @@ SG.Spirit = class {
     this.recharge = 0.34;
     const d = SG.DIRS[this.dir];
     // zone touchée par l'onde proche
-    const portee = 100, largeur = 110;
+    const portee = 125, largeur = 135;
     const cx = this.x + d.x * 60, cy = this.y - 36 + d.y * 60;
     const zone = d.x
       ? { x: cx - portee / 2, y: cy - largeur / 2, w: portee, h: largeur }
@@ -127,6 +128,14 @@ SG.Spirit = class {
     const pas = Math.floor(this.tempsMarche * 8) % 4;
     const saut = this.bouge && pas % 2 === 1 ? -3 : 0;
     SG.ombre(ctx, this.x, this.y, 26);
+    if (this.chute > 0) {
+      // il tombe dans le gouffre : il rapetisse en tournant
+      const u = this.chute / 0.7;
+      ctx.save(); ctx.translate(this.x, this.y - 30); ctx.rotate((1 - u) * 5);
+      SG.dessinerPied(ctx, SG.img['spirit-face'], 0, 30 * u, { echelle: u });
+      ctx.restore();
+      return;
+    }
     SG.dessinerPied(ctx, this.image(), this.x, this.y + saut, { retourne: this.dir === 'gauche' && !this.brandit });
   }
 };
@@ -212,7 +221,7 @@ SG.Monstre = class {
   toucher(jeu, degats, sx, sy) {
     if (this.flash > 0 || this.apparition > 0) return false;
     this.pv -= degats;
-    this.flash = 0.3;
+    this.flash = 0.16;
     let dx = this.x - sx, dy = this.y - sy;
     const d = Math.hypot(dx, dy) || 1;
     this.recul = { vx: dx / d * 480, vy: dy / d * 480, t: 0.14 };
