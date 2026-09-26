@@ -279,8 +279,18 @@ SG.Jeu = class {
   }
 
   // ------------------------------------------------------------ dialogues et objets
+  // découpe les répliques trop longues en plusieurs pages de 3 lignes au plus
+  paginer(lignes) {
+    const out = [];
+    for (const [qui, texte] of lignes) {
+      const largeur = qui ? SG.W - 100 - 262 - 70 : SG.W - 100 - 50 - 70;
+      for (const page of SG.decouperTexte(texte, largeur, 26, 3)) out.push([qui, page]);
+    }
+    return out;
+  }
+
   dialogue(lignes, ensuite) {
-    this.dlg = { lignes, i: 0, car: 0, ensuite };
+    this.dlg = { lignes: this.paginer(lignes), i: 0, car: 0, ensuite };
     this.etat = 'dialogue';
   }
 
@@ -289,7 +299,7 @@ SG.Jeu = class {
     this.spirit.brandit = true;
     this.spirit.dir = 'bas';
     this.etat = 'objet';
-    this.dlg = { lignes: [[null, texte]], i: 0, car: 0 };
+    this.dlg = { lignes: this.paginer([[null, texte]]), i: 0, car: 0 };
     SG.Son.effet('objet');
   }
 
@@ -1027,7 +1037,7 @@ SG.Jeu = class {
       SG.texte(ctx, { spirit: 'Spirit', ermite: 'L\'ermite', flash: 'Flash' }[qui], x + 262, y + 58, 30, '#7fe8ff', 'left', null, null, true);
       tx = x + 262;
     }
-    SG.texteMultiligne(ctx, texte.slice(0, Math.floor(d.car)), tx, y + (qui ? 100 : 76), w - (tx - x) - 60, 28, 36, '#ffffff');
+    SG.texteMultiligne(ctx, texte.slice(0, Math.floor(d.car)), tx, y + (qui ? 96 : 80), w - (tx - x) - 70, 26, 34, '#ffffff');
     if (d.car >= texte.length) {
       const b2 = Math.sin(this.t * 6) * 3;
       SG.texte(ctx, '▼', x + w - 58, y + h - 36 + b2, 24, '#7fe8ff', 'center');
@@ -1272,6 +1282,20 @@ SG.texte = function (ctx, t, x, y, taille, couleur, align, contour, ep, titre) {
   ctx.fillStyle = couleur;
   ctx.fillText(t, x, y);
   ctx.restore();
+};
+SG.decouperTexte = function (t, largeurMax, taille, maxLignes) {
+  const c = document.createElement('canvas').getContext('2d');
+  c.font = `800 ${taille}px ${SG.POLICE}`;
+  const lignes = [];
+  let l = '';
+  for (const m of t.split(' ')) {
+    const essai = l ? l + ' ' + m : m;
+    if (c.measureText(essai).width > largeurMax && l) { lignes.push(l); l = m; } else l = essai;
+  }
+  if (l) lignes.push(l);
+  const pages = [];
+  for (let i = 0; i < lignes.length; i += maxLignes) pages.push(lignes.slice(i, i + maxLignes).join(' '));
+  return pages.length ? pages : [''];
 };
 SG.texteMultiligne = function (ctx, t, x, y, largeurMax, taille, interligne, couleur, align) {
   ctx.save();
