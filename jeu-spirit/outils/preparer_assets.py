@@ -111,6 +111,7 @@ FACULTATIVES = {
     'boussole': ('donjon1/boussole.png', 'w', 64, ''),
     'source': ('donjon1/source.png', 'w', 64, ''),
     'flash': ('donjon1/flash.png', 'h', 120, ''),
+    'porte-cle': ('donjon1/porte-cle.png', 'w', 160, ''),
     'flash-carnet': ('donjon1/flash-carnet.png', 'h', 120, ''),
     'portrait-flash': ('donjon1/portrait-flash.png', 'h', 200, ''),
 }
@@ -139,7 +140,7 @@ def main():
             import numpy as np
             a = np.array(im).astype(float)
             h, w = a.shape[:2]
-            fx = np.clip(np.minimum(np.arange(w), w - 1 - np.arange(w)) / (w * 0.08), 0, 1)
+            fx = np.ones(w)
             fy = np.ones(h); d = int(h * 0.9); fy[d:] = np.linspace(1, 0.2, h - d)
             a[..., 3] *= fx[None, :] * fy[:, None]
             im = Image.fromarray(a.astype('uint8'), 'RGBA')

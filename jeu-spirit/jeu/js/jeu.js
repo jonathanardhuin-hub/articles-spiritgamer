@@ -751,6 +751,16 @@ SG.Jeu = class {
               // la paroi du terrier remplace la lisière d'arbres sur toute la largeur de l'écran
               const ter = I['entree-terrier'];
               liste.push({ y: y + 10, dessiner: (ctx) => SG.dessinerPied(ctx, ter, 680, y + 12, { sy: 0.78 }) });
+              // pied de la paroi : touffes et cailloux décoratifs (indestructibles) pour fondre la jonction avec l'herbe
+              const al = SG.graine(77);
+              const deco = [];
+              for (let xx = 110; xx < 1250; xx += 26 + al() * 22) {
+                if (xx > 600 && xx < 760) continue; // devant l'entrée
+                deco.push({ x: xx + al() * 10, r: al() < 0.25, e: 0.35 + al() * 0.25, v: al() < 0.5, dy: al() * 10 });
+              }
+              liste.push({ y: y + 14, dessiner: (ctx) => {
+                for (const d of deco) SG.dessinerPied(ctx, d.r ? I.rocher : I.herbes, d.x, y + 16 + d.dy, { echelle: d.r ? d.e * 0.6 : d.e, retourne: d.v });
+              } });
             } else { im = I['falaise-grotte']; dy = 14; retourne = false; }
             break;
           case 'X': liste.push({ y, dessiner: (ctx) => SG.dessinCristal(ctx, x, y, this.barriere, this.t) }); break;
