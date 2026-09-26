@@ -17,27 +17,29 @@
 
 ## Ce que j'en tire pour le Terrier des Pop-ups (donjon 1)
 
+Zelda sert de repère pour le rythme (taille, clés, sous-sols, salles variées). Le contenu vient de notre univers : le Bruit, la pub, le clickbait.
+
 On passe de 9 salles à 17, sur une carte en forme de tête de chouette (Flash).
 
 | Salle | Contenu |
 |---|---|
-| Hall | Vide, trois sorties. Comme le premier écran de Zelda. |
-| Combat 1 | Spamlings, volets fermés : les tuer tous donne une clé. |
-| Salle sombre | Noire, on ne voit qu'autour de Spirit. Des Pop-ups dedans. Aucune lumière possible dans ce donjon : il faut se débrouiller. |
-| Salle à indice | Un vieux Modérateur entre deux braseros : « Le Clic doré a la main lourde, mais il rend ce qu'il prend. » |
-| Salle des Clics dorés | Trois Clics dorés, volets fermés. Le dernier tué lâche la **Manette Retour**. |
-| Salle des lames | Deux « Bloqueurs » (blocs à pointes) qui foncent quand Spirit s'aligne avec eux. |
-| Salle des gargouilles | Deux gargouilles qui crachent des projectiles. Carte au milieu. |
-| Salle du Curseur | Des mains-curseurs sortent des murs : si elles attrapent Spirit, retour au hall. Boussole au bout. |
-| Salle du bloc | Un bloc à pousser : un escalier apparaît, qui descend vers la **cave du Mégaphone** (vue de profil). |
-| Passage souterrain | Escalier caché sous un bloc d'une salle : couloir de profil qui ressort dans une salle isolée, où se trouve la grande clé. |
+| Hall | Vide, trois sorties. |
+| Combat 1 | Spamlings, grilles fermées : les tuer tous donne une clé. |
+| Salle en panne | Le courant est coupé : tout est noir, on ne voit que les yeux des Pop-ups qui s'allument quand ils approchent. Frapper le disjoncteur avec l'onde rallume la salle quelques secondes. |
+| Pages du carnet de Flash | Flash a semé des pages de son carnet de reporter en se faisant capturer. Chaque page trouvée donne un indice sur le donjon (où pousser, quel mur est creux). |
+| Salle des Clics dorés | Trois Clics dorés, grilles fermées. Le dernier tué lâche la **Manette Retour**. |
+| Salle des bandeaux | Des bannières de pub défilent d'un mur à l'autre en balayant la salle. Il faut passer entre deux passages. |
+| Salle des notifications | Deux gargouilles envoient des bulles de notification qui explosent au contact. Carte au milieu. |
+| Salle des redirections | Des fenêtres pub s'ouvrent au sol. Si Spirit marche dedans, il est « redirigé » vers le hall. Boussole au bout. |
+| Salle du bloc | Un bloc à pousser : une trappe s'ouvre sur les **Coulisses du serveur**, vues de profil, où repose le **Mégaphone**. |
+| Le Câble | Une trappe cachée sous un bloc : on descend dans une gaine de câbles, vue de profil, qui ressort dans une salle isolée où se trouve la grande clé. |
 | Mur fêlé | Visible mais impossible à ouvrir tant qu'on n'a pas les Pétards (donjon 2). Il cache un fragment de cœur. |
 | Salles de clés | Trois ou quatre salles de combat plus courtes, avec clé au coffre ou sur un monstre. |
-| Antichambre | Salle vide et silencieuse avant le boss. |
+| Antichambre | Salle vide et silencieuse avant le boss, avec la dernière page du carnet. |
 | Boss | La Reine Pop-up. |
 | Salle de Flash | Le Gardien libéré donne le fragment de Source. |
 
-La lumière (Lanterne RGB) arrive au donjon 3. Les salles sombres des donjons 1 et 2 restent jouables dans le noir, puis deviennent faciles quand on revient avec la Lanterne. C'est exactement ce que fait Zelda NES.
+Les sous-sols ne ressemblent pas au donjon : ce sont les coulisses techniques du Réseau, vues de profil. Il y a des baies de serveurs qui clignotent, des câbles épais, des échelles de maintenance et une lumière bleue froide.
 
 ## La personnalité des 8 donjons
 
