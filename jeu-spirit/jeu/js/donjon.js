@@ -742,10 +742,30 @@ Object.assign(SG.Jeu.prototype, {
       mur(0, 0, SG.W, T); mur(0, SG.H - T, SG.W, T); mur(0, 0, T, SG.H); mur(SG.W - T, 0, T, SG.H);
       ctx.fillStyle = 'rgba(0,0,0,0.35)'; ctx.fillRect(T, T, SG.W - 2 * T, 14); ctx.fillRect(T, T, 14, SG.H - 2 * T);
     }
+    // gouffres : l'image est étirée sur chaque groupe de cases de trou
+    const gf = SG.img.gouffre;
+    if (gf && gf.width) {
+      const vu = new Set();
+      const estTrou = (c, r) => S.plan[r] && (S.plan[r][c] === 'v' || S.plan[r][c] === 'X');
+      for (let r = 0; r < SG.ROWS; r++) for (let c = 0; c < SG.COLS; c++) {
+        if (S.plan[r][c] !== 'v' || vu.has(c + ',' + r)) continue;
+        let c0 = c, c1 = c, r0 = r, r1 = r;
+        const pile = [[c, r]];
+        while (pile.length) {
+          const [x, y] = pile.pop();
+          if (vu.has(x + ',' + y) || !estTrou(x, y)) continue;
+          vu.add(x + ',' + y);
+          c0 = Math.min(c0, x); c1 = Math.max(c1, x); r0 = Math.min(r0, y); r1 = Math.max(r1, y);
+          pile.push([x + 1, y], [x - 1, y], [x, y + 1], [x, y - 1]);
+        }
+        const m = 12;
+        ctx.drawImage(gf, c0 * T - m, r0 * T - m, (c1 - c0 + 1) * T + 2 * m, (r1 - r0 + 1) * T + 2 * m);
+      }
+    }
     // trous et plaques
     for (let r = 0; r < SG.ROWS; r++) for (let c = 0; c < SG.COLS; c++) {
       const ch = S.plan[r][c];
-      if (ch === 'v') {
+      if (ch === 'v' && !(gf && gf.width)) {
         ctx.fillStyle = '#05030a'; ctx.fillRect(c * T, r * T, T, T);
         const g = ctx.createLinearGradient(0, r * T, 0, r * T + 26);
         g.addColorStop(0, 'rgba(90,60,140,0.6)'); g.addColorStop(1, 'rgba(0,0,0,0)');

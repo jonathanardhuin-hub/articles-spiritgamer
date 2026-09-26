@@ -112,6 +112,7 @@ FACULTATIVES = {
     'source': ('donjon1/source.png', 'w', 64, ''),
     'flash': ('donjon1/flash.png', 'h', 120, ''),
     'porte-cle': ('donjon1/porte-cle.png', 'w', 160, ''),
+    'gouffre': ('donjon1/gouffre.png', 'w', 200, ''),
     'flash-carnet': ('donjon1/flash-carnet.png', 'h', 120, ''),
     'portrait-flash': ('donjon1/portrait-flash.png', 'h', 200, ''),
 }
