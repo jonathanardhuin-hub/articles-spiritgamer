@@ -644,6 +644,17 @@ Object.assign(SG.Jeu.prototype, {
     }
     for (const b of this.blocs) b.anim = Math.max(0, b.anim - dt * 4);
     if (s.poussePose > 0) s.poussePose -= dt;
+    // un butin ne reste jamais pris dans un objet (coffre apparu dessus, statue, bloc) : on le pousse sur la case libre la plus proche
+    for (const bt of this.butins) {
+      const c = Math.floor(bt.x / SG.T), r = Math.floor((bt.y - 10) / SG.T);
+      const libre = (cc, rr) => { const ch = this.caseSalle(cc, rr); return ch !== null && !SG.CASES_SALLE_PLEINES.has(ch); };
+      if (libre(c, r)) continue;
+      let mieux = null;
+      for (const [dc, dr] of [[0, 1], [1, 0], [-1, 0], [0, -1], [1, 1], [-1, 1], [1, -1], [-1, -1]]) {
+        if (libre(c + dc, r + dr)) { mieux = [c + dc, r + dr]; break; }
+      }
+      if (mieux) { bt.x = mieux[0] * SG.T + 40; bt.y = mieux[1] * SG.T + 50; }
+    }
     // pousser un bloc, ouvrir une porte verrouillée
     const a = C.axe();
     if (a.x || a.y) {
@@ -967,7 +978,11 @@ SG.dessinPorte = function (ctx, dir, p, ouverte, volets) {
   // repère : le mur va de y = -40 (extérieur) à y = +40 (côté salle)
   ctx.fillStyle = '#05030a';
   ctx.fillRect(-L / 2, -40, L, 80);
-  if (im && im.width) ctx.drawImage(im, -L / 2 + 6, -40, L - 12, 82);
+  if (im && im.width) {
+    // on garde les proportions du battant : on prend la bande centrale de l'image (serrure au milieu) au lieu de l'écraser
+    const w = L - 12, h = 82, sh = Math.min(im.height, im.width * h / w);
+    ctx.drawImage(im, 0, (im.height - sh) / 2, im.width, sh, -L / 2 + 6, -40, w, h);
+  }
   // montants de pierre : ombre et contour pour l'encastrer
   ctx.strokeStyle = '#0b0814'; ctx.lineWidth = 5;
   ctx.beginPath(); ctx.moveTo(-L / 2, 40); ctx.lineTo(-L / 2, -40); ctx.lineTo(L / 2, -40); ctx.lineTo(L / 2, 40); ctx.stroke();

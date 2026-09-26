@@ -188,6 +188,19 @@ SG.Jeu = class {
         if ((this.estDonjon() ? SG.CASES_SALLE_PLEINES : SG.CASES_PLEINES).has(ch)) return true;
       }
     }
+    // dehors, le feuillage des arbres déborde de leur case : personne ne passe dessous
+    if (!this.estDonjon()) {
+      const x0 = b.x - 18, x1 = b.x + b.w + 18, y0 = b.y - 8, y1 = b.y + b.h + 66;
+      for (let r = Math.floor(y0 / SG.T); r <= Math.floor((y1 - 0.01) / SG.T); r++) {
+        for (let c = Math.floor(x0 / SG.T); c <= Math.floor((x1 - 0.01) / SG.T); c++) {
+          const ch = this.caseEn(c, r);
+          if (ch !== 'T' && ch !== 'S') continue;
+          // arbres des bords gauche et droit : seulement la marge de côté (les chemins de sortie passent entre eux)
+          if (ch === 'S' && (c === 0 || c === SG.COLS - 1) && (r * SG.T >= b.y + b.h || (r + 1) * SG.T <= b.y)) continue;
+          return true;
+        }
+      }
+    }
     for (const p of this.pnj) if (SG.boitesSeTouchent(b, SG.boitePieds(p))) return true;
     return false;
   }
@@ -739,6 +752,8 @@ SG.Jeu = class {
     ctx.restore();
     for (const p of this.projectiles) p.dessiner(ctx);
     for (const e of this.effets) e.dessiner(ctx);
+    // la distorsion de l'onde part de Spirit : on le redessine par-dessus pour qu'elle ne lui efface pas la tête
+    if (this.spirit && !this.cacherSpirit && this.spirit.attaque > 0) this.spirit.dessiner(ctx);
     if (this.ecran === 'grotte') this.dessinerLumiereGrotte(ctx);
     else if (this.estDonjon()) {
       const g = ctx.createRadialGradient(640, 360, 300, 640, 360, 800);
