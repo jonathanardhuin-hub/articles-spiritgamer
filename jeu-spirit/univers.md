@@ -21,7 +21,7 @@ Petit personnage blanc à grosse tête ronde, grands yeux bleus, casque-micro no
 ## Règles du monde
 
 - **Attaque** : Spirit lance une onde sonore avec son micro, à courte portée. Quand ses cœurs sont pleins, l'onde part plus loin (comme le rayon de l'épée dans Zelda). Le micro s'améliore deux fois : Micro Pro, puis Micro d'Or.
-- **Ennemis touchés** : ils ne meurent pas. Ils éclatent en confettis, parfois en laissant tomber un objet. Aucun sang, aucune blessure visible.
+- **Ennemis vaincus** : ils se dissipent en fumée noire et violette avec quelques étincelles, parfois en laissant tomber un objet. Aucun sang, aucune blessure visible.
 - **Vie** : des cœurs. Chaque Gardien libéré donne un cœur de plus. Des fragments de cœur sont cachés dans le monde (4 fragments = 1 cœur).
 - **Monnaie** : les Pixels.
 - **Voyage rapide** : des bornes Wi-Fi à activer dans chaque région.
@@ -48,20 +48,20 @@ L'ordre est celui de la progression principale. L'objet de chaque donjon ouvre l
 
 Deux familles, comme dans Zelda où les ennemis du monde extérieur ne sont pas ceux des donjons.
 
-**Dans le monde extérieur : des créatures ensorcelées.** Le bruit du Roi Clickbait a rendu agressives les bêtes du Réseau. Un nuage violet flotte autour d'elles (dessiné dans le code). Touchées par l'onde de Spirit, elles sont libérées : le nuage éclate en confettis et la bête s'enfuit hors de l'écran.
+**Dans le monde extérieur : les monstres du Bruit.** Le Roi Clickbait a donné corps à la rumeur et au vacarme : des monstres inventés, faits de pierre sombre, de ferraille ou de matière gluante, parcourus de fissures d'où filtre une lueur violette, avec des yeux lumineux. Style toon (contours épais, formes franches), mais une vraie présence menaçante, comme les monstres des Zelda en cel-shading. Aucun animal réel.
 
-| Région | Créatures |
+| Région | Monstres |
 |---|---|
-| Plaine des Pixels | Gloups (gelées qui sautillent et se divisent en deux), Taupikos (taupes qui surgissent du sol, lancent un caillou et replongent), Bourdons (foncent en ligne droite) |
-| Forêt des Forums | Champignons grognons (chargent), Gobelinots au lance-pierre, Araignées pendues à leur fil |
-| Monts Hardware | Rochelets (petits golems qui roulent), Chauves-souris, Bouquetins qui chargent |
-| Désert du Lag | Scarabées dorés, Cactus sauteurs, Serpents des sables qui surgissent du sol |
-| Lac des Streams | Grenouilles cracheuses d'eau, Poissons sauteurs, Crabes |
-| Cité des Bulles | Pigeons qui piquent, Chats de gouttière agiles, Rats à roulettes |
-| Marais Rétro | Gelées violettes, Moustiques, Crapauds sauteurs |
-| Toundra du Cloud | Pingouins glisseurs, Petits yétis, Loups des neiges |
+| Plaine des Pixels | Grésilles (masses gluantes qui sautent et se divisent), Cornus (brutes masquées qui lancent des lances), Crache-pierres (reptiles à carapace qui crachent des pierres) |
+| Forêt des Forums | Sylvains corrompus (arbres qui marchent), Traqueurs (archers encapuchonnés), Chauves-ombres |
+| Monts Hardware | Golems de ferraille, Harpies de fer, Rouilleurs (se roulent en boule) |
+| Désert du Lag | Spectres du Lag (se téléportent), Ensablés (surgissent du sable), Scorpions de verre |
+| Lac des Streams | Tritons à trident, Méduses électriques, Crabes-armures |
+| Cité des Bulles | Ombres d'encre, Gargouilles, Masques volants |
+| Marais Rétro | Feux follets, Sorciers des marais, Carapaces à pointes |
+| Toundra du Cloud | Chevaliers de givre, Loups de glace spectraux, Colosses de pierre |
 
-**Dans les donjons : les sbires numériques du Clickbait.** Ils éclatent en confettis quand l'onde les touche.
+**Dans les donjons : les sbires numériques du Clickbait.** Même ton que les monstres extérieurs : inquiétants, pas rigolos. Les premières versions du Pop-up, du Spamling et du Clic sont trop gags et seront redessinées en phase 2.
 
 | Donjon | Sbires |
 |---|---|
