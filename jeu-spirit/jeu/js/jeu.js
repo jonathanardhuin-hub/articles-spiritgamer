@@ -553,6 +553,12 @@ SG.Jeu = class {
     if (this.spirit) liste.push(this.spirit);
     liste.sort((a, b) => a.y - b.y);
     for (const o of liste) o.dessiner(ctx);
+    // silhouettes par-dessus le décor : Spirit et les monstres restent visibles derrière les arbres
+    ctx.save();
+    ctx.globalAlpha = 0.38;
+    for (const m of this.monstres) if (!m.apparition || m.apparition <= 0) m.dessiner(ctx);
+    if (this.spirit) { ctx.globalAlpha = 0.5; this.spirit.dessiner(ctx); }
+    ctx.restore();
     for (const p of this.projectiles) p.dessiner(ctx);
     for (const e of this.effets) e.dessiner(ctx);
     if (this.ecran === 'grotte') this.dessinerLumiereGrotte(ctx);
@@ -584,7 +590,7 @@ SG.Jeu = class {
         let im = null, dx = 0, dy = 0, retourne = graine % 2 === 0;
         switch (ch) {
           case 'T': im = I.arbre; dy = 6; break;
-          case 'S': im = I['arbre-sombre']; dy = 10; dx = (graine - 3) * 3; break;
+          case 'S': im = I['arbre-sombre']; dy = r === SG.ROWS - 1 ? 45 : 10; dx = (graine - 3) * 3; break;
           case 'b': im = I.buisson; dy = -4; break;
           case 'h': im = I.herbes; dy = -8; break;
           case 'r': im = I.rocher; dy = -6; break;
