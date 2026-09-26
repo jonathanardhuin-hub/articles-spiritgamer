@@ -103,7 +103,7 @@ FACULTATIVES = {
     'coffre-ouvert': ('donjon1/coffre-ouvert.png', 'w', 78, ''),
     'cristal': ('donjon1/cristal.png', 'h', 96, ''),
     'cristal-actif': ('donjon1/cristal-actif.png', 'h', 96, ''),
-    'entree-terrier': ('donjon1/entree-terrier.png', 'w', 560, ''),
+    'entree-terrier': ('donjon1/entree-terrier.png', 'w', 1160, ''),
     'manette': ('donjon1/manette.png', 'w', 70, ''),
     'cle': ('donjon1/cle.png', 'w', 60, ''),
     'cle-boss': ('donjon1/cle-boss.png', 'w', 70, ''),

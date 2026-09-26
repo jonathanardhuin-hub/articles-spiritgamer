@@ -123,8 +123,8 @@ SG.MONDE = {
   '0,0': {
     nom: 'Le Bois aux Grésilles',
     carte: [
-      'SSSSSSSSSSSSSSSS',
-      'S...b.ggDgg....S',
+      'SggggggggggggggS',
+      'SgggggggDggggggS',
       'S..h....:......S',
       'S.T....h:..b...S',
       'S......T::::::::',

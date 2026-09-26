@@ -746,7 +746,13 @@ SG.Jeu = class {
           case 'P': im = I.panneau; dy = -6; retourne = false; break;
           case 'M': if (this.caseEn(c - 1, r) !== 'M') { im = I['amas-rochers']; dx = 40; dy = 4; } break;
           case 'E': im = I['falaise-grotte']; dy = 2; retourne = false; break;
-          case 'D': im = I['entree-terrier'] && I['entree-terrier'].width ? I['entree-terrier'] : I['falaise-grotte']; dy = 14; retourne = false; break;
+          case 'D':
+            if (I['entree-terrier'] && I['entree-terrier'].width) {
+              // la paroi du terrier remplace la lisière d'arbres sur toute la largeur de l'écran
+              const ter = I['entree-terrier'];
+              liste.push({ y: y + 10, dessiner: (ctx) => SG.dessinerPied(ctx, ter, 680, y + 12, { sy: 0.78 }) });
+            } else { im = I['falaise-grotte']; dy = 14; retourne = false; }
+            break;
           case 'X': liste.push({ y, dessiner: (ctx) => SG.dessinCristal(ctx, x, y, this.barriere, this.t) }); break;
           case 'G': liste.push({ y: y + 30, dessiner: (ctx) => SG.dessinBarriere(ctx, x, y, this.t) }); break;
         }
