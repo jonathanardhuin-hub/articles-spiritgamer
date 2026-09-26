@@ -88,6 +88,7 @@ SG.Jeu = class {
     this.effets = []; this.projectiles = []; this.butins = []; this.monstres = []; this.pnj = [];
     if (cle === 'grotte') {
       this.pnj.push(new SG.Ermite(SG.GROTTE.ermite.x, SG.GROTTE.ermite.y));
+      this.feux = [new SG.Feu(641, 352, 1.6), new SG.Feu(436, 88, 0.8), new SG.Feu(838, 88, 0.8)];
       SG.Son.jouerMusique('grotte');
       return;
     }
@@ -161,14 +162,15 @@ SG.Jeu = class {
 
   collisionGrotte(b) {
     const G = SG.GROTTE;
-    const coins = [[b.x, b.y], [b.x + b.w, b.y], [b.x, b.y + b.h], [b.x + b.w, b.y + b.h]];
-    for (const [x, y] of coins) {
-      const dx = (x - G.sol.cx) / G.sol.rx, dy = (y - G.sol.cy) / G.sol.ry;
-      const dansSol = dx * dx + dy * dy <= 1;
-      const k = G.couloir;
-      const dansCouloir = x >= k.x && x <= k.x + k.w && y >= k.y && y <= k.y + k.h;
-      if (!dansSol && !dansCouloir) return true;
-    }
+    const dedans = (x, y) => {
+      let ok = false;
+      for (let i = 0, j = G.sol.length - 1; i < G.sol.length; j = i++) {
+        const [xi, yi] = G.sol[i], [xj, yj] = G.sol[j];
+        if ((yi > y) !== (yj > y) && x < (xj - xi) * (y - yi) / (yj - yi) + xi) ok = !ok;
+      }
+      return ok;
+    };
+    for (const [x, y] of [[b.x, b.y], [b.x + b.w, b.y], [b.x, b.y + b.h], [b.x + b.w, b.y + b.h]]) if (!dedans(x, y)) return true;
     for (const c of G.cercles) {
       const px = SG.clamp(c.x, b.x, b.x + b.w), py = SG.clamp(c.y, b.y, b.y + b.h);
       if (Math.hypot(px - c.x, py - c.y) < c.r) return true;
@@ -322,8 +324,8 @@ SG.Jeu = class {
       case 'mode': this.majMode(C, clics); break;
       case 'intro': this.majIntro(dt, C, clics); break;
       case 'jeu': this.majJeu(dt, C); break;
-      case 'dialogue': this.majDialogue(dt, C, clics); break;
-      case 'objet': this.objet.t += dt; if (this.objet.t > 0.8) this.majDialogue(dt, C, clics); break;
+      case 'dialogue': this.majFeux(dt); this.majDialogue(dt, C, clics); break;
+      case 'objet': this.majFeux(dt); this.objet.t += dt; if (this.objet.t > 0.8) this.majDialogue(dt, C, clics); break;
       case 'pause': this.majPause(C, clics); break;
       case 'transition': this.majTransition(dt); break;
       case 'finPartie': this.majFin(dt, C, clics); break;
@@ -349,6 +351,7 @@ SG.Jeu = class {
     for (const e of this.effets) e.maj(this, dt);
     this.effets = this.effets.filter((e) => !e.fini);
     for (const p of this.pnj) p.maj(this, dt);
+    if (this.ecran === 'grotte' && this.feux) for (const f of this.feux) f.maj(dt);
     if (this.etat !== 'jeu') return;
 
     // sorties d'écran et grotte
@@ -373,6 +376,8 @@ SG.Jeu = class {
     else if (s.y > SG.H - 2 && this.voisin('bas')) this.glisserVers('bas');
     else { s.x = SG.clamp(s.x, s.pw / 2, SG.W - s.pw / 2); s.y = SG.clamp(s.y, s.ph, SG.H); }
   }
+
+  majFeux(dt) { if (this.ecran === 'grotte' && this.feux) for (const f of this.feux) f.maj(dt); }
 
   majTransition(dt) {
     const tr = this.transition;
@@ -554,16 +559,7 @@ SG.Jeu = class {
   }
 
   dessinerFlammes(ctx) {
-    // léger scintillement de la lumière des feux
-    ctx.save();
-    ctx.globalCompositeOperation = 'lighter';
-    for (const [x, y, r] of [[641, 330, 120], [434, 70, 70], [838, 70, 70]]) {
-      const a = 0.12 + Math.sin(this.t * 9 + x) * 0.04 + Math.random() * 0.03;
-      const g = ctx.createRadialGradient(x, y, 0, x, y, r);
-      g.addColorStop(0, `rgba(255,170,60,${a})`); g.addColorStop(1, 'rgba(255,120,30,0)');
-      ctx.fillStyle = g; ctx.fillRect(x - r, y - r, r * 2, r * 2);
-    }
-    ctx.restore();
+    if (this.feux) for (const f of this.feux) f.dessiner(ctx);
   }
 
   dessinerLumiereGrotte(ctx) {
@@ -663,8 +659,71 @@ SG.Jeu = class {
         ctx.restore();
       }
     };
-    tache(':', '#6b4a2b', '#d9b77a', '#b8925a');
+    // chemin : bord sombre, bande creusée, centre plus clair, puis cailloux et fissures
+    tache(':', '#4a3120', '#b98d55', null);
+    const cheminCases = [];
+    for (let r = 0; r < SG.ROWS; r++) for (let c = 0; c < SG.COLS; c++) if (e.carte[r][c] === ':') cheminCases.push([c, r]);
+    const estChemin = (c, r) => {
+      const cc = SG.clamp(c, 0, SG.COLS - 1), rr = SG.clamp(r, 0, SG.ROWS - 1);
+      return e.carte[rr][cc] === ':';
+    };
+    const centre = (marge, couleur) => {
+      ctx.fillStyle = couleur;
+      for (const [c, r] of cheminCases) {
+        const x = c * T, y = r * T, m = 8 + marge;
+        ctx.beginPath(); ctx.roundRect(x + m, y + m, T - m * 2, T - m * 2, Math.max(8, 26 - marge)); ctx.fill();
+        if (estChemin(c + 1, r)) ctx.fillRect(x + 40, y + m, T, T - m * 2);
+        if (estChemin(c, r + 1)) ctx.fillRect(x + m, y + 40, T - m * 2, T);
+        if (estChemin(c - 1, r)) ctx.fillRect(x - 40, y + m, T, T - m * 2);
+        if (estChemin(c, r - 1)) ctx.fillRect(x + m, y - 40, T - m * 2, T);
+      }
+    };
+    centre(7, '#d2a867');
+    // taches et traces de roues
+    ctx.save();
+    for (const [c, r] of cheminCases) {
+      for (let i = 0; i < 3; i++) {
+        ctx.fillStyle = alea() < 0.5 ? 'rgba(150,105,55,0.35)' : 'rgba(245,215,150,0.45)';
+        ctx.beginPath(); ctx.ellipse(c * T + 12 + alea() * 56, r * T + 12 + alea() * 56, 5 + alea() * 12, 3 + alea() * 6, alea() * 3, 0, Math.PI * 2); ctx.fill();
+      }
+      if (alea() < 0.35) {
+        ctx.strokeStyle = 'rgba(90,60,30,0.55)'; ctx.lineWidth = 2; ctx.lineCap = 'round';
+        const x = c * T + 20 + alea() * 40, y = r * T + 20 + alea() * 40;
+        ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + 8, y + 5); ctx.lineTo(x + 13, y + 2); ctx.lineTo(x + 20, y + 8); ctx.stroke();
+      }
+    }
+    // cailloux avec contour, ombre et reflet
+    for (const [c, r] of cheminCases) {
+      const n = 1 + Math.floor(alea() * 3);
+      for (let i = 0; i < n; i++) {
+        const x = c * T + 14 + alea() * 52, y = r * T + 14 + alea() * 52, w = 4 + alea() * 6, h = w * (0.6 + alea() * 0.3);
+        ctx.fillStyle = 'rgba(70,45,20,0.35)';
+        ctx.beginPath(); ctx.ellipse(x + 1.5, y + 2.5, w, h, 0, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = SG.choisir(['#9c8f86', '#b3a597', '#8a7b70']);
+        ctx.strokeStyle = '#2a1d14'; ctx.lineWidth = 1.8;
+        ctx.beginPath(); ctx.ellipse(x, y, w, h, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+        ctx.fillStyle = 'rgba(255,255,255,0.45)';
+        ctx.beginPath(); ctx.ellipse(x - w * 0.3, y - h * 0.35, w * 0.35, h * 0.25, 0, 0, Math.PI * 2); ctx.fill();
+      }
+    }
+    ctx.restore();
     tache('~', '#123a6b', '#3b8fe0', '#a8e2ff');
+    // brins d'herbe qui débordent sur le bord des chemins
+    for (let r = 0; r < SG.ROWS; r++) {
+      for (let c = 0; c < SG.COLS; c++) {
+        if (e.carte[r][c] !== ':') continue;
+        const bords = [[0, -1, 40, 4], [0, 1, 40, 76], [-1, 0, 4, 40], [1, 0, 76, 40]];
+        for (const [dc, dr, bx, by] of bords) {
+          const cc = c + dc, rr = r + dr;
+          if (cc < 0 || rr < 0 || cc >= SG.COLS || rr >= SG.ROWS || e.carte[rr][cc] === ':') continue;
+          for (let i = 0; i < 2; i++) {
+            const x = c * T + bx + (dr ? (alea() - 0.5) * 60 : 0), y = r * T + by + (dc ? (alea() - 0.5) * 60 : 0);
+            ctx.strokeStyle = '#3f9a3a'; ctx.lineWidth = 3; ctx.lineCap = 'round';
+            ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x - 3 + dc * 6, y - 8 + dr * 6); ctx.moveTo(x + 4, y); ctx.lineTo(x + 6 + dc * 6, y - 9 + dr * 6); ctx.stroke();
+          }
+        }
+      }
+    }
     // fleurs
     for (let r = 0; r < SG.ROWS; r++) {
       for (let c = 0; c < SG.COLS; c++) {
@@ -709,18 +768,31 @@ SG.Jeu = class {
 
   dessinerObjetBrandi(ctx) {
     const s = this.spirit, o = this.objet;
-    const x = s.x, y = s.y - 185;
+    const x = s.x, y = s.y - 158;
+    const u = SG.clamp(o.t / 0.5, 0, 1);
     ctx.save();
-    ctx.translate(x, y);
     ctx.globalCompositeOperation = 'lighter';
-    for (let i = 0; i < 10; i++) {
-      ctx.rotate(Math.PI / 5 + o.t * 0.1);
-      ctx.fillStyle = 'rgba(120,230,255,0.10)';
-      ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(-22, -180); ctx.lineTo(22, -180); ctx.closePath(); ctx.fill();
+    const g = ctx.createRadialGradient(x, y, 0, x, y, 90);
+    g.addColorStop(0, `rgba(160,240,255,${0.45 * u})`);
+    g.addColorStop(0.5, `rgba(60,170,255,${0.18 * u})`);
+    g.addColorStop(1, 'rgba(0,80,200,0)');
+    ctx.fillStyle = g; ctx.fillRect(x - 90, y - 90, 180, 180);
+    // étincelles en forme d'étoile qui tournent autour de l'objet
+    for (let i = 0; i < 7; i++) {
+      const a = i / 7 * Math.PI * 2 + o.t * 1.2;
+      const r = 50 + Math.sin(o.t * 3 + i) * 10;
+      const px = x + Math.cos(a) * r, py = y + Math.sin(a) * r * 0.7;
+      const b = (Math.sin(o.t * 6 + i * 1.7) + 1) / 2;
+      const t = 4 + b * 7;
+      ctx.fillStyle = `rgba(220,250,255,${(0.3 + b * 0.7) * u})`;
+      ctx.beginPath();
+      ctx.moveTo(px, py - t); ctx.quadraticCurveTo(px, py, px + t, py); ctx.quadraticCurveTo(px, py, px, py + t);
+      ctx.quadraticCurveTo(px, py, px - t, py); ctx.quadraticCurveTo(px, py, px, py - t); ctx.fill();
     }
     ctx.restore();
-    if (o.type === 'ampli') SG.dessinerPied(ctx, SG.img.ampli, x, y + 28, { echelle: 1.1 });
-    else SG.dessinerButin(ctx, o.type, x, y + 10, 1.3);
+    const flotte = Math.sin(o.t * 3) * 3;
+    if (o.type === 'ampli') SG.dessinerPied(ctx, SG.img.ampli, x, y + 28 + flotte, { echelle: 1.1 });
+    else SG.dessinerButin(ctx, o.type, x, y + 10 + flotte, 1.3);
   }
 
   dessinerDialogue(ctx) {

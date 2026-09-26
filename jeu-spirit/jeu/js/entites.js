@@ -40,7 +40,7 @@ SG.Spirit = class {
     this.brandit = false;
   }
 
-  corps() { return { x: this.x - 24, y: this.y - 72, w: 48, h: 70 }; }
+  corps() { return { x: this.x - 21, y: this.y - 62, w: 42, h: 60 }; }
 
   maj(jeu, dt) {
     const C = SG.Commandes;
@@ -124,7 +124,7 @@ SG.Spirit = class {
     if (this.invincible > 0 && Math.floor(this.invincible * 16) % 2 === 0) return;
     const pas = Math.floor(this.tempsMarche * 8) % 4;
     const saut = this.bouge && pas % 2 === 1 ? -3 : 0;
-    SG.ombre(ctx, this.x, this.y, 30);
+    SG.ombre(ctx, this.x, this.y, 26);
     SG.dessinerPied(ctx, this.image(), this.x, this.y + saut, { retourne: this.dir === 'gauche' && !this.brandit });
   }
 };
@@ -214,8 +214,8 @@ SG.Gresille = class extends SG.Monstre {
     this.petite = !!petite;
     this.echelle = petite ? 0.62 : 1;
     this.pv = petite ? 1 : 2;
-    this.cw = 70 * this.echelle; this.ch = 50 * this.echelle;
-    this.pw = 56 * this.echelle; this.ph = 26 * this.echelle;
+    this.cw = 56 * this.echelle; this.ch = 40 * this.echelle;
+    this.pw = 46 * this.echelle; this.ph = 22 * this.echelle;
     this.degatsContact = 2;
     this.phase = 'repos';
     this.tPhase = SG.hasard(0.3, 1.2);
@@ -237,7 +237,7 @@ SG.Gresille = class extends SG.Monstre {
       this.phase = 'saut'; this.tPhase = 0.5;
     } else if (this.phase === 'saut') {
       const u = 1 - this.tPhase / 0.5;
-      this.h = Math.sin(Math.PI * SG.clamp(u, 0, 1)) * 46 * this.echelle;
+      this.h = Math.sin(Math.PI * SG.clamp(u, 0, 1)) * 38 * this.echelle;
       SG.deplacer(jeu, this, this.saut.vx * dt, this.saut.vy * dt);
       if (this.tPhase <= 0) { this.phase = 'atterrit'; this.tPhase = 0.18; this.h = 0; }
     } else if (this.phase === 'atterrit' && this.tPhase <= 0) {
@@ -265,7 +265,7 @@ SG.Gresille = class extends SG.Monstre {
     else if (this.phase === 'saut') { sy = 1 + 0.16 * Math.sin(Math.PI * (1 - this.tPhase / 0.5)); }
     else { sy = 1 + 0.03 * Math.sin(this.t * 5); }
     sx = 1 / Math.sqrt(sy);
-    SG.ombre(ctx, this.x, this.y, 34 * this.echelle * (1 - this.h / 140), 0.25);
+    SG.ombre(ctx, this.x, this.y, 28 * this.echelle * (1 - this.h / 120), 0.25);
     this.dessinerFlash(ctx, () => SG.dessinerPied(ctx, SG.img.gresille, this.x, this.y - this.h, { echelle: this.echelle, sx, sy }));
   }
 };
@@ -275,7 +275,7 @@ SG.Cornu = class extends SG.Monstre {
   constructor(x, y) {
     super('cornu', x, y);
     this.pv = 4;
-    this.cw = 64; this.ch = 125;
+    this.cw = 55; this.ch = 106;
     this.pw = 50; this.ph = 26;
     this.degatsContact = 4;
     this.tDir = SG.hasard(0.8, 2);
@@ -341,8 +341,8 @@ SG.CrachePierres = class extends SG.Monstre {
   constructor(x, y) {
     super('crache', x, y);
     this.pv = 3;
-    this.cw = 90; this.ch = 75;
-    this.pw = 70; this.ph = 28;
+    this.cw = 75; this.ch = 62;
+    this.pw = 58; this.ph = 24;
     this.degatsContact = 4;
     this.vitesse = 55;
     this.tDir = SG.hasard(1, 2.5);
@@ -357,7 +357,7 @@ SG.CrachePierres = class extends SG.Monstre {
       this.prepare -= dt;
       if (this.prepare <= 0) {
         const d = SG.DIRS[this.dir];
-        const bouche = this.dir === 'bas' ? { x: 0, y: -30 } : this.dir === 'haut' ? { x: 0, y: -50 } : { x: d.x * 58, y: -52 };
+        const bouche = this.dir === 'bas' ? { x: 0, y: -25 } : this.dir === 'haut' ? { x: 0, y: -42 } : { x: d.x * 48, y: -43 };
         jeu.projectiles.push(new SG.Pierre(this.x + bouche.x, this.y + bouche.y, this.dir));
         SG.Son.effet('crache');
         this.tir = SG.hasard(1.8, 3.2);
@@ -394,7 +394,7 @@ SG.CrachePierres = class extends SG.Monstre {
     if (this.apparition > 0) { this.dessinerApparition(ctx); return; }
     let sy = 1;
     if (this.prepare > 0) sy = 1 + 0.08 * Math.sin((0.5 - this.prepare) / 0.5 * Math.PI); // il gonfle avant de cracher
-    SG.ombre(ctx, this.x, this.y, 48);
+    SG.ombre(ctx, this.x, this.y, 40);
     this.dessinerFlash(ctx, () => SG.dessinerPied(ctx, this.image(), this.x, this.y, { retourne: this.dir === 'gauche', sy, sx: 2 - sy }));
   }
 };
@@ -697,6 +697,47 @@ SG.dessinerButin = function (ctx, type, x, y, echelle) {
     ctx.save();
     ctx.translate(x, y);
     SG.dessinerCoeur(ctx, 0, 0, 40 * echelle, 0.25);
+    ctx.restore();
+  }
+};
+
+// flammes animées posées sur les feux de la grotte
+SG.Feu = class {
+  constructor(x, y, taille) { this.x = x; this.y = y; this.taille = taille; this.p = []; this.t = Math.random() * 10; }
+  maj(dt) {
+    this.t += dt;
+    const n = this.taille > 1 ? 3 : 1;
+    for (let i = 0; i < n; i++) {
+      if (Math.random() < 0.5) this.p.push({
+        x: SG.hasard(-14, 14) * this.taille, y: 0, vx: SG.hasard(-10, 10), vy: -SG.hasard(40, 90) * this.taille,
+        vie: 0, duree: SG.hasard(0.3, 0.6), r: SG.hasard(4, 8) * this.taille,
+      });
+    }
+    if (Math.random() < 0.08 * this.taille) this.p.push({ x: SG.hasard(-8, 8), y: 0, vx: SG.hasard(-30, 30), vy: -SG.hasard(90, 160), vie: 0, duree: SG.hasard(0.8, 1.4), r: 2.5, braise: true });
+    for (const q of this.p) { q.vie += dt; q.x += (q.vx + Math.sin(this.t * 7 + q.y * 0.05) * 12) * dt; q.y += q.vy * dt; }
+    this.p = this.p.filter((q) => q.vie < q.duree);
+  }
+  dessiner(ctx) {
+    ctx.save();
+    ctx.globalCompositeOperation = 'lighter';
+    // lueur qui respire
+    const a = 0.16 + Math.sin(this.t * 11) * 0.03 + Math.sin(this.t * 17) * 0.02;
+    const R = 90 * this.taille;
+    const g = ctx.createRadialGradient(this.x, this.y - 10, 0, this.x, this.y - 10, R);
+    g.addColorStop(0, `rgba(255,170,70,${a})`); g.addColorStop(1, 'rgba(255,100,20,0)');
+    ctx.fillStyle = g; ctx.fillRect(this.x - R, this.y - 10 - R, R * 2, R * 2);
+    for (const q of this.p) {
+      const u = q.vie / q.duree;
+      if (q.braise) {
+        ctx.fillStyle = `rgba(255,200,90,${1 - u})`;
+        ctx.fillRect(this.x + q.x - 1.5, this.y + q.y - 1.5, 3, 3);
+        continue;
+      }
+      const r = q.r * (1 - u * 0.7);
+      const c = u < 0.3 ? [255, 200, 90] : u < 0.6 ? [255, 130, 30] : [200, 60, 20];
+      ctx.fillStyle = `rgba(${c[0]},${c[1]},${c[2]},${0.32 * (1 - u)})`;
+      ctx.beginPath(); ctx.arc(this.x + q.x, this.y + q.y, r, 0, Math.PI * 2); ctx.fill();
+    }
     ctx.restore();
   }
 };

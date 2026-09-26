@@ -71,7 +71,7 @@ SG.MONDE = {
       'ST.......::...TS',
       'SSSSSSSSS::SSSSS',
     ],
-    ennemis: [['gresille', 4, 6], ['gresille', 12, 2], ['cornu', 6, 2]],
+    ennemis: [['gresille', 4, 6], ['gresille', 12, 2], ['crache', 6, 2]],
   },
   '0,1': {
     nom: 'La Lisière',
@@ -86,7 +86,7 @@ SG.MONDE = {
       'SSS..,.......SSS',
       'SSSSSSSSSSSSSSSS',
     ],
-    ennemis: [['cornu', 3, 3], ['cornu', 9, 6]],
+    ennemis: [['gresille', 3, 3], ['gresille', 9, 6], ['crache', 8, 2]],
     secrets: { '10,2': 'pixels5' },
   },
   '2,1': {
@@ -117,7 +117,7 @@ SG.MONDE = {
       'ST.......::...TS',
       'SSSSSSSSS::SSSSS',
     ],
-    ennemis: [['cornu', 4, 6], ['gresille', 12, 2], ['gresille', 13, 6]],
+    ennemis: [['crache', 4, 6], ['gresille', 12, 2], ['gresille', 13, 6]],
     panneaux: { '7,2': 'Route de la Forêt des Forums. Des éboulis bloquent le passage. Il faudra trouver un moyen de les faire sauter.' },
   },
   '0,0': {
@@ -149,7 +149,7 @@ SG.MONDE = {
       'Sr....b.....rr.S',
       'SSSSSSSSSSSSSSSS',
     ],
-    ennemis: [['cornu', 11, 3], ['crache', 5, 6]],
+    ennemis: [['gresille', 11, 3], ['gresille', 9, 5], ['crache', 5, 6]],
     secrets: { '14,3': 'pixels5' },
   },
 };
@@ -158,15 +158,15 @@ SG.ECRAN_DEPART = '1,2';
 SG.DEPART = { x: 7.5 * SG.T, y: 5.8 * SG.T };
 SG.SORTIE_GROTTE = { ecran: '1,2', x: 3.5 * SG.T, y: 2.7 * SG.T };
 
-// La grotte : image de fond et zone où l'on peut marcher (ellipse), obstacles en cercles et rectangles
+// La grotte : image de fond, contour du sol où l'on peut marcher (relevé sur l'image), obstacles
 SG.GROTTE = {
-  sol: { cx: 655, cy: 355, rx: 515, ry: 200 },
-  couloir: { x: 560, y: 480, w: 150, h: 260 }, // l'escalier de sortie, en bas
-  cercles: [{ x: 641, y: 362, r: 58 }],       // le feu de camp
-  rects: [
-    { x: 100, y: 170, w: 200, h: 170 },         // les caisses
-    { x: 1060, y: 330, w: 95, h: 100 },         // le tonneau
+  sol: [
+    [330, 215], [410, 178], [870, 178], [955, 212], [1035, 268], [1055, 330], [1052, 440], [995, 470],
+    [900, 495], [720, 545], [716, 730], [558, 730], [558, 545], [500, 507], [360, 497], [250, 482],
+    [165, 445], [118, 392], [112, 345], [300, 345], [300, 215],
   ],
+  cercles: [{ x: 635, y: 385, r: 64 }],       // le feu de camp
+  rects: [],
   ermite: { x: 640, y: 222 },
   entree: { x: 636, y: 640 },
 };
