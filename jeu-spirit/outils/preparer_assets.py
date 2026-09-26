@@ -70,6 +70,14 @@ LISTE = {
     'fx-etincelle': ('effets/etincelle.webp', 'w', 90, ''),
     'fx-onde-proche': ('effets/onde-proche.webp', 'w', 150, ''),
     'fx-onde-loin': ('effets/onde-loin.webp', 'w', 140, ''),
+    # Interface
+    'ui-dialogue': ('interface/cadre-dialogue.png', 'w', 960, ''),
+    'ui-portrait': ('interface/cadre-portrait.png', 'w', 540, ''),
+    'ui-panneau': ('interface/panneau.png', 'w', 800, ''),
+    'ui-bouton': ('interface/bouton.png', 'w', 840, ''),
+    'ui-bouton-actif': ('interface/bouton-actif.png', 'w', 880, ''),
+    'ui-parchemin': ('interface/parchemin.png', 'w', 810, ''),
+    'logo': ('interface/logo.png', 'w', 780, ''),
 }
 
 def main():

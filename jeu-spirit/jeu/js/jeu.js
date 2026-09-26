@@ -43,7 +43,7 @@ SG.Jeu = class {
       mode: this.mode, vieMax: this.vieMax, pixels: this.pixels, ampli: this.ampli,
       fragments: this.fragments, secrets: [...this.secretsPris], ecran: this.ecran === 'grotte' ? SG.SORTIE_GROTTE.ecran : this.ecran,
       x: this.ecran === 'grotte' ? SG.SORTIE_GROTTE.x : this.spirit.x, y: this.ecran === 'grotte' ? SG.SORTIE_GROTTE.y : this.spirit.y,
-      ermiteVu: this.ermiteVu,
+      ermiteVu: this.ermiteVu, visites: [...(this.visites || [])],
     };
     try { localStorage.setItem('spirit-sauvegarde', JSON.stringify(s)); } catch (e) { /* stockage indisponible */ }
   }
@@ -54,6 +54,7 @@ SG.Jeu = class {
     this.pixels = 0; this.ampli = false; this.fragments = 0;
     this.secretsPris = new Set();
     this.ermiteVu = 0;
+    this.visites = new Set();
     this.spirit = new SG.Spirit(SG.DEPART.x, SG.DEPART.y);
     this.spirit.dir = 'haut';
     this.entrerEcran(SG.ECRAN_DEPART);
@@ -65,6 +66,7 @@ SG.Jeu = class {
     this.pixels = s.pixels; this.ampli = s.ampli; this.fragments = s.fragments;
     this.secretsPris = new Set(s.secrets || []);
     this.ermiteVu = s.ermiteVu || 0;
+    this.visites = new Set(s.visites || []);
     this.spirit = new SG.Spirit(s.x, s.y);
     this.entrerEcran(SG.MONDE[s.ecran] ? s.ecran : SG.ECRAN_DEPART);
     this.etat = 'jeu';
@@ -84,6 +86,7 @@ SG.Jeu = class {
   // ------------------------------------------------------------ écrans
   entrerEcran(cle) {
     this.ecran = cle;
+    if (cle !== 'grotte') { if (!this.visites) this.visites = new Set(); this.visites.add(cle); }
     this.coupes = new Set();
     this.effets = []; this.projectiles = []; this.butins = []; this.monstres = []; this.pnj = [];
     if (cle === 'grotte') {
@@ -438,7 +441,7 @@ SG.Jeu = class {
 
   majTitre(C, clics) {
     const opts = this.optionsTitre();
-    const zones = opts.map((_, i) => ({ x: 440, y: 470 + i * 62 - 30, w: 400, h: 56 }));
+    const zones = opts.map((_, i) => ({ x: 450, y: 440 + i * 80 - 34, w: 380, h: 68 }));
     const choix = this.choixMenu(C, clics, opts.length, zones);
     if (choix < 0) return;
     const o = opts[choix];
@@ -474,7 +477,7 @@ SG.Jeu = class {
 
   majPause(C, clics) {
     const opts = ['Reprendre', SG.Son.muet ? 'Activer le son' : 'Couper le son', 'Plein écran', 'Retour au titre'];
-    const zones = opts.map((_, i) => ({ x: 740, y: 250 + i * 70 - 32, w: 420, h: 60 }));
+    const zones = opts.map((_, i) => ({ x: 860, y: 190 + i * 88 - 34, w: 330, h: 68 }));
     if (C.appuis.menu && clics.length === 0) { this.etat = 'jeu'; return; }
     const choix = this.choixMenu({ appuis: { ...C.appuis, menu: false } }, clics, opts.length, zones);
     if (choix < 0) return;
@@ -753,12 +756,9 @@ SG.Jeu = class {
     if (this.fragments % 4) SG.texte(ctx, 'Fragments ' + (this.fragments % 4) + '/4', 140, 102, 20, '#ffd0dd', 'left');
     // emplacements A et B
     const case_ = (x, lettre, contenu) => {
-      ctx.save();
-      ctx.fillStyle = 'rgba(10,20,40,0.65)'; ctx.strokeStyle = '#2ad4ff'; ctx.lineWidth = 3;
-      ctx.beginPath(); ctx.roundRect(x, 16, 74, 74, 14); ctx.fill(); ctx.stroke();
-      SG.texte(ctx, lettre, x + 12, 40, 20, '#2ad4ff', 'left');
-      if (contenu) SG.dessinerPied(ctx, contenu, x + 40, 80, { echelle: 0.75 });
-      ctx.restore();
+      SG.cadre(ctx, SG.img['ui-portrait'], x, 12, 82, 80, 200, 20);
+      if (contenu) SG.dessinerPied(ctx, contenu, x + 41, 74, { echelle: 0.62 });
+      SG.texte(ctx, lettre, x + 16, 34, 20, '#7fe8ff', 'left', null, null, true);
     };
     case_(SG.W - 180, 'B', null);
     case_(SG.W - 96, 'A', this.ampli ? SG.img.ampli : null);
@@ -796,46 +796,110 @@ SG.Jeu = class {
   dessinerDialogue(ctx) {
     const d = this.dlg;
     const [qui, texte] = d.lignes[d.i];
-    const x = 60, y = SG.H - 210, w = SG.W - 120, h = 180;
-    ctx.save();
-    ctx.fillStyle = 'rgba(8,14,30,0.92)'; ctx.strokeStyle = '#2ad4ff'; ctx.lineWidth = 4;
-    ctx.beginPath(); ctx.roundRect(x, y, w, h, 20); ctx.fill(); ctx.stroke();
-    let tx = x + 32;
+    const x = 50, y = SG.H - 214, w = SG.W - 100, h = 196;
+    SG.cadre(ctx, SG.img['ui-dialogue'], x, y, w, h, 110, 44);
+    let tx = x + 50;
     if (qui) {
       const parle = d.car < texte.length && Math.floor(this.t * 8) % 2 === 0;
       const im = qui === 'spirit' ? SG.img[parle ? 'portrait-spirit-parle' : 'portrait-spirit'] : SG.img['portrait-ermite'];
+      const px = x + 22, py = y - 62, pw = 214, ph = 214;
+      SG.cadre(ctx, SG.img['ui-portrait'], px, py, pw, ph, 200, 38);
       ctx.save();
-      ctx.beginPath(); ctx.roundRect(x + 16, y - 60, 200, 226, 16); ctx.clip();
-      ctx.fillStyle = qui === 'spirit' ? '#16305a' : '#2b2436'; ctx.fillRect(x + 16, y - 60, 200, 226);
-      SG.dessinerPied(ctx, im, x + 116, y + 166, { echelle: 0.95 });
+      ctx.beginPath(); ctx.roundRect(px + 26, py + 26, pw - 52, ph - 52, 10); ctx.clip();
+      SG.dessinerPied(ctx, im, px + pw / 2, py + ph - 20, { echelle: 0.8 });
       ctx.restore();
-      ctx.strokeStyle = '#2ad4ff'; ctx.lineWidth = 4;
-      ctx.beginPath(); ctx.roundRect(x + 16, y - 60, 200, 226, 16); ctx.stroke();
-      SG.texte(ctx, qui === 'spirit' ? 'Spirit' : 'L\'ermite', x + 240, y + 40, 26, '#2ad4ff', 'left');
-      tx = x + 240;
+      SG.texte(ctx, qui === 'spirit' ? 'Spirit' : 'L\'ermite', x + 262, y + 58, 30, '#7fe8ff', 'left', null, null, true);
+      tx = x + 262;
     }
-    SG.texteMultiligne(ctx, texte.slice(0, Math.floor(d.car)), tx, y + (qui ? 82 : 56), w - (tx - x) - 40, 30, 38, '#ffffff');
-    if (d.car >= texte.length && Math.floor(this.t * 3) % 2 === 0) SG.texte(ctx, '▼', x + w - 36, y + h - 20, 24, '#2ad4ff', 'center');
+    SG.texteMultiligne(ctx, texte.slice(0, Math.floor(d.car)), tx, y + (qui ? 100 : 76), w - (tx - x) - 60, 28, 36, '#ffffff');
+    if (d.car >= texte.length) {
+      const b2 = Math.sin(this.t * 6) * 3;
+      SG.texte(ctx, '▼', x + w - 58, y + h - 36 + b2, 24, '#7fe8ff', 'center');
+    }
+  }
+
+  // petite carte de la Plaine sur le parchemin
+  vignette(cle) {
+    if (!this.vignettes) this.vignettes = {};
+    if (this.vignettes[cle]) return this.vignettes[cle];
+    const cv = document.createElement('canvas');
+    cv.width = 320; cv.height = 180;
+    const c = cv.getContext('2d');
+    c.scale(0.25, 0.25);
+    c.drawImage(this.fond(cle), 0, 0, SG.W, SG.H);
+    const avant = [this.ecran, this.coupes];
+    this.ecran = cle; this.coupes = new Set();
+    const liste = [];
+    this.objetsDecor(liste);
+    [this.ecran, this.coupes] = avant;
+    liste.sort((p, q) => p.y - q.y);
+    for (const o of liste) o.dessiner(c);
+    this.vignettes[cle] = cv;
+    return cv;
+  }
+
+  dessinerCarte(ctx, x, y, w, h) {
+    ctx.drawImage(SG.img['ui-parchemin'], x, y, w, h);
+    const cw = w * 0.74 / 3, ch = cw * 9 / 16;
+    const ox = x + (w - cw * 3) / 2, oy = y + (h - ch * 3) / 2;
+    for (const cle in SG.MONDE) {
+      const [cx, cy] = cle.split(',').map(Number);
+      const vx = ox + cx * cw, vy = oy + cy * ch;
+      if (this.visites && this.visites.has(cle)) {
+        ctx.save();
+        ctx.filter = 'sepia(0.55) saturate(0.85) brightness(1.05)';
+        ctx.globalAlpha = 0.92;
+        ctx.drawImage(this.vignette(cle), vx, vy, cw, ch);
+        ctx.restore();
+      } else {
+        ctx.save();
+        ctx.fillStyle = 'rgba(120,85,40,0.12)';
+        ctx.fillRect(vx + 3, vy + 3, cw - 6, ch - 6);
+        SG.texte(ctx, '?', vx + cw / 2, vy + ch / 2 + 12, 34, 'rgba(110,75,35,0.55)', 'center', 'rgba(0,0,0,0)', 1, true);
+        ctx.restore();
+      }
+      ctx.strokeStyle = 'rgba(90,55,20,0.55)'; ctx.lineWidth = 2;
+      ctx.strokeRect(vx, vy, cw, ch);
+    }
+    // la grotte
+    if (this.visites && this.visites.has('1,2')) {
+      const gx = ox + cw + 3.5 * 80 * cw / SG.W, gy = oy + 2 * ch + 1.2 * 80 * ch / SG.H;
+      ctx.fillStyle = '#3a2410'; ctx.beginPath(); ctx.arc(gx, gy, 6, 0, Math.PI * 2); ctx.fill();
+    }
+    // Spirit
+    const ici = this.ecran === 'grotte' ? SG.SORTIE_GROTTE.ecran : this.ecran;
+    const [ex, ey] = ici.split(',').map(Number);
+    const sx = this.ecran === 'grotte' ? SG.SORTIE_GROTTE.x : this.spirit.x;
+    const sy = this.ecran === 'grotte' ? SG.SORTIE_GROTTE.y : this.spirit.y;
+    const mx = ox + ex * cw + sx / SG.W * cw, my = oy + ey * ch + sy / SG.H * ch;
+    const p = 1 + Math.sin(this.t * 6) * 0.25;
+    ctx.save();
+    ctx.fillStyle = 'rgba(220,30,40,0.35)'; ctx.beginPath(); ctx.arc(mx, my, 13 * p, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#d8202e'; ctx.strokeStyle = '#3a0a0a'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.arc(mx, my, 6, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
     ctx.restore();
+    SG.texte(ctx, 'Plaine des Pixels', x + w / 2, y + h - 22, 22, '#5a3810', 'center', 'rgba(255,240,200,0.8)', 4, true);
   }
 
   dessinerPause(ctx) {
-    ctx.fillStyle = 'rgba(5,10,25,0.85)';
+    ctx.fillStyle = 'rgba(3,8,20,0.7)';
     ctx.fillRect(0, 0, SG.W, SG.H);
-    SG.texte(ctx, 'PAUSE', SG.W / 2, 110, 60, '#2ad4ff', 'center');
-    // inventaire
-    SG.texte(ctx, 'Objets', 300, 200, 32, '#fff', 'center');
-    ctx.strokeStyle = '#2ad4ff'; ctx.lineWidth = 3;
-    ctx.beginPath(); ctx.roundRect(110, 225, 380, 300, 18); ctx.stroke();
-    if (this.ampli) { SG.dessinerPied(ctx, SG.img.ampli, 200, 330, { echelle: 1 }); SG.texte(ctx, 'Ampli (A)', 200, 370, 22, '#fff', 'center'); }
-    else SG.texte(ctx, 'Aucun objet', 300, 330, 24, '#8899aa', 'center');
-    SG.dessinerCoeur(ctx, 180, 440, 40, 0.25 * (this.fragments % 4));
-    SG.texte(ctx, `Fragments de cœur : ${this.fragments % 4}/4`, 220, 450, 22, '#fff', 'left');
-    SG.dessinerButin(ctx, 'pixel', 180, 495, 0.9);
-    SG.texte(ctx, `Pixels : ${this.pixels}`, 220, 505, 22, '#fff', 'left');
+    SG.cadre(ctx, SG.img['ui-panneau'], 30, 24, SG.W - 60, SG.H - 48, 150, 60);
+    SG.texte(ctx, 'PAUSE', SG.W / 2, 78, 40, '#ffffff', 'center', '#0a2a5a', 6, true);
+    // carte
+    this.dessinerCarte(ctx, 90, 100, 700, 390);
+    // objets
+    const ox = 110, oy = 520;
+    SG.cadre(ctx, SG.img['ui-portrait'], ox, oy, 100, 100, 200, 24);
+    if (this.ampli) SG.dessinerPied(ctx, SG.img.ampli, ox + 50, oy + 82, { echelle: 0.8 });
+    SG.texte(ctx, this.ampli ? 'Ampli' : 'Aucun objet', ox + 50, oy + 124, 18, '#cfe8ff', 'center');
+    SG.dessinerCoeur(ctx, 300, 555, 44, 0.25 * (this.fragments % 4));
+    SG.texte(ctx, `Fragments : ${this.fragments % 4}/4`, 334, 564, 22, '#fff', 'left');
+    SG.dessinerButin(ctx, 'pixel', 300, 608, 0.9);
+    SG.texte(ctx, `Pixels : ${this.pixels}`, 334, 617, 22, '#fff', 'left');
     const opts = ['Reprendre', SG.Son.muet ? 'Activer le son' : 'Couper le son', 'Plein écran', 'Retour au titre'];
-    opts.forEach((o, i) => SG.boutonMenu(ctx, o, 950, 250 + i * 70, i === this.menuChoix));
-    SG.texte(ctx, this.ecran === 'grotte' ? 'La grotte de l\'ermite' : 'Plaine des Pixels : ' + SG.MONDE[this.ecran].nom, SG.W / 2, 640, 24, '#aabbcc', 'center');
+    opts.forEach((o, i) => SG.boutonMenu(ctx, o, 1025, 190 + i * 88, i === this.menuChoix, 330));
+    SG.texte(ctx, this.ecran === 'grotte' ? 'La grotte de l\'ermite' : SG.MONDE[this.ecran].nom, 1025, 590, 22, '#9fc4e8', 'center');
   }
 
   dessinerFin(ctx) {
@@ -857,32 +921,36 @@ SG.Jeu = class {
 
   dessinerTitre(ctx) {
     ctx.drawImage(this.fond(SG.ECRAN_DEPART), 0, 0, SG.W, SG.H);
-    ctx.fillStyle = 'rgba(5,15,40,0.55)'; ctx.fillRect(0, 0, SG.W, SG.H);
+    const g = ctx.createLinearGradient(0, 0, 0, SG.H);
+    g.addColorStop(0, 'rgba(4,12,35,0.75)'); g.addColorStop(0.6, 'rgba(4,12,35,0.35)'); g.addColorStop(1, 'rgba(4,12,35,0.8)');
+    ctx.fillStyle = g; ctx.fillRect(0, 0, SG.W, SG.H);
     const b = Math.sin(this.t * 2) * 6;
-    SG.dessinerPied(ctx, SG.img['spirit-brandit'], 210, 620 + b, { echelle: 2.2 });
-    SG.dessinerPied(ctx, SG.img['cornu-face-g'], 1100, 640, { echelle: 1.8, retourne: true });
-    SG.texte(ctx, 'SPIRIT', SG.W / 2, 190, 130, '#ffffff', 'center', '#0a3a8a', 14);
-    SG.texte(ctx, 'et le Roi Clickbait', SG.W / 2, 270, 52, '#2ad4ff', 'center', '#08183a', 8);
+    SG.dessinerPied(ctx, SG.img['spirit-brandit'], 200, 660 + b, { echelle: 2.3 });
+    SG.dessinerPied(ctx, SG.img['cornu-face-g'], 1090, 670, { echelle: 2.1, retourne: true });
+    const L = SG.img.logo;
+    if (L && L.width) { const lw = 720, lh = lw * L.height / L.width; ctx.drawImage(L, SG.W / 2 - lw / 2, 40 + Math.sin(this.t * 1.5) * 4, lw, lh); }
     const opts = this.optionsTitre();
-    opts.forEach((o, i) => SG.boutonMenu(ctx, o, SG.W / 2, 470 + i * 62, i === this.menuChoix));
-    SG.texte(ctx, 'Flèches ou ZQSD : bouger    Espace : action    Entrée : pause    F : plein écran    M : son', SG.W / 2, 690, 20, '#c8d8ee', 'center');
+    opts.forEach((o, i) => SG.boutonMenu(ctx, o, SG.W / 2, 440 + i * 80, i === this.menuChoix, 380));
+    SG.texte(ctx, 'Flèches ou ZQSD : bouger    Espace : action    Entrée : pause    F : plein écran    M : son', SG.W / 2, 700, 18, '#c8d8ee', 'center');
   }
 
   dessinerMode(ctx) {
     ctx.drawImage(this.fond(SG.ECRAN_DEPART), 0, 0, SG.W, SG.H);
     ctx.fillStyle = 'rgba(5,15,40,0.8)'; ctx.fillRect(0, 0, SG.W, SG.H);
-    SG.texte(ctx, 'Choisis ta difficulté', SG.W / 2, 150, 52, '#fff', 'center');
+    SG.texte(ctx, 'Choisis ta difficulté', SG.W / 2, 160, 54, '#fff', 'center', '#0a2a5a', 8, true);
     const modes = [
       ['Héros', ['Le jeu tel qu\'il est pensé :', 'les monstres font vraiment mal.', 'Pour les joueurs qui aiment', 'le défi.']],
       ['Découverte', ['Les monstres font moitié', 'moins de dégâts.', 'Pour profiter de l\'aventure', 'sans rester bloqué.']],
     ];
     modes.forEach(([nom, lignes], i) => {
       const x = 170 + i * 490, y = 250, sel = i === this.menuChoix;
-      ctx.fillStyle = sel ? 'rgba(42,212,255,0.18)' : 'rgba(255,255,255,0.05)';
-      ctx.strokeStyle = sel ? '#2ad4ff' : '#557'; ctx.lineWidth = sel ? 5 : 3;
-      ctx.beginPath(); ctx.roundRect(x, y, 450, 300, 22); ctx.fill(); ctx.stroke();
-      SG.texte(ctx, nom, x + 225, y + 70, 44, sel ? '#2ad4ff' : '#fff', 'center');
-      lignes.forEach((l, j) => SG.texte(ctx, l, x + 225, y + 140 + j * 36, 26, '#dde', 'center'));
+      ctx.save();
+      if (!sel) ctx.globalAlpha = 0.7;
+      SG.cadre(ctx, SG.img['ui-panneau'], x, y, 450, 300, 150, 44);
+      ctx.restore();
+      if (sel) { ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.fillStyle = 'rgba(42,180,255,0.08)'; ctx.fillRect(x + 30, y + 40, 390, 230); ctx.restore(); }
+      SG.texte(ctx, nom, x + 225, y + 90, 44, sel ? '#7fe8ff' : '#fff', 'center', null, null, true);
+      lignes.forEach((l, j) => SG.texte(ctx, l, x + 225, y + 150 + j * 34, 24, '#dde', 'center'));
     });
     SG.texte(ctx, 'Gauche / droite pour choisir, Espace pour valider', SG.W / 2, 640, 24, '#aabbcc', 'center');
   }
@@ -899,10 +967,11 @@ SG.Jeu = class {
 };
 
 // ---------------------------------------------------------------- texte
-SG.POLICE = '"Trebuchet MS", "Segoe UI", Verdana, sans-serif';
-SG.texte = function (ctx, t, x, y, taille, couleur, align, contour, ep) {
+SG.POLICE = '"Nunito", "Trebuchet MS", "Segoe UI", Verdana, sans-serif';
+SG.POLICE_TITRE = '"Lilita One", "Trebuchet MS", Verdana, sans-serif';
+SG.texte = function (ctx, t, x, y, taille, couleur, align, contour, ep, titre) {
   ctx.save();
-  ctx.font = `bold ${taille}px ${SG.POLICE}`;
+  ctx.font = titre ? `${taille}px ${SG.POLICE_TITRE}` : `800 ${taille}px ${SG.POLICE}`;
   ctx.textAlign = align || 'left';
   ctx.textBaseline = 'alphabetic';
   ctx.lineJoin = 'round';
@@ -915,7 +984,7 @@ SG.texte = function (ctx, t, x, y, taille, couleur, align, contour, ep) {
 };
 SG.texteMultiligne = function (ctx, t, x, y, largeurMax, taille, interligne, couleur, align) {
   ctx.save();
-  ctx.font = `bold ${taille}px ${SG.POLICE}`;
+  ctx.font = `800 ${taille}px ${SG.POLICE}`;
   const mots = t.split(' ');
   const lignes = [];
   let l = '';
@@ -927,18 +996,36 @@ SG.texteMultiligne = function (ctx, t, x, y, largeurMax, taille, interligne, cou
   ctx.restore();
   lignes.forEach((li, i) => SG.texte(ctx, li, x, y + i * interligne, taille, couleur, align || 'left'));
 };
-SG.boutonMenu = function (ctx, t, x, y, actif) {
-  ctx.save();
-  ctx.fillStyle = actif ? 'rgba(42,212,255,0.25)' : 'rgba(10,20,40,0.6)';
-  ctx.strokeStyle = actif ? '#2ad4ff' : 'rgba(255,255,255,0.3)';
-  ctx.lineWidth = 3;
-  ctx.beginPath(); ctx.roundRect(x - 200, y - 30, 400, 56, 16); ctx.fill(); ctx.stroke();
-  ctx.restore();
-  SG.texte(ctx, (actif ? '▶ ' : '') + t, x, y + 10, 30, actif ? '#ffffff' : '#c8d8ee', 'center');
+SG.boutonMenu = function (ctx, t, x, y, actif, largeur) {
+  const w = largeur || 380, h = 68;
+  const im = SG.img[actif ? 'ui-bouton-actif' : 'ui-bouton'];
+  SG.bouton3(ctx, im, x - w / 2, y - h / 2, w, h, 190);
+  SG.texte(ctx, t, x, y + 10, 28, actif ? '#ffffff' : '#b8d4f0', 'center', '#04122e', 5, true);
+};
+
+// cadre en 9 parties : les coins gardent leur taille, les bords et le centre s'étirent
+SG.cadre = function (ctx, im, x, y, w, h, bs, bd) {
+  if (!im || !im.width) return;
+  const W = im.width, H = im.height;
+  const xs = [0, bs, W - bs, W], ys = [0, bs, H - bs, H];
+  const xd = [x, x + bd, x + w - bd, x + w], yd = [y, y + bd, y + h - bd, y + h];
+  for (let i = 0; i < 3; i++) for (let j = 0; j < 3; j++) {
+    const sw = xs[i + 1] - xs[i], sh = ys[j + 1] - ys[j], dw = xd[i + 1] - xd[i], dh = yd[j + 1] - yd[j];
+    if (sw > 0 && sh > 0 && dw > 0 && dh > 0) ctx.drawImage(im, xs[i], ys[j], sw, sh, xd[i], yd[j], dw, dh);
+  }
+};
+
+// bouton en 3 parties horizontales
+SG.bouton3 = function (ctx, im, x, y, w, h, bs) {
+  if (!im || !im.width) return;
+  const k = h / im.height, bd = bs * k;
+  ctx.drawImage(im, 0, 0, bs, im.height, x, y, bd, h);
+  ctx.drawImage(im, bs, 0, im.width - bs * 2, im.height, x + bd, y, w - bd * 2, h);
+  ctx.drawImage(im, im.width - bs, 0, bs, im.height, x + w - bd, y, bd, h);
 };
 
 // ---------------------------------------------------------------- démarrage
-window.addEventListener('load', () => {
+document.addEventListener('DOMContentLoaded', () => {
   const canevas = document.getElementById('jeu');
   const jeu = new SG.Jeu(canevas);
   SG.jeu = jeu;
