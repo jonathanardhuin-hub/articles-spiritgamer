@@ -468,7 +468,13 @@ SG.Flash = class {
   dessiner(ctx) {
     SG.ombre(ctx, this.x, this.y, 34);
     const im = SG.img.flash;
-    if (im && im.width) { SG.dessinerPied(ctx, im, this.x, this.y - Math.abs(Math.sin(this.t * 2)) * 4); return; }
+    if (im && im.width) {
+      // il sautille sur place ; de temps en temps il note quelque chose dans son carnet
+      const carnet = SG.img['flash-carnet'] && Math.floor(this.t / 2.5) % 2 === 1 ? SG.img['flash-carnet'] : im;
+      const saut = Math.abs(Math.sin(this.t * 3)) * 8;
+      SG.dessinerPied(ctx, carnet, this.x, this.y - saut, { sy: 1 - (saut < 1 ? 0.04 : 0) });
+      return;
+    }
     ctx.save(); ctx.translate(this.x, this.y - 55 - Math.abs(Math.sin(this.t * 2)) * 4);
     ctx.fillStyle = '#8a5a2a'; ctx.strokeStyle = '#111'; ctx.lineWidth = 4;
     ctx.beginPath(); ctx.ellipse(0, 0, 38, 48, 0, 0, 7); ctx.fill(); ctx.stroke();
