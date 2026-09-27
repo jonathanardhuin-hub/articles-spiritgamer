@@ -139,7 +139,7 @@
     'decor-plaine': 'Décor Plaine', 'arbre': 'Arbre', 'salle': 'Salle du Terrier', 'grotte': 'Grotte', 'ampli': 'Ampli', 'manette': 'Manette',
     'coffre': 'Coffre', 'statue': 'Gargouille', 'bloc': 'Bloc', 'flash': 'Flash', 'portrait-flash': 'Portrait Flash', 'ermite': 'Ermite',
     'ui': 'Cadre interface', 'battant': 'Battant de porte', 'sol-herbe': 'Sol herbe', 'titre': 'Écran titre', 'projectiles': 'Projectiles', 'entree': 'Entrée du Terrier',
-    'loge': 'Ta loge (validée)', 'clairiere': 'La Clairière (validée)',
+    'loge': 'Ta loge (validée)', 'clairiere': 'La Clairière (validée)', 'bureau-mika': 'Bureau de Mika (validé)',
   };
 
   // ------------------------------------------------------------------ morceaux de prompt communs
@@ -241,6 +241,14 @@ Le centre de la pièce reste dégagé pour marcher.`]);
   carte('pro', 'decors', 'Ta loge, Spirit endormi à son bureau (facultatif)', 'Le jeu montre déjà Spirit endormi en assemblant sa tête au-dessus du dossier, mais une image peinte sera plus belle. Nom du fichier : loge-spirit-endormi.png.', ['loge', 'spirit-dos', 'spirit-officiel'],
     null, [], null,
     [`Reprends l'image de ta loge jointe. Garde exactement les mêmes dimensions (1672 × 941 pixels, sans recadrer, sans bordure ajoutée) et garde absolument tout identique : meubles, murs, lumière, cadrage. Ajoute seulement Spirit (la mascotte jointe : petit personnage blanc, casque-micro noir et bleu avec les lettres SG en cyan sur chaque écouteur, tee-shirt bleu) endormi dans le fauteuil beige de droite, face à son grand écran : on le voit de dos, sa tête et le haut de son casque dépassent du dossier, la tête penchée sur le côté, un bras qui pend le long de l'accoudoir. La lumière de l'écran l'éclaire doucement. Rien d'autre ne change.`]);
+
+  carte('pro', 'decors', 'La porte de ta loge qui s\'ouvre sur le couloir', 'Quand Spirit sort de sa loge pour aller voir Mika, la porte s\'ouvre vraiment (avant, l\'écran passait juste au noir). Le jeu ne reprend que la zone de la porte, donc le reste peut bouger un peu sans que ça se voie. Nom du fichier : loge-porte-ouverte.png.', ['loge'],
+    null, [], null,
+    [`Reprends l'image de ta loge jointe. Garde exactement les mêmes dimensions (1672 × 941 pixels, sans recadrer, sans bordure ajoutée) et garde absolument tout identique : meubles, murs, fauteuils, écrans, bouteille de soda, lumière, cadrage. Change uniquement la double porte du mur du bas : ses deux battants sont ouverts vers l'intérieur de la pièce, rabattus contre l'embrasure, et par l'ouverture on aperçoit le parquet clair du couloir. Une lumière chaude et douce entre par la porte et forme un rai de lumière sur le parquet et le paillasson, vers le haut de l'image, à l'intérieur de la pièce. Aucun portail, aucune lumière cyan : c'est une porte normale qui donne sur le couloir.`]);
+  carte('pro', 'perso', 'Spirit aspiré par le portail, puis qui atterrit', 'Deux poses pour l\'animation du passage : le jeu fait tournoyer la première dans le tunnel de lumière, et montre la seconde un instant quand Spirit touche le sol de la Plaine. Noms des fichiers : aspire.png et atterrit.png.', RS,
+    `${SPIRIT}\n\n${FOND_P}`,
+    ['Spirit aspiré, vu de face, en train de tomber dans le vide : bras et jambes écartés, les yeux grands ouverts, la bouche en « o », le casque bien en place, le tee-shirt qui flotte vers le haut.',
+     'Spirit qui vient d\'atterrir, vu de face : un genou au sol, une main posée par terre, l\'autre main sur l\'écouteur de son casque, la tête relevée, un petit sourire décidé.']);
 
   // ================================================================== PLAINE DES PIXELS : écrans entiers
   const PLAINE_BORD = 'des arbres touffus vert vif aux troncs bruns, comme sur le décor joint';
@@ -637,6 +645,9 @@ Le centre de la pièce reste dégagé pour marcher.`]);
   carte('qg', 'interface', 'Boutique', 'L\'écran d\'achat chez Mona.', ['ui'],
     `Même habillage que le cadre joint : néon bleu cyan, métal sombre, coins ornés. Aucun texte, aucun chiffre.`,
     ['Un comptoir de boutique vu de face, en bois sombre avec liseré cyan, trois emplacements vides pour poser des articles, format paysage 3:1.', 'Une petite étiquette de prix vide, en métal sombre bordée de cyan, avec un Pixel bleu dessiné à gauche.']);
+  carte('qg', 'decors', 'Le bureau de Mika, porte ouverte', 'Quand Spirit ressort du bureau de Mika, la porte du bas s\'ouvre vraiment. Le jeu ne reprend que la zone de la porte. Nom du fichier : bureau-de-mika-porte-ouverte.png.', ['bureau-mika'],
+    null, [], null,
+    [`Reprends l'image du bureau de Mika jointe. Garde exactement les mêmes dimensions (1672 × 941 pixels, sans recadrer, sans bordure ajoutée) et garde absolument tout identique : meubles, murs, figurines, lumière, cadrage. Change uniquement la double porte du mur du bas : ses deux battants sont ouverts vers l'intérieur de la pièce, rabattus contre l'embrasure, et par l'ouverture on aperçoit le parquet clair du couloir. Une lumière chaude entre par la porte et forme un rai de lumière sur le parquet et le tapis, vers le haut de l'image, à l'intérieur de la pièce.`]);
 
   carte('d1', 'donjons', 'Sols des salles du Terrier', 'Trous, plaque, trappe, rails et murs fêlés peints directement dans la salle, pour éviter tout effet de collage. Une étape par variante, toujours à partir de la salle aux portes ouvertes de D1-09.', ['salle'],
     null, [], null,
@@ -668,7 +679,7 @@ Le centre de la pièce reste dégagé pour marcher.`]);
   { const c = cartes.find((x) => x.id === 'D1-17'); if (c) { c.pourquoi = 'Il ne te reste que cette étape : le mur de droite éventré. Toutes les autres variantes sont reçues.'; c.prompts = [c.prompts[8]]; c.n = 1; } }
 
   // cartes ajoutées ou modifiées lors de la dernière mise à jour
-  const NOUVEAUX = new Set(['PRO-05', 'PRO-06', 'PRO-07', 'QG-10', 'PRO-01', 'D1-17', 'QG-04', 'QG-08', 'QG-09', 'PRO-03', 'D1-17', 'R2-28', 'R2-29', 'R3-28', 'R3-29', 'R4-28', 'R4-29', 'R5-28', 'R5-29', 'R6-28', 'R6-29', 'R7-28', 'R7-29', 'R8-28', 'R8-29', 'R3-11', 'R4-11', 'R5-11', 'R6-11', 'R7-11', 'R8-11', 'FIN-08']);
+  const NOUVEAUX = new Set(['PRO-08', 'PRO-09', 'PRO-05', 'PRO-06', 'PRO-07', 'QG-10', 'PRO-01', 'D1-17', 'QG-04', 'QG-08', 'QG-09', 'PRO-03', 'D1-17', 'R2-28', 'R2-29', 'R3-28', 'R3-29', 'R4-28', 'R4-29', 'R5-28', 'R5-29', 'R6-28', 'R6-29', 'R7-28', 'R7-29', 'R8-28', 'R8-29', 'R3-11', 'R4-11', 'R5-11', 'R6-11', 'R7-11', 'R8-11', 'FIN-08']);
 
   // ------------------------------------------------------------------ affichage
   const ETAPES = [['nouveau', 'Nouveautés'], ['tout', 'Tout'], ['pro', 'Prologue'], ['pl', 'Plaine'], ['d1', 'Donjon 1'], ['qg', 'Parvis du QG'], ['r2', 'Forêt + Donjon 2'], ['r3', 'Monts + Donjon 3'], ['r4', 'Désert + Donjon 4'], ['r5', 'Lac + Donjon 5'], ['r6', 'Cité + Donjon 6'], ['r7', 'Marais + Donjon 7'], ['r8', 'Toundra + Donjon 8'], ['fin', 'Tour finale']];

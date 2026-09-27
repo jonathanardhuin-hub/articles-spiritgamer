@@ -60,7 +60,7 @@ def pieces_rochers(k, rects, zones, a, gris, sombre):
         x0, y0, x1, y1, _ = rects[i]
         zone[int(y0 * F):int(y1 * F), int(x0 * F):int(x1 * F)] = 255
     g = gris & zone
-    g = cv2.morphologyEx(g, cv2.MORPH_CLOSE, elli(9))
+    g = cv2.morphologyEx(g, cv2.MORPH_CLOSE, elli(15))
     g = remplir(g)
     g = cv2.morphologyEx(g, cv2.MORPH_OPEN, elli(5))
     # le trait noir autour des pierres fait partie du rocher
@@ -82,7 +82,7 @@ def pieces_rochers(k, rects, zones, a, gris, sombre):
         if not m.any():
             continue
         x, y, ww, hh = cv2.boundingRect(cv2.findNonZero(m))
-        out.append({'t': 'r', 'x': int(x), 'y': int(y), 'm': m[y:y + hh, x:x + ww].copy()})
+        out.append({'t': 'r', 'x': int(x), 'y': int(y), 'm': m[y:y + hh, x:x + ww].copy(), 'garde': (k, i) in GARDER})
     return out
 
 
@@ -159,7 +159,8 @@ def reboucher(sol, trou, propre, tolere=0.015):
 
 
 def prolonger_bords(sol, masque):
-    """sorties de côté : on recopie la bande juste à l'intérieur jusqu'au bord, pour que le chemin file hors de l'écran"""
+    """sorties de côté : la bande juste à l'intérieur est reflétée jusqu'au bord (en miroir, donc sans couture),
+    pour que le chemin file hors de l'écran au lieu de finir sur un pavé clair"""
     H, W = sol.shape[:2]
     e = int(56 * F)
     for cote in ('g', 'd'):
@@ -170,22 +171,16 @@ def prolonger_bords(sol, masque):
         y0, y1 = int((rangs[0] * 20 - 26) * F), int(((rangs[-1] + 1) * 20 + 26) * F)
         y0, y1 = max(0, y0), min(H, y1)
         if cote == 'g':
-            src = sol[y0:y1, e:2 * e].copy()
+            src = sol[y0:y1, e:2 * e][:, ::-1].copy()
             dst = (slice(y0, y1), slice(0, e))
         else:
-            src = sol[y0:y1, W - 2 * e:W - e].copy()
+            src = sol[y0:y1, W - 2 * e:W - e][:, ::-1].copy()
             dst = (slice(y0, y1), slice(W - e, W))
         hh = y1 - y0
         fy = np.ones(hh)
         b = int(18 * F)
         fy[:b] = np.linspace(0, 1, b); fy[-b:] = np.linspace(1, 0, b)
-        fx = np.ones(e)
-        fb = int(16 * F)
-        if cote == 'g':
-            fx[-fb:] = np.linspace(1, 0, fb)
-        else:
-            fx[:fb] = np.linspace(0, 1, fb)
-        al = (fy[:, None] * fx[None, :])[..., None]
+        al = np.repeat(fy[:, None], e, 1)[..., None]
         sol[dst] = (src * al + sol[dst] * (1 - al)).astype(np.uint8)
 
 
@@ -215,9 +210,13 @@ def traiter(k, apercus=None):
     R, G, B = a[..., 0].astype(int), a[..., 1].astype(int), a[..., 2].astype(int)
     V = a.max(2).astype(int)
     gris = ((abs(R - G) < 22) & (abs(G - B) < 30) & (R > 70) & (a.min(2) < 200)).astype(np.uint8) * 255
+    # pierre au sens large (faces éclairées et faces à l'ombre, gris bleutés) : pour découper les rochers sans trous
+    mn = a.min(2).astype(int)
+    roche = (((V - mn) < 0.30 * np.maximum(V, 1)) & (G <= np.maximum(R, B) + 10) & (V > 45) & (mn < 215)).astype(np.uint8) * 255
     sombre = (V < 42).astype(np.uint8) * 255
     zones = zones_rochers(k, rects, gris)
-    rochers = pieces_rochers(k, rects, zones, a, gris, sombre)
+    # la falaise de la grotte garde son obstacle entier, mais elle est aussi découpée : Spirit entre DANS la grotte
+    rochers = pieces_rochers(k, rects, zones + [i for (kk, i) in sorted(GARDER) if kk == k], a, roche, sombre)
     # masque sans les zones de rochers : sert à trouver l'herbe libre pour les touffes
     base = appliquer(['.' * COLS] * ROWS, [r for i, r in enumerate(rects) if i not in zones])
     tout_roc = np.zeros((H0, W0), np.uint8)
@@ -267,6 +266,8 @@ def traiter(k, apercus=None):
     # pieds des rochers : la moitié basse de la silhouette bloque, on passe derrière le haut
     pieds = []
     for p in rochers:
+        if p.get('garde'):
+            continue
         m = p['m']
         h, w = m.shape
         pied = np.zeros_like(m)
@@ -311,7 +312,14 @@ def traiter(k, apercus=None):
         if p['t'] == 'h':
             m = p['m'] > 0
             e['c'] = '#%02x%02x%02x' % tuple(int(v) for v in a[p['y']:p['y'] + h, p['x']:p['x'] + w][m].mean(0))
+        if p.get('garde'):
+            e['garde'] = True
         liste.append(e)
+    # falaise de la grotte : toutes ses pierres (arche comprise) passent devant Spirit tant qu'il est dans l'entrée
+    fond_grotte = max([e['b'] for e in liste if e.get('garde')] or [0])
+    for e in liste:
+        if e.pop('garde', False):
+            e['b'] = fond_grotte
     if apercus:
         v = sol.copy()
         for p in pieces:

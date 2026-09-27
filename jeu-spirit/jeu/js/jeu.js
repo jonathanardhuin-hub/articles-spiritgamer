@@ -162,7 +162,7 @@ SG.Jeu = class {
     const e = SG.MONDE[this.ecran];
     if (this.ecran === 'loge') return SG.MASQUES[this.porteLoge || !this.reveil ? 'loge-ouverte' : 'loge'];
     const v = this.varianteQG(this.ecran);
-    if (v) return SG.MASQUES[v];
+    if (v) return SG.MASQUES[v] || SG.MASQUES[this.ecran];
     return e && e.image && SG.img[e.image] && SG.img[e.image].width ? SG.MASQUES[this.ecran] || null : null;
   }
 
@@ -170,7 +170,10 @@ SG.Jeu = class {
   varianteQG(cle) {
     const portes = SG.QG[cle], s = this.spirit;
     if (!portes || !s) return null;
-    for (const p of portes) if (p.variante && s.y < 250 && Math.abs(s.x - p.cx) < 95) return SG.img[p.variante] && SG.img[p.variante].width ? p.variante : null;
+    for (const p of portes) {
+      const pres = p.haut ? s.y < 250 : s.y > p.bas - 110;
+      if (p.variante && pres && Math.abs(s.x - p.cx) < 95) return SG.img[p.variante] && SG.img[p.variante].width ? p.variante : null;
+    }
     return null;
   }
 
@@ -525,7 +528,7 @@ SG.Jeu = class {
     if (this.reveil) {
       // Spirit dort, s'étire, puis entend le signal : on ne bouge pas encore
       this.reveil.t += dt;
-      if (this.reveil.t > 4.2 && !this.reveil.parle) {
+      if (this.reveil.t > 1.6 && !this.reveil.parle) {
         this.reveil.parle = true;
         this.dialogue(SG.TEXTES.reveil, () => {
           this.reveil = null;
@@ -539,10 +542,15 @@ SG.Jeu = class {
       // retour dans la loge après avoir vu Gus : la porte devient un portail
       const ev = this.evtPortail;
       ev.t += dt;
-      this.secousse = ev.t < 1.4 ? 6 * (1 - ev.t / 1.4) : 0;
-      if (ev.t > 1.0 && !this.porteLoge) { this.porteLoge = true; this.flash = 1; SG.Son.effet('objet'); }
-      if (ev.t > 1.9) { this.evtPortail = null; this.dialogue(SG.TEXTES.portailOuvert, () => this.sauver()); }
+      this.secousse = ev.t > 0.9 && ev.t < 2.3 ? 6 * (1 - (ev.t - 0.9) / 1.4) : 0;
+      if (ev.t > 1.6 && !this.porteLoge) { this.porteLoge = true; this.flash = 1; SG.Son.effet('objet'); }
+      if (ev.t > 2.6) { this.evtPortail = null; this.dialogue(SG.TEXTES.portailOuvert, () => this.sauver()); }
       return;
+    }
+    // de retour dans la loge après avoir vu Gus : c'est en arrivant devant son PC que le portail s'ouvre
+    if (this.ecran === 'loge' && this.qg && this.qg.gus && !this.porteLoge && !this.evtPortail) {
+      const P = SG.LOGE.pc;
+      if (s.x > P.x0 && s.x < P.x1 && s.y < P.y) { this.evtPortail = { t: 0 }; s.dir = 'haut'; return; }
     }
     if (C.appuis.menu) { this.etat = 'pause'; this.menuChoix = 0; this.focusPause = 'objets'; this.selObjet = 0; SG.Son.effet('choix'); return; }
     if (C.appuis.carte) { this.etat = 'carte'; SG.Son.effet('choix'); return; }
@@ -631,7 +639,7 @@ SG.Jeu = class {
             const [x, y, dir] = p.arrivee;
             this.spirit.x = x; this.spirit.y = y; this.spirit.dir = dir;
             this.entrerEcran(p.vers);
-            if (p.vers === 'loge' && this.qg && this.qg.gus && !this.porteLoge) this.evtPortail = { t: -0.4 };
+            if (p.vers === 'loge' && this.qg && this.qg.gus && !this.porteLoge && !this.dejaRetour) { this.dejaRetour = true; this.dialogue(SG.TEXTES.retourLoge); }
           });
           return;
         }
@@ -875,6 +883,56 @@ SG.Jeu = class {
     if (this.etat === 'finPartie') this.dessinerFin(ctx);
   }
 
+  // les écrans du bureau de la loge : un jeu et le tchat pendant qu'il dort, puis la pub du Roi partout ;
+  // quand le portail s'ouvre, l'écran SG grésille
+  // Spirit dort tant que le narrateur parle (première ligne du réveil) ; il se lève quand il prend la parole
+  dortEncore() {
+    return !!this.reveil && (!this.reveil.parle || (this.dlg && this.etat === 'dialogue' && this.dlg.i === 0));
+  }
+
+  dessinerEcransLoge(ctx) {
+    const E = SG.LOGE.ecrans, t = this.t;
+    const dort = this.dortEncore();
+    const cadre = (r, dessin) => {
+      const [x, y, w, h] = r;
+      ctx.save(); ctx.beginPath(); ctx.roundRect(x, y, w, h, 3); ctx.clip();
+      dessin(x, y, w, h);
+      ctx.restore();
+    };
+    const image = (nom, x, y, w, h, sx, sy, sw, sh) => {
+      const im = SG.img[nom];
+      if (!im || !im.width) { ctx.fillStyle = '#10204a'; ctx.fillRect(x, y, w, h); return; }
+      const k = im.width / SG.W;
+      ctx.drawImage(im, sx * k, sy * k, sw * k, sh * k, x, y, w, h);
+    };
+    if (dort) {
+      cadre(E.gauche, (x, y, w, h) => { image('titre-fond', x, y, w, h, 200, 120, 880, 340); ctx.fillStyle = 'rgba(0,10,30,0.25)'; ctx.fillRect(x, y, w, h); });
+      cadre(E.milieu, (x, y, w, h) => {
+        ctx.fillStyle = '#0c1226'; ctx.fillRect(x, y, w, h);
+        const couleurs = ['#5ff3ff', '#ff7ad9', '#ffd23a', '#9dff7a'];
+        for (let i = 0; i < 6; i++) {
+          const yy = y + 6 + ((i * 9 - t * 6) % 54 + 54) % 54;
+          ctx.fillStyle = couleurs[i % 4]; ctx.fillRect(x + 6, yy, 10, 4);
+          ctx.fillStyle = 'rgba(220,230,255,0.7)'; ctx.fillRect(x + 20, yy, 30 + ((i * 37) % 50), 4);
+        }
+      });
+    } else {
+      // la pub du Roi Clickbait a pris tous les écrans
+      const clig = Math.sin(t * 9) > 0;
+      for (const r of [E.gauche, E.milieu]) cadre(r, (x, y, w, h) => {
+        image('intro-2', x, y, w, h, 330, 40, 620, 300);
+        ctx.strokeStyle = clig ? '#ff2a55' : '#ffd23a'; ctx.lineWidth = 4; ctx.strokeRect(x + 2, y + 2, w - 4, h - 4);
+        if (Math.random() < 0.08) { ctx.fillStyle = 'rgba(255,255,255,0.25)'; ctx.fillRect(x, y + Math.random() * h, w, 3); }
+      });
+    }
+    if (this.evtPortail || (this.porteLoge && this.qg && this.qg.gus && !this.transition)) {
+      const ev = this.evtPortail;
+      if (ev && ev.t < 1.8) cadre(E.sg, (x, y, w, h) => {
+        for (let i = 0; i < 40; i++) { ctx.fillStyle = Math.random() < 0.5 ? 'rgba(95,243,255,0.55)' : 'rgba(10,10,30,0.6)'; ctx.fillRect(x + Math.random() * w, y + Math.random() * h, 8 + Math.random() * 20, 2 + Math.random() * 3); }
+      });
+    }
+  }
+
   dessinerPortail(ctx, tr) {
     const t = tr.t, cx = SG.W / 2, cy = SG.H / 2;
     if (t < 1.75) {
@@ -907,7 +965,7 @@ SG.Jeu = class {
       }
       ctx.restore();
       // Spirit tombe dans le tunnel
-      const im2 = SG.img['spirit-face'];
+      const im2 = SG.img['spirit-aspire'] && SG.img['spirit-aspire'].width ? SG.img['spirit-aspire'] : SG.img['spirit-face'];
       if (im2 && im2.width && t > 0.2) {
         const e = SG.clamp(1 - (t - 0.2) / 1.5, 0.05, 1);
         ctx.save(); ctx.translate(cx, cy + 40); ctx.rotate(t * 3); ctx.globalAlpha = SG.clamp(e * 1.4, 0, 1);
@@ -934,7 +992,12 @@ SG.Jeu = class {
       ctx.fillRect(s.x + Math.cos(g2.a) * r - 3, s.y - 50 + Math.sin(g2.a) * r * 0.7 - 3, 6, 6);
     }
     ctx.restore();
-    if (u > 0.8) { ctx.save(); ctx.globalAlpha = SG.clamp((u - 0.8) / 0.5, 0, 1); s.dessiner(ctx); ctx.restore(); }
+    if (u > 0.8) {
+      ctx.save(); ctx.globalAlpha = SG.clamp((u - 0.8) / 0.5, 0, 1);
+      const at = SG.img['spirit-atterrit'];
+      if (at && at.width && u < 1.45) SG.dessinerPied(ctx, at, s.x, s.y, {}); else s.dessiner(ctx);
+      ctx.restore();
+    }
     if (u < 0.45) { ctx.fillStyle = `rgba(240,252,255,${1 - u / 0.45})`; ctx.fillRect(0, 0, SG.W, SG.H); }
   }
 
@@ -947,6 +1010,7 @@ SG.Jeu = class {
     } else {
       ctx.drawImage(this.fond(this.ecran), 0, 0, SG.W, SG.H);
     }
+    if (this.ecran === 'loge') this.dessinerEcransLoge(ctx);
     // tout ce qui a une hauteur est trié par la position des pieds
     const liste = [];
     if (this.estDonjon()) this.objetsSalle(liste);
@@ -959,14 +1023,15 @@ SG.Jeu = class {
     for (const p of this.pnj) liste.push(p);
     if (this.reveil && this.spirit) {
       const t = this.reveil.t, R = SG.LOGE.depart, Ch = SG.LOGE.chaise;
-      if (t < 1.8) {
+      if (this.dortEncore()) {
         // endormi dans sa chaise, face à l'écran : on voit sa tête penchée au-dessus du dossier, et les « z »
         liste.push({ y: SG.H + 50, dessiner: (ctx) => {
           const dos = SG.img['spirit-dos'];
           if (dos && dos.width) {
             ctx.save();
-            ctx.beginPath(); ctx.rect(Ch.x - 90, Ch.y - 140, 180, 150); ctx.clip();
-            ctx.translate(Ch.x, Ch.y + 70); ctx.rotate(-0.28 + Math.sin(t * 1.6) * 0.02);
+            // seule la tête dépasse du dossier : on coupe tout ce qui passerait sous le haut du dossier
+            ctx.beginPath(); ctx.rect(Ch.x - 90, Ch.y - 140, 180, 140); ctx.clip();
+            ctx.translate(Ch.x - 4, Ch.y + 66); ctx.rotate(-0.18 + Math.sin(t * 1.6) * 0.02);
             SG.dessinerPied(ctx, dos, 0, 0, {});
             ctx.restore();
           }
@@ -978,7 +1043,8 @@ SG.Jeu = class {
           }
         } });
       } else {
-        const im = SG.img[t < 3.2 ? 'spirit-etire' : 'spirit-signal'];
+        // réveillé : il est déjà debout à côté de sa chaise, la main sur le casque
+        const im = SG.img['spirit-signal'];
         liste.push({ y: R.y, dessiner: (ctx) => { SG.ombre(ctx, R.x, R.y, 30, 0.3); if (im && im.width) SG.dessinerPied(ctx, im, R.x, R.y, {}); } });
       }
     } else if (this.spirit && !this.cacherSpirit) liste.push(this.spirit);
@@ -1091,7 +1157,7 @@ SG.Jeu = class {
     if (this.fonds[cle]) return this.fonds[cle];
     const e = SG.MONDE[cle];
     const nomImage = cle === 'loge' && this.porteLoge ? 'loge-portail' : (this.varianteQG(cle) || e.image);
-    if (cle === 'loge' && this.reveil && this.reveil.t < 1.8 && SG.img['loge-endormi'] && SG.img['loge-endormi'].width) return SG.img['loge-endormi'];
+    if (cle === 'loge' && this.dortEncore() && SG.img['loge-endormi'] && SG.img['loge-endormi'].width) return SG.img['loge-endormi'];
     if (nomImage && SG.img[nomImage] && SG.img[nomImage].width) return SG.img[nomImage];
     const k = Math.min(2, this.echelle);
     const cv = document.createElement('canvas');

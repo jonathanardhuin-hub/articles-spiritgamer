@@ -172,7 +172,9 @@ SG.MONDE.loge = {
   carte: Array(9).fill('................'),
   ennemis: [],
 };
-SG.LOGE = { reveil: { x: 805, y: 372 }, chaise: { x: 805, y: 270 }, depart: { x: 805, y: 430 }, portail: { x0: 548, x1: 722, y: 660 } };
+SG.LOGE = { reveil: { x: 805, y: 372 }, chaise: { x: 806, y: 265 }, pc: { x0: 690, x1: 930, y: 440 },
+  // écrans du bureau (rectangles logiques) : on les allume pour qu'ils ne restent pas noirs
+  ecrans: { gauche: [428, 141, 136, 53], milieu: [579, 143, 104, 50], sg: [714, 141, 160, 57] }, depart: { x: 900, y: 470 }, portail: { x0: 548, x1: 722, y: 660 } };
 
 // Le QG : la loge, le couloir, le bureau de Mika (le Lynx) et le hall (pièces peintes)
 SG.MONDE.couloir = { nom: 'Le couloir du QG', image: 'couloir', interieur: true, carte: Array(9).fill('................'), ennemis: [] };
@@ -180,13 +182,13 @@ SG.MONDE['bureau-lynx'] = { nom: 'Le bureau de Mika', image: 'bureau-lynx', inte
 SG.MONDE.hall = { nom: 'Le hall du QG', image: 'hall', interieur: true, carte: Array(9).fill('................'), ennemis: [] };
 // portes : zone de passage (x0..x1), sens, pièce d'arrivée et position d'arrivée
 SG.QG = {
-  loge: [{ x0: 548, x1: 722, bas: 640, vers: 'couloir', arrivee: [300, 226, 'bas'] }],
+  loge: [{ x0: 548, x1: 722, bas: 640, vers: 'couloir', arrivee: [300, 226, 'bas'], variante: 'loge-porte-ouverte', cx: 635 }],
   couloir: [
     { x0: 254, x1: 346, haut: 150, vers: 'loge', arrivee: [635, 600, 'haut'], variante: 'couloir-loge', cx: 300 },
     { x0: 898, x1: 982, haut: 150, vers: 'bureau-lynx', arrivee: [636, 560, 'haut'], variante: 'couloir-lynx', cx: 940 },
     { x0: 580, x1: 700, bas: 690, vers: 'hall', arrivee: [642, 226, 'bas'] },
   ],
-  'bureau-lynx': [{ x0: 576, x1: 696, bas: 606, vers: 'couloir', arrivee: [940, 226, 'bas'] }],
+  'bureau-lynx': [{ x0: 576, x1: 696, bas: 606, vers: 'couloir', arrivee: [940, 226, 'bas'], variante: 'bureau-lynx-ouvert', cx: 636 }],
   hall: [{ x0: 594, x1: 690, haut: 150, vers: 'couloir', arrivee: [640, 540, 'haut'], variante: 'hall-ouvert', cx: 642 }],
   portesHall: { x0: 560, x1: 720, y: 560 },
   lynx: { x: 905, y: 452 },
@@ -225,12 +227,13 @@ SG.TEXTES = {
     ['spirit', 'Et mes écrans qui affichent tous la même pub... Il se passe un truc. Je vais voir si Mika a le même problème.'],
   ],
   lynx: [
-    ['lynx', 'Ah, te voilà ! Mon PC a planté en plein raid. Depuis, il n\'affiche plus qu\'une pub avec une couronne.'],
-    ['spirit', 'Pareil chez moi. Et j\'ai un grésillement bizarre dans le casque.'],
-    ['lynx', 'Gus te cherche partout. Il est dans le hall, il avait l\'air vraiment inquiet.'],
+    ['lynx', 'Ah, enfin ! Tu tombes bien, j\'allais justement régler le problème. Tout seul, évidemment.'],
+    ['spirit', 'Tes écrans aussi affichent la pub avec la couronne ?'],
+    ['lynx', 'Mon PC a planté en plein raid. En plein raid ! Moi qui étais à deux doigts de tout gagner.'],
+    ['lynx', 'Bon. Gus te cherche dans le hall. Dis-lui que c\'est moi qui t\'envoie : ici, c\'est moi le boss.'],
   ],
-  lynxApres: [['lynx', 'Va voir Gus dans le hall. Moi je reste là, je surveille le Réseau.']],
-  lynxFin: [['lynx', 'Un signal qui vient de ta loge ? Fonce. Je garde le QG.']],
+  lynxApres: [['lynx', 'Va voir Gus dans le hall. Moi je garde le QG, il faut bien que quelqu\'un dirige.']],
+  lynxFin: [['lynx', 'Un portail dans ta loge ? Normalement, c\'est moi qui aurais dû le trouver. Allez, fonce, je te couvre.']],
   gus: [
     ['gus', 'Spirit ! Enfin. Pendant la fête, le Roi Clickbait a brisé la Source. Tout le Réseau est envahi par le Bruit.'],
     ['gus', 'Les grandes portes du QG sont bloquées depuis l\'attaque. Personne ne peut sortir.'],
@@ -239,6 +242,7 @@ SG.TEXTES = {
   ],
   gusApres: [['gus', 'Retourne dans ta loge, le signal vient de là-bas.']],
   portesHall: 'Les grandes portes du QG sont bloquées depuis l\'attaque. Impossible de sortir par là.',
+  retourLoge: [['spirit', 'Le signal est plus fort ici. Il vient de mon PC.']],
   portailOuvert: [
     [null, 'Un grondement secoue la loge. Derrière Spirit, la porte ne donne plus sur le couloir : une lumière inconnue tourbillonne à sa place.'],
     ['spirit', 'C\'est de là que vient le signal. J\'y vais.'],

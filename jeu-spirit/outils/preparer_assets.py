@@ -93,7 +93,35 @@ LISTE = {
 }
 
 # images du donjon 1 : prises en compte dès qu'elles sont déposées dans images/donjon1/
+# images « porte ouverte » : on ne garde de la version ouverte que la zone de la porte (et sa lumière au sol),
+# posée sur l'image de base, pour que rien d'autre ne bouge quand la porte s'ouvre
+COMPOSITES = {
+    'loge-portail': ('prologue/loge-de-spirit.webp', (420, 380, 860, 720)),
+    'loge-porte-ouverte': ('prologue/loge-de-spirit.webp', (420, 380, 860, 720)),
+    'hall-ouvert': ('qg/hall.png', (556, 30, 728, 250)),
+    'couloir-loge': ('qg/couloir.png', (200, 40, 400, 262)),
+    'couloir-lynx': ('qg/couloir.png', (846, 40, 1034, 262)),
+    'bureau-lynx-ouvert': ('qg/bureau-du-lynx.png', (500, 400, 780, 720)),
+}
+
+
+def composer(nom, im):
+    base_src, (x0, y0, x1, y1) = COMPOSITES[nom]
+    import numpy as np
+    from PIL import ImageFilter
+    base = Image.open(os.path.join(IMG, base_src)).convert('RGBA').resize(im.size, Image.LANCZOS)
+    k = im.size[0] / 1280
+    m = Image.new('L', im.size, 0)
+    m.paste(255, (int(x0 * k), int(y0 * k), int(x1 * k), int(y1 * k)))
+    m = m.filter(ImageFilter.GaussianBlur(18 * k))
+    return Image.composite(im, base, m)
+
+
 FACULTATIVES = {
+    'loge-porte-ouverte': ('prologue/loge-porte-ouverte.png', 'w', 836, ''),
+    'bureau-lynx-ouvert': ('qg/bureau-de-mika-porte-ouverte.png', 'w', 836, ''),
+    'spirit-aspire': ('spirit-v2/aspire.png', 'h', 112, ''),
+    'spirit-atterrit': ('spirit-v2/atterrit.png', 'h', 112, ''),
     'portail-tunnel': ('prologue/portail-tunnel.png', 'w', 836, ''),
     'arrivee-plaine': ('prologue/arrivee-plaine.png', 'w', 836, ''),
     'loge-endormi': ('prologue/loge-spirit-endormi.png', 'w', 836, ''),
@@ -194,6 +222,8 @@ def main():
             al = np.clip((al - 0.06) / 0.94, 0, 1)
             rgb = np.where(al[..., None] > 0.01, a[..., :3] / np.maximum(al[..., None], 0.01), 0)
             im = Image.fromarray(np.dstack([rgb.clip(0, 255), al * 255]).astype('uint8'), 'RGBA')
+        if nom in COMPOSITES:
+            im = composer(nom, im.resize((1672, 941), Image.LANCZOS))
         if nom == 'entree-terrier':
             # les côtés se fondent dans la lisière d'arbres, le bas se pose en douceur sur l'herbe
             import numpy as np
