@@ -74,6 +74,7 @@
   .entete { display: flex; gap: 10px; align-items: flex-start; }
   .code { font: 800 12px/1 var(--corps); letter-spacing: 1px; background: var(--cyan); color: #04122e; border-radius: 6px; padding: 5px 7px; white-space: nowrap; margin-top: 3px; }
   .entete h3 { font: 800 19px/1.25 var(--corps); margin: 0; flex: 1; text-wrap: balance; }
+  .neuf { font: 800 11px/1 var(--corps); letter-spacing: 1px; text-transform: uppercase; background: var(--violet); color: #fff; border-radius: 6px; padding: 5px 7px; margin-top: 3px; white-space: nowrap; }
   .nb { font: 700 13px var(--corps); color: var(--cyan-pale); white-space: nowrap; margin-top: 3px; }
   .pourquoi { margin: 0; color: var(--texte-doux); font-size: 15px; }
   .joindre { display: grid; gap: 6px; }
@@ -605,12 +606,15 @@ Le centre de la pièce reste dégagé pour marcher.`]);
       'la salle du Gardien : un cercle de lumière douce et chaude au centre du sol, dalles propres et nettes.',
     ]));
 
+  // cartes ajoutées ou modifiées lors de la dernière mise à jour
+  const NOUVEAUX = new Set(['PRO-02', 'PRO-03', 'QG-01', 'QG-02', 'QG-04', 'R3-11', 'R4-11', 'R5-11', 'R6-11', 'R7-11', 'R8-11', 'FIN-08']);
+
   // ------------------------------------------------------------------ affichage
-  const ETAPES = [['tout', 'Tout'], ['pro', 'Prologue'], ['pl', 'Plaine'], ['d1', 'Donjon 1'], ['qg', 'Parvis du QG'], ['r2', 'Forêt + Donjon 2'], ['r3', 'Monts + Donjon 3'], ['r4', 'Désert + Donjon 4'], ['r5', 'Lac + Donjon 5'], ['r6', 'Cité + Donjon 6'], ['r7', 'Marais + Donjon 7'], ['r8', 'Toundra + Donjon 8'], ['fin', 'Tour finale']];
+  const ETAPES = [['nouveau', 'Nouveautés'], ['tout', 'Tout'], ['pro', 'Prologue'], ['pl', 'Plaine'], ['d1', 'Donjon 1'], ['qg', 'Parvis du QG'], ['r2', 'Forêt + Donjon 2'], ['r3', 'Monts + Donjon 3'], ['r4', 'Désert + Donjon 4'], ['r5', 'Lac + Donjon 5'], ['r6', 'Cité + Donjon 6'], ['r7', 'Marais + Donjon 7'], ['r8', 'Toundra + Donjon 8'], ['fin', 'Tour finale']];
   const CATS = [['tout', 'Tout'], ['perso', 'Spirit'], ['objets', 'Objets'], ['ennemis', 'Ennemis'], ['boss', 'Boss'], ['pnj', 'Gardiens et habitants'], ['effets', 'Effets'], ['donjons', 'Donjons'], ['decors', 'Décors extérieurs'], ['interface', 'Interface']];
   const lire = (k, d) => { try { const v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); } catch (e) { return d; } };
   const ecrire = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} };
-  let etape = lire('cat-etape', 'd1'), cat = lire('cat-cat', 'tout');
+  let etape = 'nouveau', cat = lire('cat-cat', 'tout');
   const faites = new Set(lire('cat-faites', []));
 
   function puces(conteneur, liste, actuel, choisir) {
@@ -632,7 +636,7 @@ Le centre de la pièce reste dégagé pour marcher.`]);
     a.className = 'carte' + (faites.has(c.id) ? ' faite' : '');
     const refs = c.refs.map((r) => `<a class="vignette" href="refs/${r}.webp" target="_blank" rel="noopener"><img src="refs/${r}.webp" alt="${REFS[r]}" loading="lazy"><span>${REFS[r]}</span></a>`).join('');
     a.innerHTML = `
-      <div class="entete"><span class="code">${c.id}</span><h3></h3><span class="nb">${c.n} image${c.n > 1 ? 's' : ''}</span></div>
+      <div class="entete"><span class="code">${c.id}</span>${NOUVEAUX.has(c.id) ? '<span class="neuf">Nouveau</span>' : ''}<h3></h3><span class="nb">${c.n} image${c.n > 1 ? 's' : ''}</span></div>
       <p class="pourquoi"></p>
       <div class="joindre"><span class="etiq">À joindre</span><div class="vignettes">${refs}</div>${c.note ? '<div class="note-ref"></div>' : ''}</div>
       <div class="prompts"></div>
@@ -666,7 +670,7 @@ Le centre de la pièce reste dégagé pour marcher.`]);
     return a;
   }
 
-  function visibles() { return cartes.filter((c) => (etape === 'tout' || c.etape === etape) && (cat === 'tout' || c.cat === cat)); }
+  function visibles() { return cartes.filter((c) => (etape === 'tout' || c.etape === etape || (etape === 'nouveau' && NOUVEAUX.has(c.id))) && (cat === 'tout' || c.cat === cat)); }
   function compter() {
     const v = visibles(), nImg = v.reduce((s, c) => s + c.n, 0), f = v.filter((c) => faites.has(c.id)).length;
     document.getElementById('compte').textContent = `${v.length} prompts · ${nImg} images · ${f} faits`;
