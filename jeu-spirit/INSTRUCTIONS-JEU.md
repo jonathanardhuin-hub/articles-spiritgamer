@@ -92,6 +92,7 @@ Gus (rédacteur en chef), Mona (chatte rousse marchande), Lila (petite lapine fa
 
 - Une carte du catalogue = une nouvelle conversation ChatGPT. Toutes les étapes d'une carte se font dans cette même conversation. Si ChatGPT déforme Spirit ou oublie une consigne, recommencer dans une nouvelle conversation.
 - Les prompts sont dans le catalogue, jamais dans la discussion.
+- Jonathan a supprimé les 49 anciennes images à refaire (écrans de la Plaine, salles, portes et objets du Terrier, Flash, couloir, bouclier). Aucun prompt ne doit les demander. Quand une carte a besoin d'une image refaite, elle renvoie à la carte qui la produit (nouvelle salle D1-09, nouveaux objets D1-18, nouveau Flash D1-22, nouveaux écrans de la Plaine) : cette carte-là se fait d'abord.
 - Écrans et salles : 1672 × 941 pixels, avec le plan (écran ou salle) joint.
 - Personnages, monstres, objets, effets : une planche de 1536 × 1024 avec tous les éléments de la carte, bien séparés (au moins 60 px de fond gris), même échelle, fond gris uni #808080, sans ombre ni texte. Maximum 6 éléments par planche.
 - Retouches d'une même pièce : même éclairage exactement, aucune lueur ni reflet ajouté. Chaque état part de l'image de l'état juste avant (loge : écrans jeu, puis pub, puis écran SG parasité, porte ouverte avec la pub, porte ouverte avec l'écran parasité, puis vortex ; bureau de Mika : pub, puis porte ouverte avec la pub). Le jeu ne reprend de chaque retouche que la zone qui change.

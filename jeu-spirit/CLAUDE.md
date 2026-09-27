@@ -36,6 +36,7 @@ Ne jamais dessiner, recoller ou reconstituer quoi que ce soit par-dessus une ima
 
 ## Images
 - Les prompts se donnent uniquement dans le catalogue, jamais dans la discussion : Jonathan s'y retrouve mieux.
+- Jamais un prompt ne demande une image que Jonathan a supprimée (les 49 de la page « images à refaire ») : on renvoie à la carte qui produit la nouvelle version (références « @D1-09 », « @D1-18 », « @D1-22 », « @PL » dans le catalogue).
 - Tout prompt avec Spirit rappelle le SG sur le casque. Dimensions 1672 × 941 pour les écrans entiers.
 - Une retouche d'une même pièce garde exactement le même éclairage : aucune lueur, aucun reflet ni effet de lumière ajouté (sauf ce que la consigne demande, limité à la zone concernée).
 - Chaque état d'une pièce part de l'état précédent et garde tout ce qui a déjà changé (loge : écrans jeu, puis pub, puis écran SG parasité, puis porte ouverte (avec la pub), puis porte ouverte avec l'écran parasité, puis vortex à partir de celle-ci ; bureau de Mika : pub, puis porte ouverte avec la pub). Les composites du jeu reprennent toutes les zones déjà changées.
