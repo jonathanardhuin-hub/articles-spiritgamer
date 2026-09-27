@@ -238,7 +238,7 @@ Le centre de la pièce reste dégagé pour marcher.`]);
   carte('pro', 'decors', 'L\'arrivée dans la Plaine (effet)', 'L\'image qui s\'affiche juste après l\'éclair blanc, quand Spirit atterrit dans la Plaine. Le jeu la fond ensuite dans l\'écran normal de la Clairière et fait apparaître Spirit dans la colonne de lumière. Nom du fichier : arrivee-plaine.png.', ['clairiere', 'loge'],
     null, [], null,
     [`Reprends l'écran de la Clairière joint. Garde exactement les mêmes dimensions (1672 × 941 pixels, sans recadrer, sans bordure ajoutée) et garde absolument tout identique : arbres, grotte, rochers, chemins, herbe, cadrage. Ajoute seulement, au centre du croisement des chemins (au milieu de l'image en largeur, un peu sous le milieu en hauteur), une colonne de lumière cyan et blanche qui descend du haut de l'image jusqu'au sol, avec un cercle lumineux posé sur le chemin à sa base, quelques petits carrés lumineux comme des pixels qui flottent autour, et un léger reflet cyan sur l'herbe et le chemin tout proches. Même lumière cyan que le portail de la loge jointe. Aucun personnage dans la lumière : le jeu y fait apparaître Spirit lui-même.`]);
-  carte('pro', 'decors', 'Ta loge, Spirit endormi à son bureau (facultatif)', 'Le jeu montre déjà Spirit endormi en assemblant sa tête au-dessus du dossier, mais une image peinte sera plus belle. Nom du fichier : loge-spirit-endormi.png.', ['loge', 'spirit-dos', 'spirit-officiel'],
+  carte('pro', 'decors', 'Ta loge, Spirit endormi à son bureau', 'Obligatoire : la tête de Spirit collée au-dessus du fauteuil ne rendait pas bien, je l\'ai retirée. En attendant cette image, on ne voit que les « z » au-dessus du fauteuil. Nom du fichier : loge-spirit-endormi.png.', ['loge', 'spirit-dos', 'spirit-officiel'],
     null, [], null,
     [`Reprends l'image de ta loge jointe. Garde exactement les mêmes dimensions (1672 × 941 pixels, sans recadrer, sans bordure ajoutée) et garde absolument tout identique : meubles, murs, lumière, cadrage. Ajoute seulement Spirit (la mascotte jointe : petit personnage blanc, casque-micro noir et bleu avec les lettres SG en cyan sur chaque écouteur, tee-shirt bleu) endormi dans le fauteuil beige de droite, face à son grand écran : on le voit de dos, sa tête et le haut de son casque dépassent du dossier, la tête penchée sur le côté, un bras qui pend le long de l'accoudoir. La lumière de l'écran l'éclaire doucement. Rien d'autre ne change.`]);
 
@@ -667,6 +667,15 @@ Le centre de la pièce reste dégagé pour marcher.`]);
 
   // cartes terminées (images reçues par Claude) : elles disparaissent du catalogue
   const RECUES = new Set(['QG-08', 'QG-10', 'QG-09', 'R2-01', 'PL-02', 'PL-03', 'PL-04', 'PL-05', 'PL-06', 'PL-07', 'PRO-04', 'PL-08', 'PL-09', 'PL-10', 'PRO-02', 'D1-12', 'D1-13', 'D1-16', 'QG-01', 'QG-02', 'QG-03', 'QG-05', 'QG-06', 'QG-07']);
+  carte('d1', 'objets', 'Objets du Terrier, nouvelle série (plus grands, tous à la même échelle)', 'Les statues, braseros, pots, coffres et le bloc de maintenant sont trop petits et chacun a sa propre taille. Refais-les tous dans la même conversation, pour qu\'ils aient exactement la même échelle, et joins la salle et Spirit pour la taille. Une image par objet, noms : statue.png, gargouille-poussable.png, brasero.png, pot.png, coffre.png, coffre-ouvert.png, bloc.png.', ['salle', 'statue', 'bloc', 'coffre', 'spirit-face'],
+    `${OBJET}\n\nFormat carré 1024 × 1024 pixels. Tous les objets de cette série sont à la même échelle : le personnage Spirit joint mesurerait 560 pixels de haut sur cette toile. Chaque objet est posé au sol, sa base est centrée en bas de l'image, à 60 pixels du bord inférieur, et il est vu de trois quarts face, exactement comme les objets posés dans la salle jointe (on voit le dessus et la face avant). Même pierre violette sombre aux fissures violettes lumineuses que les murs de la salle jointe.`,
+    ['Une gargouille de pierre sur son socle carré (comme la statue jointe, même allure), hauteur totale 760 pixels, socle de 420 pixels de large.',
+     'La même gargouille exactement, même taille, même pose, mais sur son socle une rune en losange cyan lumineuse, identique au losange de la plaque de pression de la salle jointe : c\'est la seule gargouille qu\'on peut pousser, elle doit se reconnaître au premier coup d\'œil. Pas de traînée au sol.',
+     'Un brasero de pierre sombre sur pied, une vasque large pleine de braises rougeoyantes, sans flamme (le jeu ajoute la flamme), hauteur 520 pixels.',
+     'Une grande jarre en terre cuite brun-violet, avec un couvercle, hauteur 400 pixels.',
+     'Un coffre fermé en bois sombre cerclé de métal doré, largeur 560 pixels.',
+     'Le même coffre ouvert, couvercle relevé vers l\'arrière, intérieur vide et sombre, même largeur.',
+     'Un gros bloc de pierre cubique, même pierre que les murs, une croix de rune violette gravée sur la face avant, largeur 520 pixels. Pas de traînée au sol.']);
   for (let i = cartes.length - 1; i >= 0; i--) if (RECUES.has(cartes[i].id)) cartes.splice(i, 1);
 
   // PRO-01 : reçues l'irruption du Roi (image 2) et la Source brisée (image 3)
@@ -679,7 +688,7 @@ Le centre de la pièce reste dégagé pour marcher.`]);
   { const c = cartes.find((x) => x.id === 'D1-17'); if (c) { c.pourquoi = 'Il ne te reste que cette étape : le mur de droite éventré. Toutes les autres variantes sont reçues.'; c.prompts = [c.prompts[8]]; c.n = 1; } }
 
   // cartes ajoutées ou modifiées lors de la dernière mise à jour
-  const NOUVEAUX = new Set(['PRO-08', 'PRO-09', 'PRO-05', 'PRO-06', 'PRO-07', 'QG-10', 'PRO-01', 'D1-17', 'QG-04', 'QG-08', 'QG-09', 'PRO-03', 'D1-17', 'R2-28', 'R2-29', 'R3-28', 'R3-29', 'R4-28', 'R4-29', 'R5-28', 'R5-29', 'R6-28', 'R6-29', 'R7-28', 'R7-29', 'R8-28', 'R8-29', 'R3-11', 'R4-11', 'R5-11', 'R6-11', 'R7-11', 'R8-11', 'FIN-08']);
+  const NOUVEAUX = new Set(['D1-18', 'PRO-08', 'PRO-09', 'PRO-05', 'PRO-06', 'PRO-07', 'QG-10', 'PRO-01', 'D1-17', 'QG-04', 'QG-08', 'QG-09', 'PRO-03', 'D1-17', 'R2-28', 'R2-29', 'R3-28', 'R3-29', 'R4-28', 'R4-29', 'R5-28', 'R5-29', 'R6-28', 'R6-29', 'R7-28', 'R7-29', 'R8-28', 'R8-29', 'R3-11', 'R4-11', 'R5-11', 'R6-11', 'R7-11', 'R8-11', 'FIN-08']);
 
   // ------------------------------------------------------------------ affichage
   const ETAPES = [['nouveau', 'Nouveautés'], ['tout', 'Tout'], ['pro', 'Prologue'], ['pl', 'Plaine'], ['d1', 'Donjon 1'], ['qg', 'Parvis du QG'], ['r2', 'Forêt + Donjon 2'], ['r3', 'Monts + Donjon 3'], ['r4', 'Désert + Donjon 4'], ['r5', 'Lac + Donjon 5'], ['r6', 'Cité + Donjon 6'], ['r7', 'Marais + Donjon 7'], ['r8', 'Toundra + Donjon 8'], ['fin', 'Tour finale']];

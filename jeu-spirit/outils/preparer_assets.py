@@ -118,6 +118,7 @@ def composer(nom, im):
 
 
 FACULTATIVES = {
+    'gargouille-poussable': ('donjon1/gargouille-poussable.png', 'w', 84, ''),
     'loge-porte-ouverte': ('prologue/loge-porte-ouverte.png', 'w', 836, ''),
     'bureau-lynx-ouvert': ('qg/bureau-de-mika-porte-ouverte.png', 'w', 836, ''),
     'spirit-aspire': ('spirit-v2/aspire.png', 'h', 112, ''),
@@ -167,11 +168,11 @@ FACULTATIVES = {
     'clic-b': ('donjon1/clic-b.png', 'h', 76, ''),
     'reine': ('donjon1/reine.png', 'w', 250, ''),
     'bloc': ('donjon1/bloc.png', 'w', 80, ''),
-    'statue': ('donjon1/statue.png', 'w', 64, ''),
-    'brasero': ('donjon1/brasero.png', 'w', 64, ''),
-    'pot': ('donjon1/pot.png', 'w', 56, ''),
-    'coffre': ('donjon1/coffre.png', 'w', 78, ''),
-    'coffre-ouvert': ('donjon1/coffre-ouvert.png', 'w', 78, ''),
+    'statue': ('donjon1/statue.png', 'w', 84, ''),
+    'brasero': ('donjon1/brasero.png', 'w', 76, ''),
+    'pot': ('donjon1/pot.png', 'w', 62, ''),
+    'coffre': ('donjon1/coffre.png', 'w', 88, ''),
+    'coffre-ouvert': ('donjon1/coffre-ouvert.png', 'w', 88, ''),
     'cristal': ('donjon1/cristal.png', 'h', 96, ''),
     'cristal-actif': ('donjon1/cristal-actif.png', 'h', 96, ''),
     'entree-terrier': ('donjon1/entree-terrier.png', 'w', 1160, ''),

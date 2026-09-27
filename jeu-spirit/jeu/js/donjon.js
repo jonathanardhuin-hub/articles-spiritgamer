@@ -181,8 +181,10 @@ SG.DONJON1 = {
 
 SG.CASES_SALLE_PLEINES = new Set(['#', 'o', 'F', 'p', 'C', 'X', 'B', 'v']);
 SG.CASES_SALLE_MURS = new Set(['#', 'v']);
+// dans les salles peintes, statues et braseros se placent au milieu des dalles du sol (dalles de 131,5 px à partir de x = 114)
+SG.xDalle = (x) => 114 + 131.5 * (Math.round((x - 114 - 65.75) / 131.5)) + 65.75;
 // empreinte au sol des objets (demi-largeur, hauteur) : seul le pied arrête, on passe derrière le reste
-SG.PIEDS_OBJETS = { o: [26, 30], F: [22, 26], p: [20, 24], C: [32, 32], X: [22, 26], B: [36, 42] };
+SG.PIEDS_OBJETS = { o: [30, 30], F: [26, 26], p: [22, 24], C: [36, 32], X: [22, 26], B: [36, 42] };
 
 SG.cleSalles = (a, b) => [a, b].sort().join('|');
 
@@ -525,7 +527,7 @@ Object.assign(SG.Jeu.prototype, {
     this.cristalFrappe = D.resolues.includes(k) && S.condition === 'cristal';
     // braseros
     this.feux = [];
-    S.plan.forEach((ligne, r) => [...ligne].forEach((ch, c) => { if (ch === 'F') this.feux.push(new SG.Feu(c * SG.T + 40, r * SG.T + 34, 0.7)); }));
+    S.plan.forEach((ligne, r) => [...ligne].forEach((ch, c) => { if (ch === 'F') this.feux.push(new SG.Feu(this.imageSalle() ? SG.xDalle(c * SG.T + 40) : c * SG.T + 40, r * SG.T + 34, 0.7)); }));
     if (S.boss) {
       if (!D.fini) {
         SG.Son.jouerMusique('boss');
@@ -602,9 +604,12 @@ Object.assign(SG.Jeu.prototype, {
     const S = this.salle(), k = this.salleCle();
     if (!this.imageSalle()) return null;
     this.masques = this.masques || {};
-    if (this.masques[k]) return this.masques[k];
+    // une porte fermée (verrou, volets, grille) bouche son embrasure : Spirit ne marche jamais dans une porte close
+    const dirs = ['haut', 'bas', 'gauche', 'droite'], ouv = dirs.map((d) => this.porteOuverte(d) ? '1' : '0').join('');
+    const cm = k + '|' + ouv;
+    if (this.masques[cm]) return this.masques[cm];
     const libre = (x, y, r) => x >= r[0] && x < r[2] && y >= r[1] && y < r[3];
-    const couloirs = [[580, 0, 700, 120], [580, 600, 700, 720], [0, 320, 120, 400], [1160, 320, 1280, 400]];
+    const couloirs = [[580, 0, 700, 120], [580, 600, 700, 720], [0, 320, 120, 400], [1160, 320, 1280, 400]].filter((q, i) => ouv[i] === '1');
     const m = [];
     for (let r = 0; r < 36; r++) {
       let l = '';
@@ -617,7 +622,7 @@ Object.assign(SG.Jeu.prototype, {
       }
       m.push(l);
     }
-    return (this.masques[k] = m);
+    return (this.masques[cm] = m);
   },
 
   caseSalle(c, r) {
@@ -644,6 +649,7 @@ Object.assign(SG.Jeu.prototype, {
       if (!pied) continue;
       let cx = c * T + 40;
       if (ch === 'X') cx += S.cristalDx || 0;
+      if ((ch === 'o' || ch === 'F') && this.imageSalle()) cx = SG.xDalle(cx);
       if (ch === 'B') {
         const bl = (this.blocs || []).find((q) => q.r === r && (q.c === c || (S.decalBloc && q.c + 1 === c)));
         if (bl) { if (bl.c !== c) continue; cx = bl.c * T + 40 + (S.decalBloc || 0); }
@@ -698,6 +704,22 @@ Object.assign(SG.Jeu.prototype, {
     if (avant < SG.DELAI_GRILLES && this.tSalle >= SG.DELAI_GRILLES && this.sallePortesFermees()) SG.Son.effet('porte');
     const S = this.salle(), k = this.salleCle(), D = this.etatDonjon(), s = this.spirit;
     if (!this.entreeSalle) this.entreeSalle = { x: s.x, y: s.y };
+    // salle piège : avant que les grilles tombent, Spirit fait quelques pas dans la salle (jamais coincé dans l'embrasure)
+    // (et de même si la porte par laquelle il est entré est fermée, par exemple des volets qui attendent la plaque)
+    const piege = (S.boss && !D.fini) || !!(S.combat && !D.resolues.includes(k) && this.monstres.length > 0);
+    const cote = s.y > 604 ? 'bas' : s.y - s.ph < 116 ? 'haut' : s.x < 116 ? 'gauche' : s.x > 1164 ? 'droite' : null;
+    if (cote && (piege || (!this.porteOuverte(cote) && this.tSalle < 1.2)) && this.imageSalle()) {
+      const cible = { x: SG.clamp(s.x, 150, 1130), y: SG.clamp(s.y, 150 + s.ph, 590) };
+      const dx = cible.x - s.x, dy = cible.y - s.y, d = Math.hypot(dx, dy);
+      if (d > 1) {
+        const v = Math.min(d, 380 * dt);
+        s.x += dx / d * v; s.y += dy / d * v;
+        s.dir = Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'droite' : 'gauche') : (dy > 0 ? 'bas' : 'haut');
+        s.bouge = true; s.tempsMarche = (s.tempsMarche || 0) + dt;
+        if (this.tSalle >= SG.DELAI_GRILLES) this.tSalle = SG.DELAI_GRILLES - 0.01;
+        return;
+      }
+    }
     if (s.chute > 0) {
       s.chute -= dt;
       if (s.chute <= 0) {
@@ -749,7 +771,8 @@ Object.assign(SG.Jeu.prototype, {
           if (b && libre && !((S.condition === 'bloc' || S.condition === 'plaque') && D.resolues.includes(k))) { b.c = nc; b.r = nr; b.dc = d.x; b.dr = d.y; b.anim = 1; b.pousse = true; SG.Son.effet('porte'); }
         }
       } else this.pousse = 0;
-      const dp = this.dirPorte(fc, fr);
+      // la porte se cherche un peu plus loin que le bloc : Spirit bute contre l'embrasure, pas dedans
+      const dp = this.dirPorte(Math.floor((s.x + d.x * 70) / SG.T), Math.floor((s.y - 11 + (d.y > 0 ? 60 : d.y * 60)) / SG.T));
       if (dp && dp === s.dir && !this.porteOuverte(dp) && !this.sallePortesFermees() && !this.messageVerrou) {
         const p = this.porteVers(dp);
         if (p && p.type === 'cle') {
@@ -942,8 +965,9 @@ Object.assign(SG.Jeu.prototype, {
     const S = this.salle(), k = this.salleCle(), D = this.etatDonjon(), T = SG.T;
     for (let r = 0; r < SG.ROWS; r++) for (let c = 0; c < SG.COLS; c++) {
       const ch = this.caseSalle(c, r), x = c * T + 40, y = r * T + T;
-      if (ch === 'o') liste.push({ y, dessiner: (ctx) => SG.dessinStatue(ctx, x, y) });
-      else if (ch === 'F') liste.push({ y, dessiner: (ctx) => SG.dessinBrasero(ctx, x, y) });
+      const xd = this.imageSalle() ? SG.xDalle(x) : x;
+      if (ch === 'o') liste.push({ y, dessiner: (ctx) => SG.dessinStatue(ctx, xd, y) });
+      else if (ch === 'F') liste.push({ y, dessiner: (ctx) => SG.dessinBrasero(ctx, xd, y) });
       else if (ch === 'p') liste.push({ y, dessiner: (ctx) => SG.dessinPot(ctx, x, y) });
       else if (ch === 'C') liste.push({ y, dessiner: (ctx) => SG.dessinCoffre(ctx, x, y, D.coffres.includes(k)) });
       else if (ch === 'X') liste.push({ y, dessiner: (ctx) => SG.dessinCristal(ctx, x + (S.cristalDx || 0), y, this.cristalFrappe, this.t) });
@@ -958,7 +982,13 @@ Object.assign(SG.Jeu.prototype, {
       const tremble = this.pousse > 0.05 && SG.dist(this.spirit.x, this.spirit.y, b.c * T + 40, b.r * T + 40) < 130 ? Math.sin(this.t * 70) * 2.5 : 0;
       const x = b.c * T + 40 + (S.decalBloc || 0) - b.dc * b.anim * T + tremble, y = b.r * T + T + (S.decalBlocY || 0) - b.dr * b.anim * T;
       // traces de frottement au sol : le bloc a déjà bougé, il peut bouger encore
-      liste.push({ y, dessiner: (ctx) => (b.statue ? SG.dessinStatue(ctx, x, y) : SG.dessinBloc(ctx, x, y)) });
+      liste.push({ y, dessiner: (ctx) => {
+        if (!b.statue) { SG.dessinBloc(ctx, x, y); return; }
+        if (SG.img['gargouille-poussable'] && SG.img['gargouille-poussable'].width) { SG.dessinerPied(ctx, SG.img['gargouille-poussable'], x, y); return; }
+        // en attendant son image : la gargouille à pousser porte la lueur cyan de la plaque, les autres non
+        ctx.save(); ctx.filter = `drop-shadow(0 0 ${6 + Math.sin(this.t * 3) * 3}px rgba(95,243,255,0.9))`;
+        SG.dessinStatue(ctx, x, y); ctx.restore();
+      } });
     }
     // portes (toujours derrière les personnages : dessinées sur le fond)
     for (const dir of ['haut', 'bas', 'gauche', 'droite']) {
@@ -973,10 +1003,9 @@ Object.assign(SG.Jeu.prototype, {
     const sp = this.spirit;
     if (!sp || !this.imageSalle()) return;
     const zones = [];
-    if (sp.x < 118) zones.push([0, 150, 132, 166], [0, 300, 46, 130]);
-    if (sp.x > 1162) zones.push([1148, 150, 132, 166], [1234, 300, 46, 130]);
-    if (sp.y < 124) zones.push([560, 0, 160, 34], [522, 0, 58, 124], [700, 0, 58, 124]);
-    if (sp.y > 606) zones.push([566, 680, 148, 40], [522, 588, 66, 132], [692, 588, 66, 132]);
+    // portes de côté : le mur au-dessus de l'ouverture est derrière Spirit, rien ne passe devant lui
+    if (sp.y < 124 && this.porteOuverte('haut')) zones.push([560, 0, 160, 34], [522, 0, 58, 124], [700, 0, 58, 124]);
+    if (sp.y > 606 && this.porteOuverte('bas')) zones.push([566, 680, 148, 40], [522, 588, 66, 132], [692, 588, 66, 132]);
     if (!zones.length) return;
     const cv = this.fondSalle(this.ecran), k = cv.width / SG.W;
     liste.push({ y: sp.y + 0.5, dessiner: (ctx) => { for (const [x, y, w, h] of zones) ctx.drawImage(cv, x * k, y * k, w * k, h * k, x, y, w, h); } });

@@ -558,7 +558,7 @@ SG.Jeu = class {
     if (C.appuis.A) {
       if (!this.parler() && !this.ouvrirCoffre()) {
         if (this.ampli) s.attaquer(this);
-        else if (!this.dejaPrevenu && this.ecran !== 'grotte' && this.ecran !== 'loge') { this.dejaPrevenu = true; this.dialogue([[null, SG.TEXTES.sansAmpli]]); return; }
+        else if (!this.dejaPrevenu && this.ecran !== 'grotte' && !(SG.MONDE[this.ecran] && SG.MONDE[this.ecran].interieur)) { this.dejaPrevenu = true; this.dialogue([[null, SG.TEXTES.sansAmpli]]); return; }
       }
     }
     s.maj(this, dt);
@@ -1027,7 +1027,8 @@ SG.Jeu = class {
         // endormi dans sa chaise, face à l'écran : on voit sa tête penchée au-dessus du dossier, et les « z »
         liste.push({ y: SG.H + 50, dessiner: (ctx) => {
           const dos = SG.img['spirit-dos'];
-          if (dos && dos.width) {
+          // en attendant l'image peinte de la loge avec Spirit endormi (catalogue PRO-07) : seulement les « z » au-dessus du fauteuil
+          if (false && dos && dos.width) {
             ctx.save();
             // seule la tête dépasse du dossier : on coupe tout ce qui passerait sous le haut du dossier
             ctx.beginPath(); ctx.rect(Ch.x - 90, Ch.y - 140, 180, 140); ctx.clip();

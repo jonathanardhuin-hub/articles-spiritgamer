@@ -273,5 +273,5 @@ SG.TEXTES = {
     : `Tu as trouvé un fragment de cœur ! (${n % 4} sur 4) Réunis-en quatre pour gagner un cœur de plus.`,
   foretBientot: 'La barrière s\'est dissipée. Au-delà commence la Forêt des Forums... La suite de l\'aventure arrive dans la prochaine version du jeu.',
   barriere: 'Le cristal s\'illumine. Au loin, la barrière de Bruit de la route du nord se dissipe !',
-  sansAmpli: 'Spirit n\'a aucun moyen de se défendre. Il vaudrait mieux passer à la grotte d\'abord.',
+  sansAmpli: 'Spirit n\'a rien pour se défendre. Mieux vaut éviter ces créatures pour l\'instant.',
 };
