@@ -1,0 +1,186 @@
+<title>Atelier Spirit</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito+Sans:wght@400;600;800&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+  :root {
+    --fond: #eef3fa; --surface: #ffffff; --surface-2: #e3ebf6; --texte: #0f1c33; --doux: #52617a;
+    --ligne: #c9d5e6; --cyan: #0a8fb8; --cyan-fond: #d7f1fa; --violet: #7a3fd1; --violet-fond: #ece2fb;
+    --ok: #1d8a4e; --ok-fond: #daf3e5; --pre: #f5f8fc;
+    --display: "Fredoka", "Trebuchet MS", system-ui, sans-serif;
+    --corps: "Nunito Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --mono: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --fond: #0a1426; --surface: #111f38; --surface-2: #172a4a; --texte: #e8f0fb; --doux: #9fb0cb;
+      --ligne: #243a60; --cyan: #34d1ff; --cyan-fond: #0f3550; --violet: #b890ff; --violet-fond: #2c1f4d;
+      --ok: #4fd68b; --ok-fond: #12382a; --pre: #0c182d;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --fond: #0a1426; --surface: #111f38; --surface-2: #172a4a; --texte: #e8f0fb; --doux: #9fb0cb;
+    --ligne: #243a60; --cyan: #34d1ff; --cyan-fond: #0f3550; --violet: #b890ff; --violet-fond: #2c1f4d;
+    --ok: #4fd68b; --ok-fond: #12382a; --pre: #0c182d;
+  }
+  body { background: var(--fond); color: var(--texte); font: 15px/1.55 var(--corps); }
+  .page { max-width: 1100px; margin: 0 auto; padding-inline: 16px; padding-block: 24px 80px; display: grid; gap: 22px; }
+  h1, h2, h3 { font-family: var(--display); text-wrap: balance; margin: 0; }
+  h1 { font-size: clamp(28px, 5vw, 40px); font-weight: 700; }
+  h1 small { display: block; font: 600 15px/1.4 var(--corps); color: var(--doux); margin-top: 4px; }
+  .guide { display: flex; flex-wrap: wrap; gap: 10px 22px; margin: 0; padding: 0; list-style: none; color: var(--doux); font-size: 14px; }
+  .guide li { display: flex; gap: 8px; align-items: center; }
+  .guide i { width: 22px; height: 22px; border-radius: 5px; flex: none; }
+  .guide .g-ok { background: var(--surface-2); border: 1px solid var(--ligne); }
+  .guide .g-vide { border: 2px dashed var(--cyan); }
+  .barre { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--fond); padding-block: 10px; display: flex; flex-wrap: wrap; gap: 6px; border-bottom: 1px solid var(--ligne); }
+  .onglet { font: 700 13px/1 var(--corps); padding: 8px 12px; border-radius: 999px; border: 1px solid var(--ligne); background: var(--surface); color: var(--texte); cursor: pointer; display: inline-flex; gap: 6px; align-items: center; }
+  .onglet b { font: 700 11px/1 var(--mono); color: var(--violet); }
+  .onglet[aria-pressed="true"] { background: var(--cyan); border-color: var(--cyan); color: var(--fond); }
+  .onglet[aria-pressed="true"] b { color: var(--fond); }
+  .onglet:focus-visible, button:focus-visible, summary:focus-visible { outline: 3px solid var(--violet); outline-offset: 2px; }
+  .bloc { display: grid; gap: 14px; }
+  .bloc > header { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+  .bloc h2 { font-size: 24px; }
+  .compte { font: 700 12px/1 var(--mono); color: var(--doux); letter-spacing: .04em; }
+  .groupe { display: grid; gap: 8px; }
+  .groupe h3 { font: 800 12px/1 var(--corps); text-transform: uppercase; letter-spacing: .08em; color: var(--doux); }
+  .grille { display: grid; grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); gap: 10px; }
+  .vig { display: grid; gap: 4px; padding: 0; border: 0; background: none; color: var(--doux); font: 600 11px/1.25 var(--corps); text-align: center; cursor: zoom-in; word-break: break-word; }
+  .vig img { width: 100%; aspect-ratio: 1; object-fit: contain; background: var(--surface-2); border: 1px solid var(--ligne); border-radius: 8px; padding: 4px; }
+  .vig:hover img { border-color: var(--cyan); }
+  .carte { background: var(--surface); border: 1px solid var(--ligne); border-radius: 12px; padding: 16px; display: grid; gap: 12px; }
+  .carte.fait { opacity: .55; }
+  .entete { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .code { font: 700 12px/1 var(--mono); background: var(--cyan-fond); color: var(--cyan); padding: 5px 7px; border-radius: 5px; }
+  .entete h3 { font-size: 19px; font-weight: 600; flex: 1 1 260px; }
+  .typ { font: 700 11px/1 var(--corps); text-transform: uppercase; letter-spacing: .07em; color: var(--violet); background: var(--violet-fond); padding: 5px 7px; border-radius: 5px; }
+  .fait-btn { font: 800 13px/1 var(--corps); padding: 8px 12px; border-radius: 8px; border: 1px solid var(--ok); background: transparent; color: var(--ok); cursor: pointer; }
+  .fait .fait-btn { background: var(--ok); color: var(--surface); }
+  .pourquoi { margin: 0; color: var(--doux); max-width: 75ch; }
+  .etiq { font: 800 11px/1 var(--corps); text-transform: uppercase; letter-spacing: .09em; color: var(--doux); }
+  .zone { display: grid; gap: 8px; }
+  .cases { display: grid; grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); gap: 10px; }
+  .case { aspect-ratio: 1; max-width: 100%; border: 2px dashed var(--cyan); border-radius: 8px; padding: 8px; display: grid; align-content: space-between; font: 600 11px/1.3 var(--corps); color: var(--doux); overflow: hidden; }
+  .case b { font: 700 18px/1 var(--mono); color: var(--cyan); }
+  .case span { display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
+  .fait .case { border-style: solid; border-color: var(--ok); background: var(--ok-fond); }
+  .fait .case b { color: var(--ok); }
+  .joindre { display: flex; flex-wrap: wrap; gap: 10px; }
+  .joindre .vig { width: 96px; }
+  .nouvelle { width: 150px; min-height: 96px; border: 2px dashed var(--violet); border-radius: 8px; display: grid; place-items: center; padding: 8px; font: 700 12px/1.3 var(--corps); color: var(--violet); text-align: center; }
+  .prompt { display: grid; gap: 6px; }
+  .prompt-tete { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+  .copier { font: 800 13px/1 var(--corps); padding: 8px 14px; border-radius: 8px; border: 0; background: var(--cyan); color: var(--fond); cursor: pointer; }
+  pre { margin: 0; white-space: pre-wrap; word-break: break-word; font: 13px/1.5 var(--corps); background: var(--pre); border: 1px solid var(--ligne); border-radius: 8px; padding: 12px; max-height: 240px; overflow: auto; }
+  details.plus-tard { background: var(--surface); border: 1px solid var(--ligne); border-radius: 12px; padding: 12px 16px; }
+  details.plus-tard > summary { cursor: pointer; font: 600 17px/1.3 var(--display); }
+  details.plus-tard[open] > summary { margin-bottom: 12px; }
+  details.plus-tard .liste { display: grid; gap: 14px; }
+  .liste { display: grid; gap: 14px; }
+  .vide { color: var(--doux); margin: 0; }
+  .loupe { position: fixed; inset: 0; z-index: 20; background: rgb(5 10 20 / .88); display: grid; place-items: center; padding: 16px; gap: 10px; align-content: center; }
+  .loupe[hidden] { display: none; }
+  .loupe img { max-width: 100%; max-height: 80vh; background: #808080; border-radius: 8px; }
+  .loupe p { margin: 0; color: #e8f0fb; font-weight: 600; text-align: center; }
+  .loupe button { font: 800 14px/1 var(--corps); padding: 10px 16px; border-radius: 8px; border: 0; background: #34d1ff; color: #0a1426; cursor: pointer; }
+</style>
+
+<div class="page">
+  <header>
+    <h1>Atelier Spirit<small>Les images qu'on garde et celles qui restent à faire, étape par étape</small></h1>
+  </header>
+  <ul class="guide">
+    <li><i class="g-ok"></i>Image prête : on la garde telle quelle</li>
+    <li><i class="g-vide"></i>Carré vide : image à faire avec le prompt de la carte</li>
+    <li>1 carte = 1 nouvelle conversation ChatGPT</li>
+    <li>« Fait » se retient sur cet appareil</li>
+  </ul>
+  <nav class="barre" id="onglets" aria-label="Étapes"></nav>
+  <main id="contenu" class="bloc"></main>
+</div>
+<div class="loupe" id="loupe" hidden><img id="loupe-img" alt=""><p id="loupe-nom"></p><p>Clic droit ou appui long sur l'image pour l'enregistrer.</p><button type="button" id="loupe-fermer">Fermer</button></div>
+
+<script>
+  const D = /*DATA*/null;
+  const ETAPES = [['pro', 'Prologue'], ['pl', 'Plaine'], ['d1', 'Donjon 1'], ['qg', 'Parvis du QG'], ['r2', 'Forêt + Donjon 2'], ['r3', 'Monts + Donjon 3'], ['r4', 'Désert + Donjon 4'], ['r5', 'Lac + Donjon 5'], ['r6', 'Cité + Donjon 6'], ['r7', 'Marais + Donjon 7'], ['r8', 'Toundra + Donjon 8'], ['fin', 'Tour finale']];
+  const TYPES = { perso: 'Spirit', objets: 'Objets', ennemis: 'Ennemis', boss: 'Boss', pnj: 'Gardiens et habitants', effets: 'Effets', donjons: 'Donjons', decors: 'Décors', interface: 'Interface' };
+  const NOUVELLES = { '@D1-09': 'Ta nouvelle salle du Terrier (carte D1-09)', '@D1-18': 'Tes nouveaux objets du Terrier (carte D1-18)', '@D1-22': 'Ton nouveau Flash (carte D1-22)', '@PL': 'Un de tes nouveaux écrans de la Plaine (PL-01 à PL-09)' };
+  const lire = (k, d) => { try { const v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); } catch (e) { return d; } };
+  const ecrire = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} };
+  let etape = lire('atelier-etape', 'pro');
+  const faites = new Set(lire('atelier-faites', []));
+  const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+  function onglets() {
+    const nav = document.getElementById('onglets');
+    nav.innerHTML = ETAPES.map(([k, t]) => {
+      const n = D.cartes.filter((c) => c.e === k && c.neuf && !faites.has(c.id)).length;
+      return `<button type="button" class="onglet" data-k="${k}" aria-pressed="${k === etape}">${t}${n ? `<b>${n}</b>` : ''}</button>`;
+    }).join('');
+    nav.querySelectorAll('.onglet').forEach((b) => b.addEventListener('click', () => { etape = b.dataset.k; ecrire('atelier-etape', etape); rendre(); window.scrollTo({ top: 0 }); }));
+  }
+
+  function cases(c) {
+    const lab = [];
+    for (let i = 0; i < c.n; i++) {
+      if (i < c.it.length) lab.push(c.it[i]);
+      else lab.push(c.st ? `Étape ${i - c.it.length + (c.it.length ? 2 : 1)} de la carte` : '');
+    }
+    return lab.map((t, i) => `<div class="case" title="${esc(t)}"><b>${i + 1}</b><span>${esc(t)}</span></div>`).join('');
+  }
+
+  function carte(c) {
+    const refs = c.r.map((r) => NOUVELLES[r]
+      ? `<div class="nouvelle">${esc(NOUVELLES[r])}</div>`
+      : `<button type="button" class="vig" data-ref="${r}"><img src="${D.refs[r]}" alt="" loading="lazy"><span>${esc(D.labels[r] || r)}</span></button>`).join('');
+    const prompts = c.pr.map((p, i) => `<div class="prompt"><div class="prompt-tete"><span class="etiq">${c.pr.length > 1 ? `Prompt ${i + 1} sur ${c.pr.length}` : 'Prompt'}</span><button type="button" class="copier" data-c="${c.id}" data-i="${i}">Copier</button></div><pre>${esc(p)}</pre></div>`).join('');
+    return `<article class="carte${faites.has(c.id) ? ' fait' : ''}" id="${c.id}">
+      <div class="entete"><span class="code">${c.id}</span><h3>${esc(c.t)}</h3><span class="typ">${TYPES[c.cat] || c.cat}</span><button type="button" class="fait-btn" data-f="${c.id}">${faites.has(c.id) ? 'Fait' : 'Marquer fait'}</button></div>
+      <p class="pourquoi">${esc(c.p)}</p>
+      <div class="zone"><span class="etiq">À faire (${c.n} image${c.n > 1 ? 's' : ''})</span><div class="cases">${cases(c)}</div></div>
+      ${c.r.length ? `<div class="zone"><span class="etiq">À joindre dans ChatGPT</span><div class="joindre">${refs}</div></div>` : ''}
+      ${prompts}
+    </article>`;
+  }
+
+  function rendre() {
+    onglets();
+    const g = D.gardees[etape] || [];
+    const cs = D.cartes.filter((c) => c.e === etape);
+    const now = cs.filter((c) => c.neuf), tard = cs.filter((c) => !c.neuf);
+    const nbG = g.reduce((a, x) => a + x.images.length, 0);
+    const main = document.getElementById('contenu');
+    main.innerHTML = `
+      <section class="bloc"><header><h2>Images prêtes, on les garde</h2><span class="compte">${nbG} IMAGE${nbG > 1 ? 'S' : ''}</span></header>
+        ${g.length ? g.map((x) => `<div class="groupe"><h3>${esc(x.titre)}</h3><div class="grille">${x.images.map((im, i) => `<button type="button" class="vig" data-g="${esc(x.titre)}" data-i="${i}"><img src="${im.src}" alt="" loading="lazy"><span>${esc(im.nom)}</span></button>`).join('')}</div></div>`).join('') : '<p class="vide">Rien encore pour cette étape.</p>'}
+      </section>
+      <section class="bloc"><header><h2>À faire maintenant</h2><span class="compte">${now.length} CARTE${now.length > 1 ? 'S' : ''}</span></header>
+        ${now.length ? `<div class="liste">${now.map(carte).join('')}</div>` : '<p class="vide">Rien à faire maintenant dans cette étape.</p>'}
+      </section>
+      ${tard.length ? `<details class="plus-tard"><summary>Plus tard dans cette étape (${tard.length} cartes)</summary><div class="liste">${tard.map(carte).join('')}</div></details>` : ''}`;
+    main.querySelectorAll('.copier').forEach((b) => b.addEventListener('click', () => {
+      const c = D.cartes.find((x) => x.id === b.dataset.c), t = c.pr[+b.dataset.i];
+      const ok = () => { b.textContent = 'Copié'; setTimeout(() => { b.textContent = 'Copier'; }, 1500); };
+      const repli = () => { const r = document.createRange(); r.selectNodeContents(b.closest('.prompt').querySelector('pre')); const s = getSelection(); s.removeAllRanges(); s.addRange(r); b.textContent = 'Sélectionné : Ctrl+C'; };
+      try { navigator.clipboard.writeText(t).then(ok, repli); } catch (e) { repli(); }
+    }));
+    main.querySelectorAll('.fait-btn').forEach((b) => b.addEventListener('click', () => {
+      const id = b.dataset.f; faites.has(id) ? faites.delete(id) : faites.add(id); ecrire('atelier-faites', [...faites]);
+      const a = b.closest('.carte'); a.classList.toggle('fait', faites.has(id)); b.textContent = faites.has(id) ? 'Fait' : 'Marquer fait'; onglets();
+    }));
+    main.querySelectorAll('.vig').forEach((b) => b.addEventListener('click', () => {
+      if (b.dataset.ref) ouvrir(D.refs[b.dataset.ref], D.labels[b.dataset.ref] || b.dataset.ref);
+      else { const x = g.find((y) => y.titre === b.dataset.g).images[+b.dataset.i]; ouvrir(x.src, x.nom); }
+    }));
+  }
+
+  const loupe = document.getElementById('loupe');
+  function ouvrir(src, nom) { document.getElementById('loupe-img').src = src; document.getElementById('loupe-nom').textContent = nom; loupe.hidden = false; document.getElementById('loupe-fermer').focus(); }
+  document.getElementById('loupe-fermer').addEventListener('click', () => { loupe.hidden = true; });
+  loupe.addEventListener('click', (e) => { if (e.target === loupe) loupe.hidden = true; });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') loupe.hidden = true; });
+  if (!ETAPES.some(([k]) => k === etape)) etape = 'pro';
+  rendre();
+</script>
