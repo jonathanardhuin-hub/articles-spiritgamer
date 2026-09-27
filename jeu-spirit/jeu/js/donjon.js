@@ -82,7 +82,7 @@ SG.DONJON1 = {
     },
     '2,2': {
       nom: 'La Salle des Plaques',
-      image: 'salle-plaque', imageResolue: 'salle-plaque-enfoncee', decalBloc: 40,
+      image: 'salle-plaque', imageResolue: 'salle-plaque-enfoncee', decalBloc: 40, decalBlocY: -22,
       plan: [
         '################',
         '#..............#',
@@ -180,6 +180,9 @@ SG.DONJON1 = {
 };
 
 SG.CASES_SALLE_PLEINES = new Set(['#', 'o', 'F', 'p', 'C', 'X', 'B', 'v']);
+SG.CASES_SALLE_MURS = new Set(['#', 'v']);
+// empreinte au sol des objets (demi-largeur, hauteur) : seul le pied arrête, on passe derrière le reste
+SG.PIEDS_OBJETS = { o: [26, 30], F: [22, 26], p: [20, 24], C: [32, 32], X: [22, 26], B: [36, 42] };
 
 SG.cleSalles = (a, b) => [a, b].sort().join('|');
 
@@ -631,6 +634,27 @@ Object.assign(SG.Jeu.prototype, {
     return ch;
   },
 
+  // la boîte touche-t-elle le pied d'une statue, d'un brasero, d'un pot, d'un coffre, du cristal ou d'un bloc ?
+  piedObjetTouche(b) {
+    const S = this.salle(), T = SG.T;
+    const c0 = Math.floor(b.x / T) - 1, c1 = Math.floor((b.x + b.w) / T) + 1;
+    const r0 = Math.floor(b.y / T), r1 = Math.floor((b.y + b.h) / T) + 1;
+    for (let r = r0; r <= r1; r++) for (let c = c0; c <= c1; c++) {
+      const ch = this.caseSalle(c, r), pied = ch && SG.PIEDS_OBJETS[ch];
+      if (!pied) continue;
+      let cx = c * T + 40;
+      if (ch === 'X') cx += S.cristalDx || 0;
+      if (ch === 'B') {
+        const bl = (this.blocs || []).find((q) => q.r === r && (q.c === c || (S.decalBloc && q.c + 1 === c)));
+        if (bl) { if (bl.c !== c) continue; cx = bl.c * T + 40 + (S.decalBloc || 0); }
+        if (bl) { const [hw, hh] = pied, yb = r * T + T - 4 + (S.decalBlocY || 0); if (SG.boitesSeTouchent(b, { x: cx - hw, y: yb - hh, w: hw * 2, h: hh })) return true; continue; }
+      }
+      const [hw, hh] = pied;
+      if (SG.boitesSeTouchent(b, { x: cx - hw, y: r * T + T - 4 - hh, w: hw * 2, h: hh })) return true;
+    }
+    return false;
+  },
+
   voisinSalle(dir) {
     const p = this.porteVers(dir);
     if (!p || p.type === 'sortie' || !this.porteOuverte(dir)) return null;
@@ -932,9 +956,8 @@ Object.assign(SG.Jeu.prototype, {
     }
     for (const b of this.blocs || []) {
       const tremble = this.pousse > 0.05 && SG.dist(this.spirit.x, this.spirit.y, b.c * T + 40, b.r * T + 40) < 130 ? Math.sin(this.t * 70) * 2.5 : 0;
-      const x = b.c * T + 40 + (S.decalBloc || 0) - b.dc * b.anim * T + tremble, y = b.r * T + T - b.dr * b.anim * T;
+      const x = b.c * T + 40 + (S.decalBloc || 0) - b.dc * b.anim * T + tremble, y = b.r * T + T + (S.decalBlocY || 0) - b.dr * b.anim * T;
       // traces de frottement au sol : le bloc a déjà bougé, il peut bouger encore
-      if (!b.pousse) liste.push({ y: -50, dessiner: (ctx) => SG.tracesBloc(ctx, b.c * T + 40 + (S.decalBloc || 0), b.r * T + 40) });
       liste.push({ y, dessiner: (ctx) => (b.statue ? SG.dessinStatue(ctx, x, y) : SG.dessinBloc(ctx, x, y)) });
     }
     // portes (toujours derrière les personnages : dessinées sur le fond)
@@ -942,6 +965,21 @@ Object.assign(SG.Jeu.prototype, {
       const p = this.porteVers(dir);
       liste.push({ y: dir === 'bas' ? SG.H + 100 : -100, dessiner: (ctx) => SG.dessinPorte(ctx, dir, p, this.porteOuverte(dir), this.sallePortesFermees(), !!this.imageSalle(), SG.clamp(((this.tSalle || 0) - SG.DELAI_GRILLES) / 0.22, 0, 1)) });
     }
+    this.avantPortes(liste);
+  },
+
+  // quand Spirit s'engage dans une porte peinte, le linteau et les montants passent devant lui : il entre DANS la porte
+  avantPortes(liste) {
+    const sp = this.spirit;
+    if (!sp || !this.imageSalle()) return;
+    const zones = [];
+    if (sp.x < 118) zones.push([0, 150, 132, 166], [0, 300, 46, 130]);
+    if (sp.x > 1162) zones.push([1148, 150, 132, 166], [1234, 300, 46, 130]);
+    if (sp.y < 124) zones.push([560, 0, 160, 34], [522, 0, 58, 124], [700, 0, 58, 124]);
+    if (sp.y > 606) zones.push([566, 680, 148, 40], [522, 588, 66, 132], [692, 588, 66, 132]);
+    if (!zones.length) return;
+    const cv = this.fondSalle(this.ecran), k = cv.width / SG.W;
+    liste.push({ y: sp.y + 0.5, dessiner: (ctx) => { for (const [x, y, w, h] of zones) ctx.drawImage(cv, x * k, y * k, w * k, h * k, x, y, w, h); } });
   },
 
   // ---------------------------------------------------------------- carte du donjon
@@ -997,19 +1035,6 @@ SG.tracesBloc = function (ctx, x, y) {
   ctx.restore();
 };
 SG.dessinBloc = function (ctx, x, y) {
-  // le bloc est taillé dans la même pierre que les murs de la salle : il a l'air d'appartenir au donjon
-  const sv = SG.img['salle-vide'];
-  if (sv && sv.width) {
-    const k = sv.width / 1672;
-    ctx.save();
-    ctx.fillStyle = 'rgba(0,0,0,0.35)'; ctx.beginPath(); ctx.ellipse(x, y - 4, 42, 10, 0, 0, Math.PI * 2); ctx.fill();
-    ctx.fillStyle = '#1d1930'; ctx.strokeStyle = '#07050d'; ctx.lineWidth = 4;
-    ctx.beginPath(); ctx.roundRect(x - 38, y - 40, 76, 34, 6); ctx.fill(); ctx.stroke();
-    ctx.drawImage(sv, 482 * k, 12 * k, 132 * k, 124 * k, x - 38, y - 88, 76, 66);
-    ctx.strokeStyle = '#07050d'; ctx.beginPath(); ctx.roundRect(x - 38, y - 88, 76, 66, 8); ctx.stroke();
-    ctx.restore();
-    return;
-  }
   SG.dessinImageOu('bloc', ctx, x, y, () => {
     ctx.save(); ctx.fillStyle = '#6a6284'; ctx.strokeStyle = '#120f1d'; ctx.lineWidth = 4;
     ctx.beginPath(); ctx.roundRect(x - 38, y - 92, 76, 88, 8); ctx.fill(); ctx.stroke();

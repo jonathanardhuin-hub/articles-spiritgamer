@@ -20,11 +20,11 @@ SG.MONDE = {
     carte: [
       '................',
       '................',
-      '.........h...h..',
+      '................',
       '......P.........',
       '................',
-      '...........b....',
-      '..h.b...........',
+      '................',
+      '................',
       '................',
       '................',
     ],
@@ -39,9 +39,9 @@ SG.MONDE = {
       '................',
       '................',
       '................',
-      '..h.............',
-      '............b...',
-      '...b.........h..',
+      '................',
+      '................',
+      '................',
       '................',
       '................',
     ],
@@ -55,9 +55,9 @@ SG.MONDE = {
       '................',
       '................',
       '................',
-      '............h...',
-      '.........b......',
-      '....h........b..',
+      '................',
+      '................',
+      '................',
       '................',
       '................',
     ],
@@ -70,10 +70,10 @@ SG.MONDE = {
       '................',
       '................',
       '................',
-      '....b......h....',
       '................',
-      '...h............',
-      '..........b.....',
+      '................',
+      '................',
+      '................',
       '................',
       '................',
     ],
@@ -85,10 +85,10 @@ SG.MONDE = {
     carte: [
       '................',
       '................',
-      '.......h........',
-      '.........b..b...',
       '................',
-      '.....h..........',
+      '................',
+      '................',
+      '................',
       '................',
       '................',
       '................',
@@ -102,11 +102,11 @@ SG.MONDE = {
     carte: [
       '................',
       '................',
-      '...b............',
       '................',
       '................',
-      '....b.......h...',
-      '..........h.....',
+      '................',
+      '................',
+      '................',
       '................',
       '................',
     ],
@@ -119,9 +119,9 @@ SG.MONDE = {
       '.......GG.......',
       '................',
       '......P....X....',
-      '...h............',
       '................',
-      '..........b..h..',
+      '................',
+      '................',
       '................',
       '................',
       '................',
@@ -151,10 +151,10 @@ SG.MONDE = {
     carte: [
       '................',
       '................',
-      '...h............',
-      '..............h.',
-      '....b...........',
-      '..........b.....',
+      '................',
+      '................',
+      '................',
+      '................',
       '................',
       '................',
       '................',
@@ -172,7 +172,26 @@ SG.MONDE.loge = {
   carte: Array(9).fill('................'),
   ennemis: [],
 };
-SG.LOGE = { reveil: { x: 805, y: 372 }, depart: { x: 805, y: 430 }, portail: { x0: 548, x1: 722, y: 660 } };
+SG.LOGE = { reveil: { x: 805, y: 372 }, chaise: { x: 805, y: 270 }, depart: { x: 805, y: 430 }, portail: { x0: 548, x1: 722, y: 660 } };
+
+// Le QG : la loge, le couloir, le bureau du Lynx et le hall (pièces peintes)
+SG.MONDE.couloir = { nom: 'Le couloir du QG', image: 'couloir', interieur: true, carte: Array(9).fill('................'), ennemis: [] };
+SG.MONDE['bureau-lynx'] = { nom: 'Le bureau du Lynx', image: 'bureau-lynx', interieur: true, carte: Array(9).fill('................'), ennemis: [] };
+SG.MONDE.hall = { nom: 'Le hall du QG', image: 'hall', interieur: true, carte: Array(9).fill('................'), ennemis: [] };
+// portes : zone de passage (x0..x1), sens, pièce d'arrivée et position d'arrivée
+SG.QG = {
+  loge: [{ x0: 548, x1: 722, bas: 640, vers: 'couloir', arrivee: [300, 226, 'bas'] }],
+  couloir: [
+    { x0: 254, x1: 346, haut: 150, vers: 'loge', arrivee: [635, 600, 'haut'], variante: 'couloir-loge', cx: 300 },
+    { x0: 898, x1: 982, haut: 150, vers: 'bureau-lynx', arrivee: [636, 560, 'haut'], variante: 'couloir-lynx', cx: 940 },
+    { x0: 580, x1: 700, bas: 690, vers: 'hall', arrivee: [642, 226, 'bas'] },
+  ],
+  'bureau-lynx': [{ x0: 576, x1: 696, bas: 606, vers: 'couloir', arrivee: [940, 226, 'bas'] }],
+  hall: [{ x0: 594, x1: 690, haut: 150, vers: 'couloir', arrivee: [640, 540, 'haut'], variante: 'hall-ouvert', cx: 642 }],
+  portesHall: { x0: 560, x1: 720, y: 560 },
+  lynx: { x: 905, y: 452 },
+  gus: { x: 405, y: 312 },
+};
 SG.ARRIVEE_PLAINE = { ecran: '1,2', x: 640, y: 390 };
 
 SG.ECRAN_DEPART = '1,2';
@@ -201,9 +220,28 @@ SG.TEXTES = {
     'Depuis, le Bruit a pris corps. Des monstres rôdent partout dans le Réseau.',
   ],
   reveil: [
-    [null, 'Pendant ce temps, dans sa loge cachée derrière la scène du QG, Spirit dormait, son casque sur les oreilles. Il n\'a rien entendu. Il est le seul à ne pas avoir été touché.'],
+    [null, 'Pendant ce temps, au fond du QG, Spirit s\'était endormi devant son écran, le casque sur les oreilles. Il n\'a rien entendu de la fête ni de l\'attaque.'],
     ['spirit', 'Hein ? Qu\'est-ce que c\'est que ce grésillement dans mon casque ?'],
-    [null, 'Son micro capte un faible signal. Au même instant, la porte de la loge s\'ouvre toute seule sur une lumière inconnue.'],
+    ['spirit', 'Et mes écrans qui affichent tous la même pub... Il se passe un truc. Je vais voir les autres.'],
+  ],
+  lynx: [
+    ['lynx', 'Ah, te voilà ! Mon PC a planté en plein raid. Depuis, il n\'affiche plus qu\'une pub avec une couronne.'],
+    ['spirit', 'Pareil chez moi. Et j\'ai un grésillement bizarre dans le casque.'],
+    ['lynx', 'Gus te cherche partout. Il est dans le hall, il avait l\'air vraiment inquiet.'],
+  ],
+  lynxApres: [['lynx', 'Va voir Gus dans le hall. Moi je reste là, je surveille le Réseau.']],
+  lynxFin: [['lynx', 'Un signal qui vient de ta loge ? Fonce. Je garde le QG.']],
+  gus: [
+    ['gus', 'Spirit ! Enfin. Pendant la fête, le Roi Clickbait a brisé la Source. Tout le Réseau est envahi par le Bruit.'],
+    ['gus', 'Les grandes portes du QG sont bloquées depuis l\'attaque. Personne ne peut sortir.'],
+    ['spirit', 'Mon casque capte un signal. Il vient de ma loge, j\'en suis sûr.'],
+    ['gus', 'Alors vas-y. Si quelqu\'un peut réparer ça, c\'est toi.'],
+  ],
+  gusApres: [['gus', 'Retourne dans ta loge, le signal vient de là-bas.']],
+  portesHall: 'Les grandes portes du QG sont bloquées depuis l\'attaque. Impossible de sortir par là.',
+  portailOuvert: [
+    [null, 'Un grondement secoue la loge. Derrière Spirit, la porte ne donne plus sur le couloir : une lumière inconnue tourbillonne à sa place.'],
+    ['spirit', 'C\'est de là que vient le signal. J\'y vais.'],
   ],
   portailFerme: 'La porte est fermée. Le signal dans le casque de Spirit est encore trop faible.',
   arriveePlaine: [

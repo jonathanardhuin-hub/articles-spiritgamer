@@ -9,6 +9,8 @@ from masques import appliquer, apercu, COLS, ROWS
 
 R = lambda x0, y0, x1, y1, v='#': (x0, y0, x1, y1, v)
 VIDE = ['.' * COLS] * ROWS
+_dj = os.path.join(os.path.dirname(__file__), 'decoupes.json')
+DECOUPES = json.load(open(_dj)) if os.path.exists(_dj) and __name__ == '__main__' else {}
 
 ECRANS = {
   # Plaine des Pixels ------------------------------------------------------------------------------
@@ -65,11 +67,37 @@ ECRANS = {
       R(0, 562, 526, 720), R(268, 540, 372, 720), R(744, 540, 1280, 720),
       R(526, 580, 744, 720)]),
   'loge-ouverte': ('prologue/loge-portail-ouvert.png', LOGE[:-1] + [R(526, 560, 548, 720), R(722, 560, 744, 720)]),
+  # QG : couloir (porte de la loge en haut à gauche, porte du bureau du Lynx en haut à droite, passage vers le hall en bas)
+  'couloir': ('qg/couloir.png', COULOIR := [
+      R(0, 0, 1280, 172), R(0, 0, 120, 720), R(1160, 0, 1280, 720), R(0, 565, 578, 720), R(702, 565, 1280, 720),
+      R(100, 105, 170, 205), R(1105, 105, 1175, 205), R(100, 520, 170, 620), R(1105, 520, 1175, 620)]),
+  'couloir-loge': ('qg/couloir-porte-loge-ouverte.png', COULOIR + [R(254, 92, 346, 172, '.')]),
+  'couloir-lynx': ('qg/couloir-porte-lynx-ouverte.png', COULOIR + [R(898, 92, 982, 172, '.')]),
+  'bureau-lynx': ('qg/bureau-du-lynx.png', [
+      R(0, 0, 1280, 182), R(0, 0, 120, 720), R(1150, 0, 1280, 720), R(0, 580, 574, 720), R(698, 580, 1280, 720),
+      R(230, 40, 1010, 262), R(430, 165, 835, 372), R(565, 300, 665, 386),
+      R(110, 90, 200, 225), R(115, 225, 190, 300), R(115, 300, 232, 505), R(100, 505, 180, 590),
+      R(1040, 150, 1180, 470), R(1100, 390, 1170, 490), R(1085, 530, 1165, 590)]),
+  'hall': ('qg/hall.png', HALL := [
+      R(0, 0, 1280, 174), R(0, 0, 110, 720), R(1165, 0, 1280, 720), R(0, 578, 1280, 720),
+      R(180, 120, 535, 232), R(100, 90, 180, 190), R(110, 185, 218, 580), R(155, 470, 228, 578), R(272, 545, 360, 600),
+      R(822, 60, 982, 212), R(778, 125, 832, 200), R(1058, 178, 1170, 582), R(1100, 90, 1175, 190)]),
+  'hall-ouvert': ('qg/hall-porte-ouverte.png', HALL + [R(592, 62, 692, 176, '.')]),
 }
 
 def masque(cle):
     src, rects = ECRANS[cle]
-    return appliquer(VIDE, rects)
+    dec = DECOUPES.get(cle)
+    if not dec:
+        return appliquer(VIDE, rects)
+    # rochers détourés (outils/decoupes_plaine.py) : seul leur pied bloque ; l'eau suit la rive peinte
+    garde = [r for i, r in enumerate(rects) if i not in dec['zones'] and r[4] != '~']
+    g = [list(l) for l in appliquer(VIDE, garde)]
+    for c, r in dec['eau']:
+        if g[r][c] == '.': g[r][c] = '~'
+    for c, r in dec['pieds']:
+        g[r][c] = '#'
+    return [''.join(l) for l in g]
 
 if __name__ == '__main__':
     racine = os.path.join(os.path.dirname(__file__), '..')

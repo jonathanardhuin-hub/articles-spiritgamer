@@ -1,5 +1,6 @@
 """Prépare les images du jeu : redimensionne (2x la taille affichée), ferme la bouche de Spirit, exporte en WebP."""
-import os, sys
+import os
+import sys, sys
 from PIL import Image
 sys.path.insert(0, os.path.dirname(__file__))
 from bouche import fermer_bouche
@@ -93,6 +94,19 @@ LISTE = {
 
 # images du donjon 1 : prises en compte dès qu'elles sont déposées dans images/donjon1/
 FACULTATIVES = {
+    'portail-tunnel': ('prologue/portail-tunnel.png', 'w', 836, ''),
+    'arrivee-plaine': ('prologue/arrivee-plaine.png', 'w', 836, ''),
+    'loge-endormi': ('prologue/loge-spirit-endormi.png', 'w', 836, ''),
+    'couloir': ('qg/couloir.png', 'w', 836, ''),
+    'couloir-loge': ('qg/couloir-porte-loge-ouverte.png', 'w', 836, ''),
+    'couloir-lynx': ('qg/couloir-porte-lynx-ouverte.png', 'w', 836, ''),
+    'bureau-lynx': ('qg/bureau-du-lynx.png', 'w', 836, ''),
+    'hall': ('qg/hall.png', 'w', 836, ''),
+    'hall-ouvert': ('qg/hall-porte-ouverte.png', 'w', 836, ''),
+    'lynx': ('personnages/lynx-detoure.png', 'h', 150, ''),
+    'gus': ('personnages/gus-detoure.png', 'h', 132, ''),
+    'portrait-lynx': ('personnages/lynx-portrait-detoure.png', 'h', 200, ''),
+    'portrait-gus': ('personnages/gus-portrait-detoure.png', 'h', 200, ''),
     # écrans et salles peints d'un seul tenant (gardés à leur taille d'origine, 1672 x 941)
     'ecran-1-2': ('plaine/ecran-1-2-la-clairiere.png', 'w', 836, ''),
     'ecran-1-1': ('plaine/ecran-1-1-le-carrefour.png', 'w', 836, ''),
@@ -125,7 +139,7 @@ FACULTATIVES = {
     'clic-b': ('donjon1/clic-b.png', 'h', 76, ''),
     'reine': ('donjon1/reine.png', 'w', 250, ''),
     'bloc': ('donjon1/bloc.png', 'w', 80, ''),
-    'statue': ('donjon1/statue.png', 'w', 76, ''),
+    'statue': ('donjon1/statue.png', 'w', 64, ''),
     'brasero': ('donjon1/brasero.png', 'w', 64, ''),
     'pot': ('donjon1/pot.png', 'w', 56, ''),
     'coffre': ('donjon1/coffre.png', 'w', 78, ''),
@@ -158,7 +172,15 @@ def main():
     for nom, info in FACULTATIVES.items():
         if os.path.exists(os.path.join(IMG, info[0])):
             LISTE[nom] = info
+    # écrans de la Plaine : sol sans les touffes découpées (outils/decoupes_plaine.py), s'il existe
+    for nom in list(LISTE):
+        sol = os.path.join('plaine', 'sol', nom + '.png')
+        if nom.startswith('ecran-') and os.path.exists(os.path.join(IMG, sol)):
+            LISTE[nom] = (sol,) + tuple(LISTE[nom][1:])
+    seules = sys.argv[1:]  # noms donnés en argument : on ne refait que ceux-là
     for nom, (src, axe, taille, opt) in LISTE.items():
+        if seules and nom not in seules:
+            continue
         im = Image.open(os.path.join(IMG, src)).convert('RGBA')
         if opt == 'bouche':
             im = fermer_bouche(im)
@@ -185,6 +207,8 @@ def main():
         s = cible / (im.height if axe == 'h' else im.width)
         im = im.resize((max(1, round(im.width * s)), max(1, round(im.height * s))), Image.LANCZOS)
         im.save(os.path.join(SORTIE, nom + '.webp'), 'WEBP', quality=88, method=6)
+    if seules:
+        return
     # textures de sol, répétées en mosaïque (256 pixels logiques)
     for n in ('herbe', 'terre', 'eau'):
         t = Image.open(os.path.join(IMG, 'sols', n + '.webp')).convert('RGB')

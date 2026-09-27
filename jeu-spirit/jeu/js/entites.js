@@ -486,6 +486,17 @@ SG.Ermite = class {
   }
 };
 
+// habitant du QG (le Lynx, Gus) : immobile, il respire et regarde Spirit
+SG.Personnage = class {
+  constructor(x, y, nom) { this.x = x; this.y = y; this.nom = nom; this.pw = 56; this.ph = 28; this.t = Math.random() * 3; }
+  corps() { return { x: this.x - 35, y: this.y - 140, w: 70, h: 140 }; }
+  maj(jeu, dt) { this.t += dt; }
+  dessiner(ctx) {
+    SG.ombre(ctx, this.x, this.y, 34);
+    SG.dessinerPied(ctx, SG.img[this.nom], this.x, this.y, { sy: 1 + Math.sin(this.t * 2) * 0.012 });
+  }
+};
+
 // ---------------------------------------------------------------- projectiles
 SG.Projectile = class {
   constructor(x, y, dir, vitesse) {
@@ -600,6 +611,40 @@ SG.Eclat = class {
   dessiner(ctx) {
     const u = this.t / 0.22;
     SG.dessinerEffet(ctx, SG.img['fx-etincelle'], this.x, this.y, this.ang, 0.35 + u * 0.35, 1 - u, false);
+  }
+};
+
+// brins d'herbe quand l'onde fauche une touffe peinte (couleur prise sur la touffe)
+SG.Herbe = class {
+  constructor(x, y, couleur, largeur) {
+    this.x = x; this.y = y; this.t = 0; this.fini = false;
+    const c = couleur || '#4cc23a', n = Math.round(SG.clamp((largeur || 60) / 5, 9, 18));
+    this.f = [];
+    for (let i = 0; i < n; i++) {
+      const a = -Math.PI / 2 + SG.hasard(-1.3, 1.3), v = SG.hasard(90, 240);
+      this.f.push({ x: SG.hasard(-largeur / 3, largeur / 3), y: SG.hasard(-8, 8), vx: Math.cos(a) * v, vy: Math.sin(a) * v, r: SG.hasard(0, 6), vr: SG.hasard(-14, 14), l: SG.hasard(9, 17), c: i % 3 === 0 ? '#bff27a' : c });
+    }
+  }
+  maj(jeu, dt) {
+    this.t += dt;
+    for (const f of this.f) { f.x += f.vx * dt; f.y += f.vy * dt; f.vy += 520 * dt; f.vx *= 1 - dt * 2.5; f.r += f.vr * dt; }
+    if (this.t > 0.75) this.fini = true;
+  }
+  dessiner(ctx) {
+    ctx.save();
+    ctx.globalAlpha = Math.max(0, 1 - Math.max(0, this.t - 0.35) / 0.4);
+    ctx.lineCap = 'round';
+    for (const f of this.f) {
+      ctx.save();
+      ctx.translate(this.x + f.x, this.y + f.y);
+      ctx.rotate(f.r);
+      ctx.strokeStyle = '#123a12'; ctx.lineWidth = 5;
+      ctx.beginPath(); ctx.moveTo(0, -f.l / 2); ctx.lineTo(0, f.l / 2); ctx.stroke();
+      ctx.strokeStyle = f.c; ctx.lineWidth = 3;
+      ctx.beginPath(); ctx.moveTo(0, -f.l / 2); ctx.lineTo(0, f.l / 2); ctx.stroke();
+      ctx.restore();
+    }
+    ctx.restore();
   }
 };
 

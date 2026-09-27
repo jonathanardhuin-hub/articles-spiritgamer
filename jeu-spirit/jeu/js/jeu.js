@@ -59,6 +59,7 @@ SG.Jeu = class {
       x: this.ecran === 'grotte' ? SG.SORTIE_GROTTE.x : this.spirit.x, y: this.ecran === 'grotte' ? SG.SORTIE_GROTTE.y : this.spirit.y,
       ermiteVu: this.ermiteVu, visites: [...(this.visites || [])],
       version: SG.VERSION, d1: this.d1 || null, manette: !!this.manette, objetB: this.objetB || null, source: this.source || 0, barriere: !!this.barriere,
+      qg: this.qg || null, portail: !!this.porteLoge,
     };
     if (donjon) { s.ecran = 'd1:' + SG.DONJON1.entree.salle; s.x = SG.DONJON1.entree.x; s.y = SG.DONJON1.entree.y; }
     try { localStorage.setItem('spirit-sauvegarde', JSON.stringify(s)); } catch (e) { /* stockage indisponible */ }
@@ -75,6 +76,7 @@ SG.Jeu = class {
     this.spirit = new SG.Spirit(SG.LOGE.reveil.x, SG.LOGE.reveil.y);
     this.spirit.dir = 'bas';
     this.porteLoge = false;
+    this.qg = { lynx: false, gus: false };
     this.reveil = { t: 0, parle: false };
     this.entrerEcran('loge');
   }
@@ -87,7 +89,9 @@ SG.Jeu = class {
     this.visites = new Set(s.visites || []);
     this.d1 = s.d1 || null; this.manette = !!s.manette; this.objetB = s.objetB || null; this.source = s.source || 0; this.barriere = !!s.barriere;
     this.spirit = new SG.Spirit(s.x, s.y);
-    this.reveil = null; this.porteLoge = true;   // de retour dans la loge : la porte reste ouverte sur le portail
+    this.reveil = null;
+    this.qg = s.qg || { lynx: true, gus: true };
+    this.porteLoge = !!this.qg.gus && (s.ecran !== 'loge' || !!s.portail);   // le portail reste ouvert une fois apparu
     const ok = SG.MONDE[s.ecran] || (this.estDonjon(s.ecran) && SG.DONJON1.salles[s.ecran.slice(3)]);
     this.entrerEcran(ok ? s.ecran : SG.ECRAN_DEPART);
     this.etat = 'jeu';
@@ -119,6 +123,8 @@ SG.Jeu = class {
     }
     const e = SG.MONDE[cle];
     SG.Son.jouerMusique(e.interieur ? 'titre' : 'plaine');
+    if (cle === 'bureau-lynx') this.pnj.push(new SG.Personnage(SG.QG.lynx.x, SG.QG.lynx.y, 'lynx'));
+    if (cle === 'hall') this.pnj.push(new SG.Personnage(SG.QG.gus.x, SG.QG.gus.y, 'gus'));
     // quitter le donjon fait revenir ses ennemis ; dehors, un ennemi vaincu revient après 2 minutes
     this.mortsDonjon = {};
     const mortsIci = (this.mortsDehors && this.mortsDehors[cle]) || {};
@@ -131,7 +137,7 @@ SG.Jeu = class {
       this.monstres.push(m);
     }
     // les secrets déjà trouvés n'apparaissent plus, et leur buisson non plus
-    for (const k in e.secrets || {}) if (this.secretsPris.has(cle + ':' + k)) this.coupes.add(k);
+    for (const k in e.secrets || {}) if (this.secretsPris.has(cle + ':' + k)) { this.coupes.add(k); const i = this.touffeSecrete(cle, k); if (i >= 0) this.coupes.add('t' + i); }
     this.sauver();
   }
 
@@ -154,8 +160,18 @@ SG.Jeu = class {
     if (this.ecran === 'grotte') return null;
     if (this.estDonjon()) return this.masqueSalle ? this.masqueSalle() : null;
     const e = SG.MONDE[this.ecran];
-    if (this.ecran === 'loge') return SG.MASQUES[this.porteLoge ? 'loge-ouverte' : 'loge'];
+    if (this.ecran === 'loge') return SG.MASQUES[this.porteLoge || !this.reveil ? 'loge-ouverte' : 'loge'];
+    const v = this.varianteQG(this.ecran);
+    if (v) return SG.MASQUES[v];
     return e && e.image && SG.img[e.image] && SG.img[e.image].width ? SG.MASQUES[this.ecran] || null : null;
+  }
+
+  // porte du QG près de laquelle se tient Spirit : elle s'ouvre (image et passage)
+  varianteQG(cle) {
+    const portes = SG.QG[cle], s = this.spirit;
+    if (!portes || !s) return null;
+    for (const p of portes) if (p.variante && s.y < 250 && Math.abs(s.x - p.cx) < 95) return SG.img[p.variante] && SG.img[p.variante].width ? p.variante : null;
+    return null;
   }
 
   // la boîte touche-t-elle un obstacle du masque ? (hors de l'écran : on prolonge la cellule du bord)
@@ -211,19 +227,13 @@ SG.Jeu = class {
           if (!estSpirit) return true;
         }
         if (ch === 'v' && entite && (entite.vole || entite === this.spirit)) continue;
-        if ((this.estDonjon() ? SG.CASES_SALLE_PLEINES : SG.CASES_PLEINES).has(ch)) return true;
+        if ((this.estDonjon() ? SG.CASES_SALLE_MURS : SG.CASES_PLEINES).has(ch)) return true;
       }
     }
+    // dans un donjon, seul le pied des objets arrête : on peut passer derrière une statue, un bloc ou un brasero
+    if (this.estDonjon() && this.piedObjetTouche(b)) return true;
     const mq = this.masque();
     if (mq && this.collisionMasque(mq, b, entite)) return true;
-    // dans un donjon, statues, braseros et blocs dépassent de leur case vers le haut : on s'arrête avant, sans marcher sur leur tête
-    if (this.estDonjon()) {
-      const y1 = b.y + b.h + 28, r = Math.floor((y1 - 0.01) / SG.T);
-      for (let c = Math.floor(b.x / SG.T); c <= Math.floor((b.x + b.w - 0.01) / SG.T); c++) {
-        const ch = this.caseEn(c, r);
-        if (ch === 'o' || ch === 'F' || ch === 'B' || ch === 'p' || ch === 'C') return true;
-      }
-    }
     // dehors, le feuillage des arbres déborde de leur case : personne ne passe dessous
     if (!this.estDonjon() && !mq) {
       const x0 = b.x - 18, x1 = b.x + b.w + 18, y0 = b.y - 8, y1 = b.y + b.h + 66;
@@ -267,7 +277,7 @@ SG.Jeu = class {
     const ch = this.caseEn(Math.floor(x / SG.T), Math.floor(y / SG.T));
     const mq = this.masque();
     if (mq) { const l = mq[SG.clamp(Math.floor(y / 20), 0, mq.length - 1)]; if (l[SG.clamp(Math.floor(x / 20), 0, l.length - 1)] === '#') return true; }
-    if (this.estDonjon()) return ch !== null && ch !== 'v' && SG.CASES_SALLE_PLEINES.has(ch);
+    if (this.estDonjon()) return ch === '#' || this.piedObjetTouche({ x: x - 2, y: y - 2, w: 4, h: 4 });
     return ch !== null && ch !== '~' && SG.CASES_PLEINES.has(ch);
   }
 
@@ -282,10 +292,36 @@ SG.Jeu = class {
   }
 
   // coupe les buissons et hautes herbes dans la zone ; renvoie le nombre de cases coupées
+  // touffe peinte qui porte le secret d'une case (la plus proche du centre de la case)
+  touffeSecrete(ecran, k) {
+    const D = SG.DECOUPES && SG.DECOUPES[ecran];
+    if (!D) return -1;
+    const [c, r] = k.split(',').map(Number), x = c * SG.T + 40, y = r * SG.T + 60;
+    let mi = -1, md = Infinity;
+    D.forEach((p, i) => { if (p.t !== 'h') return; const d = Math.hypot(p.d[0] + p.d[2] / 2 - x, p.b - y); if (d < md) { md = d; mi = i; } });
+    return mi;
+  }
+
   couperDecor(zone) {
     if (this.ecran === 'grotte') return 0;
     let n = 0;
     const e = SG.MONDE[this.ecran] || {};
+    const D = SG.DECOUPES && SG.DECOUPES[this.ecran];
+    if (D) D.forEach((p, i) => {
+      if (p.t !== 'h' || this.coupes.has('t' + i)) return;
+      const [x, y, w, h] = p.d;
+      if (!SG.boitesSeTouchent(zone, { x: x + w * 0.15, y: y + h * 0.3, w: w * 0.7, h: h * 0.7 })) return;
+      this.coupes.add('t' + i);
+      n++;
+      this.effets.push(new SG.Herbe(x + w / 2, p.b - h * 0.35, p.c, w));
+      SG.Son.effet('feuilles');
+      const k = e.secrets && Object.keys(e.secrets).find((q) => this.touffeSecrete(this.ecran, q) === i);
+      if (k && !this.secretsPris.has(this.ecran + ':' + k)) {
+        const b = new SG.Butin(e.secrets[k], x + w / 2, p.b + 4, true);
+        b.cleSecret = this.ecran + ':' + k;
+        this.butins.push(b);
+      } else if (Math.random() < 0.15) this.lacherObjet(x + w / 2, p.b + 4, true);
+    });
     const c0 = Math.floor(zone.x / SG.T), c1 = Math.floor((zone.x + zone.w) / SG.T);
     const r0 = Math.floor(zone.y / SG.T), r1 = Math.floor((zone.y + zone.h) / SG.T);
     for (let r = r0; r <= r1; r++) {
@@ -371,12 +407,23 @@ SG.Jeu = class {
     SG.Son.effet('objet');
   }
 
+  parlerQG(p) {
+    const q = this.qg || (this.qg = { lynx: false, gus: false });
+    if (p.nom === 'lynx') {
+      const t = q.gus ? SG.TEXTES.lynxFin : q.lynx ? SG.TEXTES.lynxApres : SG.TEXTES.lynx;
+      this.dialogue(t, () => { q.lynx = true; this.sauver(); });
+    } else {
+      this.dialogue(q.gus ? SG.TEXTES.gusApres : SG.TEXTES.gus, () => { q.gus = true; this.sauver(); });
+    }
+  }
+
   parler() {
     const s = this.spirit, d = SG.DIRS[s.dir];
     const px = s.x + d.x * 50, py = s.y - 20 + d.y * 50;
     for (const p of this.pnj) {
       if (SG.dist(px, py, p.x, p.y - 30) < 90) {
         if (p instanceof SG.Flash) { this.parlerFlash(); return true; }
+        if (p instanceof SG.Personnage) { this.parlerQG(p); return true; }
         if (!this.ampli) {
           this.dialogue(SG.TEXTES.ermiteDon, () => {
             this.ampli = true;
@@ -438,6 +485,14 @@ SG.Jeu = class {
     this.etat = 'transition';
   }
 
+  // passage par le portail de la loge : tunnel de lumière, éclair blanc, puis arrivée dans la Plaine
+  passerPortail(action, ensuite) {
+    this.transition = { type: 'portail', t: 0, duree: 3.4, action, ensuite, fait: false, grains: [] };
+    for (let i = 0; i < 70; i++) this.transition.grains.push({ a: Math.random() * Math.PI * 2, r: SG.hasard(0, 1), v: SG.hasard(0.4, 1.4), c: SG.choisir(['#5ff3ff', '#8a4dff', '#ffffff', '#3f8cff']), t: SG.hasard(3, 9) });
+    this.etat = 'transition';
+    SG.Son.effet('objet');
+  }
+
   fonduVers(action) {
     this.transition = { type: 'fondu', t: 0, duree: 0.7, action, fait: false };
     this.etat = 'transition';
@@ -475,12 +530,18 @@ SG.Jeu = class {
         this.dialogue(SG.TEXTES.reveil, () => {
           this.reveil = null;
           s.x = SG.LOGE.depart.x; s.y = SG.LOGE.depart.y; s.dir = 'bas';
-          this.porteLoge = true;
-          this.effets.push(new SG.Eclat(635, 600));
-          SG.Son.effet('porte');
           this.sauver();
         });
       }
+      return;
+    }
+    if (this.evtPortail) {
+      // retour dans la loge après avoir vu Gus : la porte devient un portail
+      const ev = this.evtPortail;
+      ev.t += dt;
+      this.secousse = ev.t < 1.4 ? 6 * (1 - ev.t / 1.4) : 0;
+      if (ev.t > 1.0 && !this.porteLoge) { this.porteLoge = true; this.flash = 1; SG.Son.effet('objet'); }
+      if (ev.t > 1.9) { this.evtPortail = null; this.dialogue(SG.TEXTES.portailOuvert, () => this.sauver()); }
       return;
     }
     if (C.appuis.menu) { this.etat = 'pause'; this.menuChoix = 0; this.focusPause = 'objets'; this.selObjet = 0; SG.Son.effet('choix'); return; }
@@ -552,15 +613,32 @@ SG.Jeu = class {
       this.dialogue([[null, SG.TEXTES.foretBientot]], () => { this.spirit.y += 30; setTimeout(() => { this.messageForet = false; }, 2000); });
       return;
     }
-    if (this.ecran === 'loge') {
+    if (this.ecran === 'loge' && this.porteLoge) {
       const P = SG.LOGE.portail;
-      if (this.porteLoge && s.y > P.y && s.x > P.x0 && s.x < P.x1) {
-        this.fonduVers(() => {
+      if (s.y > P.y && s.x > P.x0 && s.x < P.x1) {
+        this.passerPortail(() => {
           const A = SG.ARRIVEE_PLAINE;
           this.spirit.x = A.x; this.spirit.y = A.y; this.spirit.dir = 'bas';
           this.entrerEcran(A.ecran);
-          this.dialogue(SG.TEXTES.arriveePlaine);
-        });
+        }, () => this.dialogue(SG.TEXTES.arriveePlaine));
+        return;
+      }
+    } else if (SG.QG[this.ecran]) {
+      for (const p of SG.QG[this.ecran]) {
+        if (s.x < p.x0 || s.x > p.x1) continue;
+        if ((p.haut && s.y < p.haut) || (p.bas && s.y > p.bas)) {
+          this.fonduVers(() => {
+            const [x, y, dir] = p.arrivee;
+            this.spirit.x = x; this.spirit.y = y; this.spirit.dir = dir;
+            this.entrerEcran(p.vers);
+            if (p.vers === 'loge' && this.qg && this.qg.gus && !this.porteLoge) this.evtPortail = { t: -0.4 };
+          });
+          return;
+        }
+      }
+      const H = SG.QG.portesHall;
+      if (this.ecran === 'hall' && s.y > H.y && s.x > H.x0 && s.x < H.x1 && s.dir === 'bas') {
+        if (!this.messageHall) { this.messageHall = true; this.dialogue([[null, SG.TEXTES.portesHall]], () => { this.spirit.y -= 20; setTimeout(() => { this.messageHall = false; }, 1500); }); }
         return;
       }
     }
@@ -585,7 +663,14 @@ SG.Jeu = class {
     const tr = this.transition;
     tr.t += dt;
     if (tr.type === 'fondu' && !tr.fait && tr.t >= tr.duree / 2) { tr.fait = true; tr.action(); }
-    if (tr.t >= tr.duree) { this.transition = null; this.etat = 'jeu'; }
+    if (tr.type === 'portail') {
+      if (!tr.fait && tr.t >= 1.7) { tr.fait = true; tr.action(); SG.Son.effet('porte'); }
+      this.cacherSpirit = tr.t < 2.55;
+    }
+    if (tr.t >= tr.duree) {
+      this.transition = null; this.etat = 'jeu';
+      if (tr.type === 'portail') { this.cacherSpirit = false; if (tr.ensuite) tr.ensuite(); }
+    }
   }
 
   majDialogue(dt, C, clics) {
@@ -773,7 +858,10 @@ SG.Jeu = class {
       ctx.restore();
       return;
     }
+    if (this.secousse > 0) ctx.translate(SG.hasard(-1, 1) * this.secousse, SG.hasard(-1, 1) * this.secousse);
     this.dessinerScene(ctx);
+    if (this.etat === 'transition' && this.transition.type === 'portail') this.dessinerPortail(ctx, this.transition);
+    if (this.flash > 0) { ctx.fillStyle = `rgba(230,250,255,${this.flash})`; ctx.fillRect(-20, -20, SG.W + 40, SG.H + 40); this.flash = Math.max(0, this.flash - 0.04); }
     ctx.restore();
     if (this.etat === 'transition' && this.transition.type === 'fondu') {
       const tr = this.transition, u = tr.t / tr.duree;
@@ -785,6 +873,69 @@ SG.Jeu = class {
     if (this.etat === 'pause') this.dessinerPause(ctx);
     if (this.etat === 'carte') this.dessinerEcranCarte(ctx);
     if (this.etat === 'finPartie') this.dessinerFin(ctx);
+  }
+
+  dessinerPortail(ctx, tr) {
+    const t = tr.t, cx = SG.W / 2, cy = SG.H / 2;
+    if (t < 1.75) {
+      // le tunnel : on est aspiré dans la lumière
+      const a = SG.clamp(t / 0.5, 0, 1);
+      ctx.save();
+      ctx.globalAlpha = a;
+      const im = SG.img['portail-tunnel'];
+      if (im && im.width) {
+        const z = 1 + t * 0.5;
+        ctx.translate(cx, cy); ctx.rotate(t * 0.35); ctx.scale(z, z);
+        ctx.drawImage(im, -SG.W / 2 - 60, -SG.H / 2 - 40, SG.W + 120, SG.H + 80);
+      } else {
+        const g = ctx.createRadialGradient(cx, cy, 10, cx, cy, 760);
+        g.addColorStop(0, '#e8fbff'); g.addColorStop(0.12, '#5ff3ff'); g.addColorStop(0.45, '#2a2a8f'); g.addColorStop(1, '#05030f');
+        ctx.fillStyle = g; ctx.fillRect(0, 0, SG.W, SG.H);
+        ctx.lineCap = 'round';
+        for (let i = 0; i < 9; i++) {
+          const r = ((i / 9 + t * 0.55) % 1) ** 2 * 900;
+          ctx.strokeStyle = i % 2 ? 'rgba(138,77,255,0.55)' : 'rgba(95,243,255,0.55)';
+          ctx.lineWidth = 3 + r / 60;
+          ctx.beginPath(); ctx.ellipse(cx, cy, r, r * 0.62, t * (i % 2 ? 0.8 : -0.8), 0, Math.PI * 2); ctx.stroke();
+        }
+        for (const g2 of tr.grains) {
+          const r = ((g2.r + t * g2.v) % 1) ** 2 * 900, l = 10 + r / 8;
+          ctx.strokeStyle = g2.c; ctx.lineWidth = 2 + r / 200;
+          ctx.beginPath(); ctx.moveTo(cx + Math.cos(g2.a) * r, cy + Math.sin(g2.a) * r * 0.62);
+          ctx.lineTo(cx + Math.cos(g2.a) * (r + l), cy + Math.sin(g2.a) * (r + l) * 0.62); ctx.stroke();
+        }
+      }
+      ctx.restore();
+      // Spirit tombe dans le tunnel
+      const im2 = SG.img['spirit-face'];
+      if (im2 && im2.width && t > 0.2) {
+        const e = SG.clamp(1 - (t - 0.2) / 1.5, 0.05, 1);
+        ctx.save(); ctx.translate(cx, cy + 40); ctx.rotate(t * 3); ctx.globalAlpha = SG.clamp(e * 1.4, 0, 1);
+        SG.dessinerPied(ctx, im2, 0, 50 * e, { echelle: e });
+        ctx.restore();
+      }
+      if (t > 1.45) { ctx.fillStyle = `rgba(240,252,255,${SG.clamp((t - 1.45) / 0.3, 0, 1)})`; ctx.fillRect(0, 0, SG.W, SG.H); }
+      return;
+    }
+    // l'arrivée : l'éclair retombe, une colonne de lumière dépose Spirit
+    const s = this.spirit, u = t - 1.75;
+    const arr = SG.img['arrivee-plaine'];
+    if (arr && arr.width && u < 1.2) { ctx.save(); ctx.globalAlpha = SG.clamp(1 - (u - 0.5) / 0.7, 0, 1); ctx.drawImage(arr, 0, 0, SG.W, SG.H); ctx.restore(); }
+    const col = SG.clamp(1 - Math.max(0, u - 0.9) / 0.75, 0, 1);
+    ctx.save();
+    ctx.globalCompositeOperation = 'lighter';
+    const g = ctx.createLinearGradient(s.x - 60, 0, s.x + 60, 0);
+    g.addColorStop(0, 'rgba(95,243,255,0)'); g.addColorStop(0.5, `rgba(200,250,255,${0.85 * col})`); g.addColorStop(1, 'rgba(95,243,255,0)');
+    ctx.fillStyle = g; ctx.fillRect(s.x - 60, 0, 120, s.y + 10);
+    ctx.fillStyle = `rgba(160,240,255,${0.5 * col})`; ctx.beginPath(); ctx.ellipse(s.x, s.y, 70 + u * 30, 18 + u * 6, 0, 0, Math.PI * 2); ctx.fill();
+    for (const g2 of tr.grains) {
+      const k = SG.clamp(1 - u / 0.9, 0, 1), r = 30 + g2.r * 220 * k;
+      ctx.fillStyle = g2.c; ctx.globalAlpha = col;
+      ctx.fillRect(s.x + Math.cos(g2.a) * r - 3, s.y - 50 + Math.sin(g2.a) * r * 0.7 - 3, 6, 6);
+    }
+    ctx.restore();
+    if (u > 0.8) { ctx.save(); ctx.globalAlpha = SG.clamp((u - 0.8) / 0.5, 0, 1); s.dessiner(ctx); ctx.restore(); }
+    if (u < 0.45) { ctx.fillStyle = `rgba(240,252,255,${1 - u / 0.45})`; ctx.fillRect(0, 0, SG.W, SG.H); }
   }
 
   dessinerScene(ctx) {
@@ -807,13 +958,29 @@ SG.Jeu = class {
     }
     for (const p of this.pnj) liste.push(p);
     if (this.reveil && this.spirit) {
-      const t = this.reveil.t, im = SG.img[t < 1.8 ? 'spirit-endormi' : t < 3.2 ? 'spirit-etire' : 'spirit-signal'];
-      const R = SG.LOGE.reveil;
-      liste.push({ y: R.y, dessiner: (ctx) => {
-        SG.ombre(ctx, R.x, R.y, 30, 0.3);
-        if (im && im.width) SG.dessinerPied(ctx, im, R.x, R.y, {});
-        if (t < 1.8) SG.texte(ctx, 'z', R.x + 44, R.y - 110 - (t * 20) % 24, 26, '#cfe8ff', 'center');
-      } });
+      const t = this.reveil.t, R = SG.LOGE.depart, Ch = SG.LOGE.chaise;
+      if (t < 1.8) {
+        // endormi dans sa chaise, face à l'écran : on voit sa tête penchée au-dessus du dossier, et les « z »
+        liste.push({ y: SG.H + 50, dessiner: (ctx) => {
+          const dos = SG.img['spirit-dos'];
+          if (dos && dos.width) {
+            ctx.save();
+            ctx.beginPath(); ctx.rect(Ch.x - 90, Ch.y - 140, 180, 150); ctx.clip();
+            ctx.translate(Ch.x, Ch.y + 70); ctx.rotate(-0.28 + Math.sin(t * 1.6) * 0.02);
+            SG.dessinerPied(ctx, dos, 0, 0, {});
+            ctx.restore();
+          }
+          for (let i = 0; i < 3; i++) {
+            const u = ((t * 0.7 + i / 3) % 1);
+            ctx.save(); ctx.globalAlpha = Math.sin(u * Math.PI);
+            SG.texte(ctx, 'z', Ch.x + 30 + u * 34, Ch.y - 70 - u * 60, 22 + i * 6, '#cfe8ff', 'center', 'rgba(0,0,30,0.8)', 4, true);
+            ctx.restore();
+          }
+        } });
+      } else {
+        const im = SG.img[t < 3.2 ? 'spirit-etire' : 'spirit-signal'];
+        liste.push({ y: R.y, dessiner: (ctx) => { SG.ombre(ctx, R.x, R.y, 30, 0.3); if (im && im.width) SG.dessinerPied(ctx, im, R.x, R.y, {}); } });
+      }
     } else if (this.spirit && !this.cacherSpirit) liste.push(this.spirit);
     liste.sort((a, b) => a.y - b.y);
     for (const o of liste) o.dessiner(ctx);
@@ -861,6 +1028,18 @@ SG.Jeu = class {
   objetsDecor(liste) {
     const e = SG.MONDE[this.ecran];
     const I = SG.img;
+    // rochers et touffes découpés dans l'écran peint : mêmes pixels, triés avec les personnages
+    const D = SG.DECOUPES && SG.DECOUPES[this.ecran], pl = I['decoupes-' + this.ecran.replace(',', '-')];
+    if (D && pl && pl.width) D.forEach((p, i) => {
+      const [sx, sy, sw, sh] = p.s, [x, y, w, h] = p.d;
+      if (p.t === 'h' && this.coupes.has('t' + i)) {
+        // touffe coupée : il reste le pied, ras du sol
+        const k = 0.3;
+        liste.push({ y: -40, dessiner: (ctx) => ctx.drawImage(pl, sx, sy + sh * (1 - k), sw, sh * k, x, y + h * (1 - k), w, h * k) });
+        return;
+      }
+      liste.push({ y: p.b - (p.t === 'h' ? 6 : 0), dessiner: (ctx) => ctx.drawImage(pl, sx, sy, sw, sh, x, y, w, h) });
+    });
     for (let r = 0; r < SG.ROWS; r++) {
       for (let c = 0; c < SG.COLS; c++) {
         const ch = this.caseEn(c, r);
@@ -911,7 +1090,8 @@ SG.Jeu = class {
   fond(cle) {
     if (this.fonds[cle]) return this.fonds[cle];
     const e = SG.MONDE[cle];
-    const nomImage = cle === 'loge' && this.porteLoge ? 'loge-portail' : e.image;
+    const nomImage = cle === 'loge' && this.porteLoge ? 'loge-portail' : (this.varianteQG(cle) || e.image);
+    if (cle === 'loge' && this.reveil && this.reveil.t < 1.8 && SG.img['loge-endormi'] && SG.img['loge-endormi'].width) return SG.img['loge-endormi'];
     if (nomImage && SG.img[nomImage] && SG.img[nomImage].width) return SG.img[nomImage];
     const k = Math.min(2, this.echelle);
     const cv = document.createElement('canvas');
@@ -1043,7 +1223,7 @@ SG.Jeu = class {
     const titre = (t, x, y) => SG.texte(ctx, t, x, y, 17, '#7fe8ff', 'center', '#02102a', 4, true);
     // 1. mini-carte
     const mx = 46, my = 60, mw = 170, mh = 48;
-    titre(this.estDonjon() ? 'TERRIER' : this.ecran === 'loge' ? 'QG' : 'PLAINE', mx + mw / 2, 53);
+    titre(this.estDonjon() ? 'TERRIER' : (SG.MONDE[this.ecran] && SG.MONDE[this.ecran].interieur) ? 'QG' : 'PLAINE', mx + mw / 2, 53);
     ctx.fillStyle = 'rgba(5,15,35,0.9)'; ctx.beginPath(); ctx.roundRect(mx, my, mw, mh, 6); ctx.fill();
     ctx.strokeStyle = 'rgba(42,212,255,0.6)'; ctx.lineWidth = 2; ctx.stroke();
     if (this.estDonjon()) {
@@ -1191,7 +1371,7 @@ SG.Jeu = class {
     let tx = x + 50;
     if (qui) {
       const parle = d.car < texte.length && Math.floor(this.t * 8) % 2 === 0;
-      const portraits = { spirit: parle ? 'portrait-spirit-parle' : 'portrait-spirit', ermite: 'portrait-ermite', flash: 'portrait-flash' };
+      const portraits = { spirit: parle ? 'portrait-spirit-parle' : 'portrait-spirit', ermite: 'portrait-ermite', flash: 'portrait-flash', lynx: 'portrait-lynx', gus: 'portrait-gus' };
       const im = SG.img[portraits[qui]];
       const px = x + 22, py = y - 62, pw = 214, ph = 214;
       SG.cadre(ctx, SG.img['ui-portrait'], px, py, pw, ph, 200, 38);
@@ -1200,7 +1380,7 @@ SG.Jeu = class {
       if (im && im.width) SG.dessinerPied(ctx, im, px + pw / 2, py + ph - 20, { echelle: 0.8 });
       else if (qui === 'flash') { ctx.translate(px + pw / 2, py + ph / 2 + 60); ctx.scale(1.3, 1.3); new SG.Flash(0, 0).dessiner(ctx); }
       ctx.restore();
-      SG.texte(ctx, { spirit: 'Spirit', ermite: 'L\'ermite', flash: 'Flash' }[qui], x + 262, y + 58, 30, '#7fe8ff', 'left', null, null, true);
+      SG.texte(ctx, { spirit: 'Spirit', ermite: 'L\'ermite', flash: 'Flash', lynx: 'Le Lynx', gus: 'Gus' }[qui], x + 262, y + 58, 30, '#7fe8ff', 'left', null, null, true);
       tx = x + 262;
     }
     SG.texteMultiligne(ctx, texte.slice(0, Math.floor(d.car)), tx, y + (qui ? 96 : 80), w - (tx - x) - 70, 26, 34, '#ffffff');

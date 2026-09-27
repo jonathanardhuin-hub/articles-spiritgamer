@@ -139,6 +139,7 @@
     'decor-plaine': 'Décor Plaine', 'arbre': 'Arbre', 'salle': 'Salle du Terrier', 'grotte': 'Grotte', 'ampli': 'Ampli', 'manette': 'Manette',
     'coffre': 'Coffre', 'statue': 'Gargouille', 'bloc': 'Bloc', 'flash': 'Flash', 'portrait-flash': 'Portrait Flash', 'ermite': 'Ermite',
     'ui': 'Cadre interface', 'battant': 'Battant de porte', 'sol-herbe': 'Sol herbe', 'titre': 'Écran titre', 'projectiles': 'Projectiles', 'entree': 'Entrée du Terrier',
+    'loge': 'Ta loge (validée)', 'clairiere': 'La Clairière (validée)',
   };
 
   // ------------------------------------------------------------------ morceaux de prompt communs
@@ -230,6 +231,16 @@ Le centre de la pièce reste dégagé pour marcher.`]);
     ['Spirit endormi, affalé en arrière comme dans un fauteuil (le fauteuil n\'est pas dessiné), vu de face, bras pendants, bouche entrouverte, une petite bulle de sommeil (sans lettres Z), casque sur les oreilles.',
      'Spirit assis vu de face, qui s\'étire, bras levés, yeux mi-clos, bâillement.',
      'Spirit debout vu de face, la main sur l\'écouteur de son casque, sourcils levés, comme s\'il entendait un signal lointain.']);
+
+  carte('pro', 'decors', 'Le passage dans le portail (effet)', 'L\'image de fond de l\'animation quand Spirit saute dans le portail de sa loge. Le jeu la fait tourner et zoomer, et dessine Spirit qui tombe dedans : il ne doit donc pas être sur l\'image. Nom du fichier à m\'envoyer : portail-tunnel.png.', ['titre', 'loge'],
+    `Format paysage 16:9, dimensions exactes 1672 × 941 pixels. Même rendu que l'écran titre joint : toon HD, contours épais, couleurs riches. Aucun texte, aucun logo, aucun personnage.`,
+    ['Vue de face, au bout d\'un tunnel de lumière qui tourbillonne : des anneaux cyan et violets en spirale qui se resserrent vers un centre blanc éblouissant, parfaitement au milieu de l\'image. Le long des parois filent vers les bords des petits carrés lumineux comme des pixels, des éclats d\'écran et des fragments de fenêtres de navigateur, étirés par la vitesse. Les bords de l\'image sont bleu nuit presque noir, le centre est presque blanc. Même lumière cyan que le portail de la loge jointe.']);
+  carte('pro', 'decors', 'L\'arrivée dans la Plaine (effet)', 'L\'image qui s\'affiche juste après l\'éclair blanc, quand Spirit atterrit dans la Plaine. Le jeu la fond ensuite dans l\'écran normal de la Clairière et fait apparaître Spirit dans la colonne de lumière. Nom du fichier : arrivee-plaine.png.', ['clairiere', 'loge'],
+    null, [], null,
+    [`Reprends l'écran de la Clairière joint. Garde exactement les mêmes dimensions (1672 × 941 pixels, sans recadrer, sans bordure ajoutée) et garde absolument tout identique : arbres, grotte, rochers, chemins, herbe, cadrage. Ajoute seulement, au centre du croisement des chemins (au milieu de l'image en largeur, un peu sous le milieu en hauteur), une colonne de lumière cyan et blanche qui descend du haut de l'image jusqu'au sol, avec un cercle lumineux posé sur le chemin à sa base, quelques petits carrés lumineux comme des pixels qui flottent autour, et un léger reflet cyan sur l'herbe et le chemin tout proches. Même lumière cyan que le portail de la loge jointe. Aucun personnage dans la lumière : le jeu y fait apparaître Spirit lui-même.`]);
+  carte('pro', 'decors', 'Ta loge, Spirit endormi à son bureau (facultatif)', 'Le jeu montre déjà Spirit endormi en assemblant sa tête au-dessus du dossier, mais une image peinte sera plus belle. Nom du fichier : loge-spirit-endormi.png.', ['loge', 'spirit-dos', 'spirit-officiel'],
+    null, [], null,
+    [`Reprends l'image de ta loge jointe. Garde exactement les mêmes dimensions (1672 × 941 pixels, sans recadrer, sans bordure ajoutée) et garde absolument tout identique : meubles, murs, lumière, cadrage. Ajoute seulement Spirit (la mascotte jointe : petit personnage blanc, casque-micro noir et bleu avec les lettres SG en cyan sur chaque écouteur, tee-shirt bleu) endormi dans le fauteuil beige de droite, face à son grand écran : on le voit de dos, sa tête et le haut de son casque dépassent du dossier, la tête penchée sur le côté, un bras qui pend le long de l'accoudoir. La lumière de l'écran l'éclaire doucement. Rien d'autre ne change.`]);
 
   // ================================================================== PLAINE DES PIXELS : écrans entiers
   const PLAINE_BORD = 'des arbres touffus vert vif aux troncs bruns, comme sur le décor joint';
@@ -657,7 +668,7 @@ Le centre de la pièce reste dégagé pour marcher.`]);
   { const c = cartes.find((x) => x.id === 'D1-17'); if (c) { c.pourquoi = 'Il ne te reste que cette étape : le mur de droite éventré. Toutes les autres variantes sont reçues.'; c.prompts = [c.prompts[8]]; c.n = 1; } }
 
   // cartes ajoutées ou modifiées lors de la dernière mise à jour
-  const NOUVEAUX = new Set(['QG-10', 'PRO-01', 'D1-17', 'QG-04', 'QG-08', 'QG-09', 'PRO-03', 'D1-17', 'R2-28', 'R2-29', 'R3-28', 'R3-29', 'R4-28', 'R4-29', 'R5-28', 'R5-29', 'R6-28', 'R6-29', 'R7-28', 'R7-29', 'R8-28', 'R8-29', 'R3-11', 'R4-11', 'R5-11', 'R6-11', 'R7-11', 'R8-11', 'FIN-08']);
+  const NOUVEAUX = new Set(['PRO-05', 'PRO-06', 'PRO-07', 'QG-10', 'PRO-01', 'D1-17', 'QG-04', 'QG-08', 'QG-09', 'PRO-03', 'D1-17', 'R2-28', 'R2-29', 'R3-28', 'R3-29', 'R4-28', 'R4-29', 'R5-28', 'R5-29', 'R6-28', 'R6-29', 'R7-28', 'R7-29', 'R8-28', 'R8-29', 'R3-11', 'R4-11', 'R5-11', 'R6-11', 'R7-11', 'R8-11', 'FIN-08']);
 
   // ------------------------------------------------------------------ affichage
   const ETAPES = [['nouveau', 'Nouveautés'], ['tout', 'Tout'], ['pro', 'Prologue'], ['pl', 'Plaine'], ['d1', 'Donjon 1'], ['qg', 'Parvis du QG'], ['r2', 'Forêt + Donjon 2'], ['r3', 'Monts + Donjon 3'], ['r4', 'Désert + Donjon 4'], ['r5', 'Lac + Donjon 5'], ['r6', 'Cité + Donjon 6'], ['r7', 'Marais + Donjon 7'], ['r8', 'Toundra + Donjon 8'], ['fin', 'Tour finale']];
