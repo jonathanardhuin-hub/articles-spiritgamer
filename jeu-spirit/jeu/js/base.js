@@ -4,7 +4,7 @@
 const SG = {};
 SG.W = 1280;          // largeur logique de l'écran
 SG.H = 720;           // hauteur logique de l'aire de jeu
-SG.VERSION = 44;      // à augmenter à chaque mise en ligne : les anciennes sauvegardes sont effacées
+SG.VERSION = 45;      // à augmenter à chaque mise en ligne : les anciennes sauvegardes sont effacées
 SG.BANDE = 150;       // bandeau d'informations au-dessus de l'aire de jeu
 SG.HT = SG.H + SG.BANDE;
 SG.decalY = 0;
@@ -47,7 +47,7 @@ SG.IMAGES = [
 ];
 SG.img = {};
 // images facultatives : utilisées dès qu'elles existent, sinon un dessin provisoire est affiché
-SG.IMAGES_FACULTATIVES = ['spirit-pousse-face', 'spirit-pousse-dos', 'spirit-pousse-profil', 'battant-cle', 'battant-grille', 'battant-boss', 'battant-ouvert', 'salle-vide', 'porte-ouverte', 'gouffre', 'grille', 'porte-cle', 'porte-boss', 'clic-b', 'manette', 'cle', 'cle-boss', 'carte-donjon', 'boussole', 'source', 'flash', 'flash-carnet', 'portrait-flash',
+SG.IMAGES_FACULTATIVES = ['ecran-1-2', 'ecran-1-1', 'ecran-1-0', 'ecran-0-1', 'ecran-0-2', 'ecran-2-0', 'ecran-2-1', 'ecran-2-2', 'salle-base', 'salle-plaque', 'salle-plaque-enfoncee', 'salle-gouffre', 'salle-mur-fele', 'salle-boss', 'salle-gardien', 'loge', 'loge-portail', 'spirit-endormi', 'spirit-etire', 'spirit-signal', 'intro-2', 'intro-3', 'fin-de-partie', 'mode-heros', 'mode-decouverte', 'spirit-pousse-face', 'spirit-pousse-dos', 'spirit-pousse-profil', 'battant-cle', 'battant-grille', 'battant-boss', 'battant-ouvert', 'salle-vide', 'porte-ouverte', 'gouffre', 'grille', 'porte-cle', 'porte-boss', 'clic-b', 'manette', 'cle', 'cle-boss', 'carte-donjon', 'boussole', 'source', 'flash', 'flash-carnet', 'portrait-flash',
   'salle-donjon', 'bloc', 'statue', 'brasero', 'pot', 'coffre', 'coffre-ouvert', 'cristal', 'cristal-actif', 'entree-terrier', 'reine'];
 
 SG.chargerImages = function (progression) {

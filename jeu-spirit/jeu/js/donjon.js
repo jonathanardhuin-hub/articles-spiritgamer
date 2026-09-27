@@ -17,13 +17,13 @@ SG.DONJON1 = {
       nom: 'Le Hall d\'entrée',
       plan: [
         '################',
-        '#F............F#',
         '#..............#',
+        '#.F..........F.#',
         '#...p......p...#',
         '#..............#',
-        '#..............#',
         '#...p......p...#',
-        '#F............F#',
+        '#.F..........F.#',
+        '#..............#',
         '################',
       ],
       ennemis: [],
@@ -47,15 +47,16 @@ SG.DONJON1 = {
     },
     '2,3': {
       nom: 'La Salle du Bloc',
+      image: 'salle-mur-fele', murees: ['droite'],
       plan: [
         '################',
         '#..............#',
         '#..o........o..#',
         '#..............#',
         '#......B.......#',
-        '#..............#',
-        '#..o........o..#',
         '#.p..........p.#',
+        '#..o........o..#',
+        '#..............#',
         '################',
       ],
       condition: 'bloc',
@@ -81,12 +82,13 @@ SG.DONJON1 = {
     },
     '2,2': {
       nom: 'La Salle des Plaques',
+      image: 'salle-plaque', imageResolue: 'salle-plaque-enfoncee', decalBloc: 40,
       plan: [
         '################',
         '#..............#',
-        '#.o..o..G.o..o.#',
+        '#.o..o.G..o..o.#',
         '#..............#',
-        '#.......I......#',
+        '#......I.......#',
         '#..............#',
         '#.o..o....o..o.#',
         '#..............#',
@@ -130,14 +132,15 @@ SG.DONJON1 = {
     },
     '2,1': {
       nom: 'Le Cristal',
+      image: 'salle-gouffre', cristalDx: 40, gouffre: [515, 118, 762, 600], ilot: [582, 285, 700, 400],
       plan: [
         '################',
         '#..............#',
-        '#.........vvvvv#',
-        '#.........vvvvv#',
-        '#.........vvXvv#',
-        '#.........vvvvv#',
-        '#.........vvvvv#',
+        '#..............#',
+        '#..............#',
+        '#......X.......#',
+        '#..............#',
+        '#..............#',
         '#..............#',
         '################',
       ],
@@ -147,6 +150,7 @@ SG.DONJON1 = {
     },
     '1,0': {
       nom: 'Le Trône de la Reine',
+      image: 'salle-boss', imageFinie: 'salle-gardien',
       plan: [
         '################',
         '#..............#',
@@ -580,6 +584,39 @@ Object.assign(SG.Jeu.prototype, {
     return null;
   },
 
+  // image peinte de la salle courante (selon l'état de l'énigme ou du boss), ou null si elle n'est pas chargée
+  imageSalle(k) {
+    const S = this.salle(k), D = this.etatDonjon(), cle = k || this.salleCle();
+    let n = S.image || 'salle-base';
+    if (S.imageResolue && D.resolues.includes(cle)) n = S.imageResolue;
+    if (S.imageFinie && D.fini) n = S.imageFinie;
+    const im = SG.img[n];
+    return im && im.width ? im : null;
+  },
+
+  // obstacles des murs peints (cellules de 20 px) : sol entre 120 et 1160 × 120 et 600, couloirs des quatre portes
+  masqueSalle() {
+    const S = this.salle(), k = this.salleCle();
+    if (!this.imageSalle()) return null;
+    this.masques = this.masques || {};
+    if (this.masques[k]) return this.masques[k];
+    const libre = (x, y, r) => x >= r[0] && x < r[2] && y >= r[1] && y < r[3];
+    const couloirs = [[580, 0, 700, 120], [580, 600, 700, 720], [0, 320, 120, 400], [1160, 320, 1280, 400]];
+    const m = [];
+    for (let r = 0; r < 36; r++) {
+      let l = '';
+      for (let c = 0; c < 64; c++) {
+        const x = c * 20 + 10, y = r * 20 + 10;
+        let ch = libre(x, y, [120, 120, 1160, 600]) || couloirs.some((q) => libre(x, y, q)) ? '.' : '#';
+        if (S.murees && S.murees.includes('droite') && x > 1150) ch = '#';
+        if (S.gouffre && libre(x, y, S.gouffre)) ch = S.ilot && libre(x, y, S.ilot) ? '#' : 'v';
+        l += ch;
+      }
+      m.push(l);
+    }
+    return (this.masques[k] = m);
+  },
+
   caseSalle(c, r) {
     if (r < 0 || r >= SG.ROWS || c < 0 || c >= SG.COLS) return null;
     const S = this.salle(), k = this.salleCle(), D = this.etatDonjon();
@@ -587,7 +624,7 @@ Object.assign(SG.Jeu.prototype, {
     const dp = this.dirPorte(c, r);
     if (dp) return this.porteOuverte(dp) ? '.' : '#';
     if (ch === 'B' || ch === 'G') ch = '.';
-    for (const b of this.blocs || []) if (b.c === c && b.r === r) return 'B';
+    for (const b of this.blocs || []) if (b.r === r && (b.c === c || (S.decalBloc && b.c + 1 === c))) return 'B';
     if (ch === 'p' && this.coupes.has(c + ',' + r)) return '.';
     const cf = S.coffre;
     if (cf && cf.c === c && cf.r === r && (!cf.cache || D.resolues.includes(k))) return 'C';
@@ -624,8 +661,8 @@ Object.assign(SG.Jeu.prototype, {
       if (ch === 'X') { this.activerCristalPlaine(); return true; }
       return false;
     }
-    const ch = this.caseSalle(Math.floor(x / SG.T), Math.floor(y / SG.T));
-    if (ch !== 'X') return false;
+    const rr = Math.floor(y / SG.T), dx = this.salle().cristalDx || 0;
+    if (this.caseSalle(Math.floor(x / SG.T), rr) !== 'X' && this.caseSalle(Math.floor((x - dx) / SG.T), rr) !== 'X') return false;
     if (!this.cristalFrappe) { this.cristalFrappe = true; this.effets.push(new SG.Eclat(x, y - 30)); this.resoudre(this.salleCle()); }
     return true;
   },
@@ -648,7 +685,8 @@ Object.assign(SG.Jeu.prototype, {
     }
     if (!s.recul || true) {
       const cc = Math.floor(s.x / SG.T), rr = Math.floor((s.y - 10) / SG.T);
-      if (this.caseSalle(cc, rr) === 'v') { s.chute = 0.7; s.attaque = 0; s.recul = null; SG.Son.effet('fin'); return; }
+      const mq = this.masqueSalle(), lq = mq && mq[SG.clamp(Math.floor((s.y - 10) / 20), 0, 35)];
+      if (this.caseSalle(cc, rr) === 'v' || (lq && lq[SG.clamp(Math.floor(s.x / 20), 0, 63)] === 'v')) { s.chute = 0.7; s.attaque = 0; s.recul = null; SG.Son.effet('fin'); return; }
     }
     if (this.bossDialogue) { this.bossDialogue = false; this.dialogue(SG.TEXTES.donjon.bossDebut); return; }
     if (S.combat && this.sallePleine && this.monstres.length === 0 && !D.resolues.includes(k)) this.resoudre(k);
@@ -681,9 +719,9 @@ Object.assign(SG.Jeu.prototype, {
         this.pousse += dt;
         if (this.pousse > 0.35) {
           this.pousse = 0;
-          const b = this.blocs.find((q) => q.c === fc && q.r === fr);
-          const nc = fc + d.x, nr = fr + d.y, cible = this.caseSalle(nc, nr);
-          const libre = (cible === '.' || cible === 'I') && !this.dirPorte(nc, nr) && !this.monstres.some((m) => Math.floor(m.x / SG.T) === nc && Math.floor((m.y - 5) / SG.T) === nr);
+          const b = this.blocs.find((q) => q.r === fr && (q.c === fc || (S.decalBloc && q.c + 1 === fc)));
+          const bc = b ? b.c : fc, nc = bc + d.x, nr = fr + d.y, cible = this.caseSalle(nc, nr), cible2 = S.decalBloc ? this.caseSalle(nc + 1, nr) : '.';
+          const libre = (cible === '.' || cible === 'I' || (S.decalBloc && d.x > 0 && cible === 'B')) && (cible2 === '.' || cible2 === 'I' || (S.decalBloc && d.x < 0 && cible2 === 'B')) && !this.dirPorte(nc, nr) && !this.monstres.some((m) => Math.floor(m.x / SG.T) === nc && Math.floor((m.y - 5) / SG.T) === nr);
           if (b && libre && !((S.condition === 'bloc' || S.condition === 'plaque') && D.resolues.includes(k))) { b.c = nc; b.r = nr; b.dc = d.x; b.dr = d.y; b.anim = 1; b.pousse = true; SG.Son.effet('porte'); }
         }
       } else this.pousse = 0;
@@ -758,6 +796,31 @@ Object.assign(SG.Jeu.prototype, {
 
   // ---------------------------------------------------------------- dessin des salles
   fondSalle(cle) {
+    const peinte = this.imageSalle(cle.slice(3));
+    const nomFond = cle + '|' + (peinte ? peinte.src : '');
+    if (this.fonds[nomFond]) return this.fonds[nomFond];
+    if (peinte) {
+      const S0 = this.salle(cle.slice(3));
+      const cv = document.createElement('canvas');
+      const k = Math.min(2, this.echelle);
+      cv.width = SG.W * k; cv.height = SG.H * k;
+      const ctx = cv.getContext('2d');
+      ctx.scale(k, k);
+      ctx.drawImage(peinte, 0, 0, SG.W, SG.H);
+      // ouvertures sans porte : murées avec un morceau du même mur, pris juste à côté
+      const q = peinte.width / SG.W;
+      const ouv = { haut: [572, 0, 136, 120, 300, 0], bas: [572, 600, 136, 120, 300, 600], gauche: [0, 306, 124, 112, 0, 180], droite: [1156, 306, 124, 112, 1156, 180] };
+      const [sx0, sy0] = cle.slice(3).split(',').map(Number);
+      for (const dir in ouv) {
+        const d = SG.DIRS[dir], voisine = (sx0 + d.x) + ',' + (sy0 + d.y);
+        const aPorte = SG.DONJON1.portes[SG.cleSalles(cle.slice(3), voisine)] || (cle.slice(3) === SG.DONJON1.entree.salle && dir === 'bas');
+        if (aPorte || (S0.murees && S0.murees.includes(dir))) continue;
+        const [x, y, w, h, sx, sy] = ouv[dir];
+        ctx.drawImage(peinte, sx * q, sy * q, w * q, h * q, x, y, w, h);
+      }
+      this.fonds[nomFond] = cv;
+      return cv;
+    }
     if (this.fonds[cle]) return this.fonds[cle];
     const S = this.salle(cle.slice(3));
     const k = Math.min(2, this.echelle), T = SG.T;
@@ -859,25 +922,25 @@ Object.assign(SG.Jeu.prototype, {
       else if (ch === 'F') liste.push({ y, dessiner: (ctx) => SG.dessinBrasero(ctx, x, y) });
       else if (ch === 'p') liste.push({ y, dessiner: (ctx) => SG.dessinPot(ctx, x, y) });
       else if (ch === 'C') liste.push({ y, dessiner: (ctx) => SG.dessinCoffre(ctx, x, y, D.coffres.includes(k)) });
-      else if (ch === 'X') liste.push({ y, dessiner: (ctx) => SG.dessinCristal(ctx, x, y, this.cristalFrappe, this.t) });
+      else if (ch === 'X') liste.push({ y, dessiner: (ctx) => SG.dessinCristal(ctx, x + (S.cristalDx || 0), y, this.cristalFrappe, this.t) });
     }
     // plaque enfoncée par la gargouille : elle s'illumine
-    if (S.condition === 'plaque' && D.resolues.includes(k)) {
+    if (S.condition === 'plaque' && D.resolues.includes(k) && !this.imageSalle()) {
       S.plan.forEach((ligne, r) => [...ligne].forEach((ch, c) => {
         if (ch === 'I') liste.push({ y: -60, dessiner: (ctx) => { ctx.save(); ctx.shadowColor = '#5ff3ff'; ctx.shadowBlur = 24; ctx.strokeStyle = '#5ff3ff'; ctx.lineWidth = 4; ctx.beginPath(); ctx.roundRect(c * T + 8, r * T + 8, T - 16, T - 16, 10); ctx.stroke(); ctx.restore(); } });
       }));
     }
     for (const b of this.blocs || []) {
       const tremble = this.pousse > 0.05 && SG.dist(this.spirit.x, this.spirit.y, b.c * T + 40, b.r * T + 40) < 130 ? Math.sin(this.t * 70) * 2.5 : 0;
-      const x = b.c * T + 40 - b.dc * b.anim * T + tremble, y = b.r * T + T - b.dr * b.anim * T;
+      const x = b.c * T + 40 + (S.decalBloc || 0) - b.dc * b.anim * T + tremble, y = b.r * T + T - b.dr * b.anim * T;
       // traces de frottement au sol : le bloc a déjà bougé, il peut bouger encore
-      if (!b.pousse) liste.push({ y: -50, dessiner: (ctx) => SG.tracesBloc(ctx, b.c * T + 40, b.r * T + 40) });
+      if (!b.pousse) liste.push({ y: -50, dessiner: (ctx) => SG.tracesBloc(ctx, b.c * T + 40 + (S.decalBloc || 0), b.r * T + 40) });
       liste.push({ y, dessiner: (ctx) => (b.statue ? SG.dessinStatue(ctx, x, y) : SG.dessinBloc(ctx, x, y)) });
     }
     // portes (toujours derrière les personnages : dessinées sur le fond)
     for (const dir of ['haut', 'bas', 'gauche', 'droite']) {
       const p = this.porteVers(dir);
-      liste.push({ y: dir === 'bas' ? SG.H + 100 : -100, dessiner: (ctx) => SG.dessinPorte(ctx, dir, p, this.porteOuverte(dir), this.sallePortesFermees(), SG.clamp(((this.tSalle || 0) - SG.DELAI_GRILLES) / 0.22, 0, 1)) });
+      liste.push({ y: dir === 'bas' ? SG.H + 100 : -100, dessiner: (ctx) => SG.dessinPorte(ctx, dir, p, this.porteOuverte(dir), this.sallePortesFermees(), !!this.imageSalle(), SG.clamp(((this.tSalle || 0) - SG.DELAI_GRILLES) / 0.22, 0, 1)) });
     }
   },
 
@@ -1001,8 +1064,28 @@ SG.dessinCristal = function (ctx, x, y, frappe, t) {
   });
 };
 SG.DELAI_GRILLES = 0.6;
-SG.dessinPorte = function (ctx, dir, p, ouverte, volets, descente = 1) {
+SG.dessinPorte = function (ctx, dir, p, ouverte, volets, peinte, descente = 1) {
   if (!p) return;
+  if (peinte) {
+    // l'ouverture est déjà peinte dans la salle : ouverte, rien à dessiner ; fermée, le battant remplit l'embrasure
+    if (ouverte) return;
+    const t = p.type;
+    const im = SG.img[(volets || t === 'o' || t.startsWith('enigme') || t === 'sortie') ? 'battant-grille' : t === 'boss' ? 'battant-boss' : 'battant-cle'];
+    const o = { haut: [640, 59, 128, 118, 0], bas: [638, 660, 126, 120, Math.PI], gauche: [61, 362, 104, 122, -Math.PI / 2], droite: [1219, 361, 104, 122, Math.PI / 2] }[dir];
+    const [cx, cy, L, P, ang] = o;
+    ctx.save(); ctx.translate(cx, cy); ctx.rotate(ang);
+    ctx.beginPath(); ctx.rect(-L / 2, -P / 2, L, P); ctx.clip();
+    if (im && im.width) {
+      const sh = Math.min(im.height, im.width * P / L);
+      const glisse = volets ? (1 - descente) * P : 0;
+      ctx.drawImage(im, 0, (im.height - sh) / 2, im.width, sh, -L / 2, -P / 2 - glisse, L, P);
+    }
+    const g = ctx.createLinearGradient(0, P / 2, 0, P / 2 - 22);
+    g.addColorStop(0, 'rgba(0,0,0,0.45)'); g.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = g; ctx.fillRect(-L / 2, P / 2 - 22, L, 22);
+    ctx.restore();
+    return;
+  }
   const type = p.type;
   let nom = 'battant-ouvert';
   if (!ouverte) nom = (volets || type === 'o' || type.startsWith('enigme') || type === 'sortie') ? 'battant-grille' : type === 'boss' ? 'battant-boss' : 'battant-cle';

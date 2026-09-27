@@ -147,6 +147,29 @@ SG.Jeu = class {
     }
   }
 
+  // masque d'obstacles de l'écran peint en cours (cellules de 20 px), ou null
+  masque() {
+    if (this.ecran === 'grotte') return null;
+    if (this.estDonjon()) return this.masqueSalle ? this.masqueSalle() : null;
+    const e = SG.MONDE[this.ecran];
+    return e && e.image && SG.img[e.image] && SG.img[e.image].width ? SG.MASQUES[this.ecran] || null : null;
+  }
+
+  // la boîte touche-t-elle un obstacle du masque ? (hors de l'écran : on prolonge la cellule du bord)
+  collisionMasque(mq, b, entite) {
+    const c0 = Math.floor(b.x / 20), c1 = Math.floor((b.x + b.w - 0.01) / 20);
+    const r0 = Math.floor(b.y / 20), r1 = Math.floor((b.y + b.h - 0.01) / 20);
+    for (let r = r0; r <= r1; r++) {
+      const ligne = mq[SG.clamp(r, 0, mq.length - 1)];
+      for (let c = c0; c <= c1; c++) {
+        const ch = ligne[SG.clamp(c, 0, ligne.length - 1)];
+        if (ch === '#' || ch === '~') return true;
+        if (ch === 'v' && !(entite && (entite.vole || entite === this.spirit))) return true;
+      }
+    }
+    return false;
+  }
+
   caseEn(c, r) {
     if (this.ecran === 'grotte') return '.';
     if (this.estDonjon()) return this.caseSalle(c, r);
@@ -188,6 +211,8 @@ SG.Jeu = class {
         if ((this.estDonjon() ? SG.CASES_SALLE_PLEINES : SG.CASES_PLEINES).has(ch)) return true;
       }
     }
+    const mq = this.masque();
+    if (mq && this.collisionMasque(mq, b, entite)) return true;
     // dans un donjon, statues, braseros et blocs dépassent de leur case vers le haut : on s'arrête avant, sans marcher sur leur tête
     if (this.estDonjon()) {
       const y1 = b.y + b.h + 28, r = Math.floor((y1 - 0.01) / SG.T);
@@ -197,7 +222,7 @@ SG.Jeu = class {
       }
     }
     // dehors, le feuillage des arbres déborde de leur case : personne ne passe dessous
-    if (!this.estDonjon()) {
+    if (!this.estDonjon() && !mq) {
       const x0 = b.x - 18, x1 = b.x + b.w + 18, y0 = b.y - 8, y1 = b.y + b.h + 66;
       for (let r = Math.floor(y0 / SG.T); r <= Math.floor((y1 - 0.01) / SG.T); r++) {
         for (let c = Math.floor(x0 / SG.T); c <= Math.floor((x1 - 0.01) / SG.T); c++) {
@@ -237,6 +262,8 @@ SG.Jeu = class {
   obstacleHaut(x, y) {
     if (this.ecran === 'grotte') return this.collisionGrotte({ x: x - 2, y: y - 2, w: 4, h: 4 });
     const ch = this.caseEn(Math.floor(x / SG.T), Math.floor(y / SG.T));
+    const mq = this.masque();
+    if (mq) { const l = mq[SG.clamp(Math.floor(y / 20), 0, mq.length - 1)]; if (l[SG.clamp(Math.floor(x / 20), 0, l.length - 1)] === '#') return true; }
     if (this.estDonjon()) return ch !== null && ch !== 'v' && SG.CASES_SALLE_PLEINES.has(ch);
     return ch !== null && ch !== '~' && SG.CASES_PLEINES.has(ch);
   }
@@ -396,6 +423,13 @@ SG.Jeu = class {
     if (dir === 'bas') s.y = don ? SG.T + 130 : s.ph + 4;
     s.recul = null;
     this.entrerEcran(cle);
+    if (this.collision(SG.boitePieds(s), s)) {
+      const horiz = dir === 'gauche' || dir === 'droite', x0 = s.x, y0 = s.y;
+      chercher: for (let d = 10; d <= 200; d += 10) for (const sg of [1, -1]) {
+        const nx = horiz ? x0 : x0 + sg * d, ny = horiz ? y0 + sg * d : y0;
+        if (!this.collision(SG.boitePieds(s, nx, ny), s)) { s.x = nx; s.y = ny; break chercher; }
+      }
+    }
     const apres = this.capturer();
     this.transition = { type: 'glisse', dir, avant, apres, t: 0, duree: 0.55, depart, arrivee: { x: s.x, y: s.y } };
     this.etat = 'transition';
@@ -499,7 +533,8 @@ SG.Jeu = class {
       this.dialogue([[null, SG.TEXTES.foretBientot]], () => { this.spirit.y += 30; setTimeout(() => { this.messageForet = false; }, 2000); });
       return;
     }
-    if (this.caseEn(c, r) === 'E' && s.dir === 'haut') {
+    const eg = SG.MONDE[this.ecran] && SG.MONDE[this.ecran].grotte;
+    if ((this.caseEn(c, r) === 'E' || (eg && s.x > eg.x0 && s.x < eg.x1 && s.y < eg.y)) && s.dir === 'haut') {
       this.fonduVers(() => {
         this.entrerEcran('grotte');
         this.spirit.x = SG.GROTTE.entree.x; this.spirit.y = SG.GROTTE.entree.y; this.spirit.dir = 'haut';
@@ -790,7 +825,8 @@ SG.Jeu = class {
     for (let r = 0; r < SG.ROWS; r++) {
       for (let c = 0; c < SG.COLS; c++) {
         const ch = this.caseEn(c, r);
-        const x = c * SG.T + 40, y = r * SG.T + SG.T;
+        if (e.image && 'TSrMEg~:,'.includes(ch)) continue;
+        const x = c * SG.T + 40 + (ch === 'X' && e.cristal ? e.cristal.dx : 0), y = r * SG.T + SG.T;
         const graine = (c * 31 + r * 17 + this.ecran.length) % 7;
         let im = null, dx = 0, dy = 0, retourne = graine % 2 === 0;
         switch (ch) {
@@ -836,6 +872,7 @@ SG.Jeu = class {
   fond(cle) {
     if (this.fonds[cle]) return this.fonds[cle];
     const e = SG.MONDE[cle];
+    if (e.image && SG.img[e.image] && SG.img[e.image].width) return SG.img[e.image];
     const k = Math.min(2, this.echelle);
     const cv = document.createElement('canvas');
     cv.width = SG.W * k; cv.height = SG.H * k;
