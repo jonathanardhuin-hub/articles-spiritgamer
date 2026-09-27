@@ -636,7 +636,7 @@ Le centre de la pièce reste dégagé pour marcher.`]);
     ]));
 
   // cartes terminées (images reçues par Claude) : elles disparaissent du catalogue
-  const RECUES = new Set(['PL-02', 'PL-03', 'PL-04', 'PL-05', 'PL-06', 'PL-07', 'PRO-04', 'PL-08', 'PL-09', 'PL-10', 'PRO-02', 'D1-12', 'D1-13', 'D1-16', 'QG-01', 'QG-02', 'QG-03', 'QG-05', 'QG-06', 'QG-07']);
+  const RECUES = new Set(['QG-09', 'R2-01', 'PL-02', 'PL-03', 'PL-04', 'PL-05', 'PL-06', 'PL-07', 'PRO-04', 'PL-08', 'PL-09', 'PL-10', 'PRO-02', 'D1-12', 'D1-13', 'D1-16', 'QG-01', 'QG-02', 'QG-03', 'QG-05', 'QG-06', 'QG-07']);
   for (let i = cartes.length - 1; i >= 0; i--) if (RECUES.has(cartes[i].id)) cartes.splice(i, 1);
 
   // PRO-01 : reçues l'irruption du Roi (image 2) et la Source brisée (image 3)
