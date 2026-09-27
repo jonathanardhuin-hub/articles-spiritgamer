@@ -114,17 +114,15 @@
   <header class="tete">
     <h1>Catalogue d'images<small>Spirit et le Roi Clickbait · toutes les images du jeu</small></h1>
     <ul class="mode-emploi">
-      <li><b>1 carte = 1 conversation ChatGPT</b>Copie le prompt, joins les images montrées sous « À joindre » (clique dessus pour les ouvrir en grand et les enregistrer).</li>
+      <li><b>1 carte = 1 nouvelle conversation ChatGPT</b>Ouvre une nouvelle conversation pour chaque carte, et fais toutes les étapes de la carte dans cette même conversation (par exemple l'image puis sa version porte ouverte). Si ChatGPT commence à déformer Spirit ou à oublier une consigne, recommence la carte dans une nouvelle conversation. Joins les images montrées sous « À joindre » (clique dessus pour les ouvrir en grand et les enregistrer), et pour les salles le plan de salle gris.</li>
       <li><b>Dans l'ordre des étapes</b>Commence par « Donjon 1 » : c'est ce que je code maintenant. Chaque étape suivante contient sa région et son donjon complet (catégorie Donjons : salles, portes, mécanismes, sous-sols).</li>
       <li><b>Range les images dans Google Drive</b>Dossier « Spirit images », puis un sous-dossier par carte, nommé avec son code (par exemple D1-03). Dis-moi ensuite quels codes sont prêts : je les récupère moi-même.</li>
       <li><b>Portes et passages</b>Chaque écran qui a une porte contient une étape de plus : la même image avec la porte ouverte. Fais-la dans la même conversation, juste après.</li>
-      <li><b>Avec Scenario</b>Choisis « Scenario » dans la ligne Outil : chaque carte donne alors un prompt court par image, le modèle à utiliser (Spirit, Spirit Personnages ou Spirit Décors), le format, et pour les salles le plan à mettre en image de structure. Le bouton « Copier les prompts » les copie tous d'un coup, un par ligne.</li>
       <li><b>Coche chaque étape</b>Chaque prompt a son bouton « fait ». Une carte ne disparaît que quand toutes ses étapes sont faites (par exemple l'image puis sa version porte ouverte).</li>
     </ul>
   </header>
 
   <nav class="filtres" aria-label="Filtres">
-    <div class="rangee" id="outil"><span class="etiq">Outil</span></div>
     <div class="rangee" id="etapes"><span class="etiq">Étape</span></div>
     <div class="rangee" id="categories"><span class="etiq">Catégorie</span><label class="masquer"><input type="checkbox" id="masquer-faites" checked> Cacher les cartes faites</label><span class="compte" id="compte"></span></div>
   </nav>
@@ -144,6 +142,7 @@
     'decor-plaine': 'Décor Plaine', 'arbre': 'Arbre', 'salle': 'Salle du Terrier', 'grotte': 'Grotte', 'ampli': 'Ampli', 'manette': 'Manette',
     'coffre': 'Coffre', 'statue': 'Gargouille', 'bloc': 'Bloc', 'flash': 'Flash', 'portrait-flash': 'Portrait Flash', 'ermite': 'Ermite',
     'ui': 'Cadre interface', 'battant': 'Battant de porte', 'sol-herbe': 'Sol herbe', 'titre': 'Écran titre', 'projectiles': 'Projectiles', 'entree': 'Entrée du Terrier',
+    'plan-salle-4-portes': 'Plan de salle (4 portes)', 'plan-salle-sans-porte': 'Plan de salle (sans porte)',
     'loge': 'Ta loge (validée)', 'clairiere': 'La Clairière (validée)', 'bureau-mika': 'Bureau de Mika (validé)',
   };
 
@@ -163,7 +162,7 @@
   const GARDIEN = `Même rendu que le Gardien joint (Flash, le hibou reporter) : animal inventé qui se tient debout comme un personnage, toon HD, contours noirs épais, air bienveillant et un peu fatigué d'avoir été enfermé. Fond uni gris moyen (#808080), personnage entier et centré, pas d'ombre au sol, aucun texte.`;
   const PNJ = `Même rendu que les personnages joints : toon HD, contours noirs épais, personnage inventé (animal qui se tient debout comme un humain), sympathique et crédible. Fond uni gris moyen (#808080), pas d'ombre au sol, aucun texte.`;
   const PORTES = `Chaque image est un battant de porte vu exactement de face, qui remplit toute l'image jusqu'aux bords, au format paysage 2:1 (deux fois plus large que haut). Rien autour : ni mur, ni sol, ni cadre de pierre. Même rendu que le battant joint, toon HD, contours épais. Aucun texte.`;
-  const SALLE_PORTES = (theme) => `Crée 1 image, seule dans son fichier.\n\nFormat paysage 16:9, dimensions exactes 1672 × 941 pixels. Une salle de donjon entière vue de dessus comme dans les Zelda en 2D, avec exactement le même cadrage que la salle jointe. Quadrillage invisible, à respecter au pixel près : les murs font exactement 157 pixels d'épaisseur de chaque côté, et le sol entre eux est un quadrillage parfaitement régulier d'exactement 13 dalles carrées en largeur et 6 en hauteur, chaque dalle de 104,5 × 104,5 pixels, joints fins, droits et alignés, aucune dalle coupée ni décalée. Les portes du haut et du bas sont centrées sur la 7e dalle, celles de gauche et de droite sur le joint entre la 3e et la 4e rangée. Tout ce qui est peint dans le sol (trou, plaque, trappe, îlot) occupe un nombre entier de dalles et suit leurs joints. Une porte au milieu exact de chacun des quatre murs (haut, bas, gauche, droite), comme dans le premier Zelda : chaque porte est un couloir creusé dans toute l'épaisseur du mur, avec un encadrement de pierre en saillie de chaque côté et un linteau massif au-dessus, et le passage est au moins aussi haut que large (les portes de gauche et de droite sont un tunnel vu de dessus, aussi haut qu'une dalle et demie, jamais une fente basse). Un petit personnage debout doit tenir entier dans chaque passage. Les quatre portes sont ouvertes : on voit un passage plongé dans l'ombre. Sol en dalles parfaitement vide, sans objet ni personnage : statues, braseros, blocs, coffres et pots sont posés par le jeu. Seuls les trous, l'eau, la lave et les fosses sont peints dans le sol, car ils en font partie. Toon HD, contours épais, lumière d'ambiance. Aucun texte.\n\nThème : ${theme}`;
+  const SALLE_PORTES = (theme) => `Crée 1 image, seule dans son fichier.\n\nFormat paysage 16:9, dimensions exactes 1672 × 941 pixels. Une salle de donjon entière vue de dessus comme dans les Zelda en 2D, en suivant exactement le plan de salle joint (image grise) : murs, dalles et portes aux mêmes endroits, au pixel près, le plan n'est qu'un guide et ne doit pas se voir dans l'image finale. Même rendu que la salle jointe. Quadrillage invisible, à respecter au pixel près : les murs font exactement 157 pixels d'épaisseur de chaque côté, et le sol entre eux est un quadrillage parfaitement régulier d'exactement 13 dalles carrées en largeur et 6 en hauteur, chaque dalle de 104,5 × 104,5 pixels, joints fins, droits et alignés, aucune dalle coupée ni décalée. Les portes du haut et du bas sont centrées sur la 7e dalle, celles de gauche et de droite sur le joint entre la 3e et la 4e rangée. Tout ce qui est peint dans le sol (trou, plaque, trappe, îlot) occupe un nombre entier de dalles et suit leurs joints. Une porte au milieu exact de chacun des quatre murs (haut, bas, gauche, droite), comme dans le premier Zelda : chaque porte est un couloir creusé dans toute l'épaisseur du mur, avec un encadrement de pierre en saillie de chaque côté et un linteau massif au-dessus, et le passage est au moins aussi haut que large (les portes de gauche et de droite sont un tunnel vu de dessus, aussi haut qu'une dalle et demie, jamais une fente basse). Un petit personnage debout doit tenir entier dans chaque passage. Les quatre portes sont ouvertes : on voit un passage plongé dans l'ombre. Sol en dalles parfaitement vide, sans objet ni personnage : statues, braseros, blocs, coffres et pots sont posés par le jeu. Seuls les trous, l'eau, la lave et les fosses sont peints dans le sol, car ils en font partie. Toon HD, contours épais, lumière d'ambiance. Aucun texte.\n\nThème : ${theme}`;
   const SUITES_PORTES = [
     `Modifie l'image précédente. Garde exactement les mêmes dimensions (1672 × 941 pixels, sans recadrer, sans bordure ajoutée) et garde absolument tout identique au pixel près (murs, sol, lumière, cadrage, encadrements des portes). Change uniquement l'intérieur des quatre passages : ils sont maintenant fermés par une grille de barreaux épais qui vient de descendre.`,
     `Modifie à nouveau l'image de la salle aux portes ouvertes. Garde exactement les mêmes dimensions (1672 × 941 pixels, sans recadrer, sans bordure ajoutée) et garde absolument tout identique. Change uniquement l'intérieur des quatre passages : ils sont fermés par une lourde porte verrouillée, avec une grosse serrure dorée au centre.`,
@@ -175,7 +174,7 @@
   const SOLS_SALLE = (liste) => liste.map((x, i) => `${i === 0 ? 'Reprends l\'image de la salle aux quatre portes ouvertes (étape 1 de la carte « la salle et ses portes » : joins-la si tu es dans une nouvelle conversation).' : 'Reprends à nouveau l\'image de la salle aux quatre portes ouvertes.'} Garde exactement les mêmes dimensions (1672 × 941 pixels, sans recadrer, sans bordure ajoutée) et garde absolument tout identique : murs, portes, lumière, cadrage. Modifie uniquement le sol pour y peindre, bien intégré dans les dalles, sans effet de collage : ${x}`);
   const PORTE_OUVERTE = (quoi) => `Reprends l'image que tu viens de faire. Garde exactement les mêmes dimensions (1672 × 941 pixels, sans recadrer, sans bordure ajoutée) et garde absolument tout identique : sol, arbres, bâtiments, lumière, cadrage. Change uniquement ${quoi} : elle est ouverte, on voit l'intérieur éclairé. Les battants ouverts sont exactement les mêmes que fermés : même matière, même couleur, mêmes panneaux, même poignée, même encadrement ; seul leur angle change, rien n'est redessiné autrement. Sens d'ouverture, très important : les battants s'ouvrent vers l'intérieur du bâtiment, ils rentrent dans l'embrasure, du côté opposé à l'endroit où l'on marche ; ils ne dépassent jamais sur la cour, la place ou le chemin. La lumière de l'intérieur sort par la porte et se répand sur le sol de la zone où l'on marche (la cour, la place, le chemin), jamais vers le bord de l'image ni dans le vide. Rien d'autre ne bouge.`;
   const suitesPorte = (desc) => /porte|portes/.test(desc) ? [PORTE_OUVERTE('la porte d\'entrée décrite dans le prompt précédent (et seulement elle)')] : null;
-  const salleVide = (theme) => `Format paysage 16:9, dimensions exactes 1672 × 941 pixels. Une salle de donjon vide vue de dessus comme dans les Zelda en 2D, avec exactement le même cadrage que la salle jointe. Quadrillage invisible, à respecter au pixel près : les murs font exactement 157 pixels d'épaisseur de chaque côté, et le sol entre eux est un quadrillage parfaitement régulier d'exactement 13 dalles carrées en largeur et 6 en hauteur, chaque dalle de 104,5 × 104,5 pixels, joints fins, droits et alignés, aucune dalle coupée ni décalée. Les portes du haut et du bas sont centrées sur la 7e dalle, celles de gauche et de droite sur le joint entre la 3e et la 4e rangée. Tout ce qui est peint dans le sol (trou, plaque, trappe, îlot) occupe un nombre entier de dalles et suit leurs joints. Murs pleins et continus sur les quatre côtés, sans aucune porte ni ouverture (le jeu découpe les portes lui-même). Sol en dalles, parfaitement vide, sans objet ni personnage. Toon HD, contours épais, lumière d'ambiance. Aucun texte.\n\nThème : ${theme}`;
+  const salleVide = (theme) => `Format paysage 16:9, dimensions exactes 1672 × 941 pixels. Une salle de donjon vide vue de dessus comme dans les Zelda en 2D, en suivant exactement le plan de salle joint (image grise) : murs, dalles et portes aux mêmes endroits, au pixel près, le plan n'est qu'un guide et ne doit pas se voir dans l'image finale. Même rendu que la salle jointe. Quadrillage invisible, à respecter au pixel près : les murs font exactement 157 pixels d'épaisseur de chaque côté, et le sol entre eux est un quadrillage parfaitement régulier d'exactement 13 dalles carrées en largeur et 6 en hauteur, chaque dalle de 104,5 × 104,5 pixels, joints fins, droits et alignés, aucune dalle coupée ni décalée. Les portes du haut et du bas sont centrées sur la 7e dalle, celles de gauche et de droite sur le joint entre la 3e et la 4e rangée. Tout ce qui est peint dans le sol (trou, plaque, trappe, îlot) occupe un nombre entier de dalles et suit leurs joints. Murs pleins et continus sur les quatre côtés, sans aucune porte ni ouverture (le jeu découpe les portes lui-même). Sol en dalles, parfaitement vide, sans objet ni personnage. Toon HD, contours épais, lumière d'ambiance. Aucun texte.\n\nThème : ${theme}`;
   const marche = (quadrupede) => quadrupede
     ? `Pour chacune des 3 vues de la carte des poses (face, dos, profil droit), fais 2 images de marche : d'abord patte avant gauche et patte arrière droite en avant, puis patte avant droite et patte arrière gauche en avant. Même taille, même cadrage et même éclairage que les images de poses jointes.`
     : `Pour chacune des 3 vues de la carte des poses (face, dos, profil droit), fais 2 images de marche : d'abord la jambe gauche en avant et la droite en arrière, puis la jambe droite en avant et la gauche en arrière. Une seule jambe en avant à la fois, bien visible. Les bras se balancent à l'opposé des jambes. Même taille, même cadrage et même éclairage que les images de poses jointes.`;
@@ -314,7 +313,7 @@ Le centre de la pièce reste dégagé pour marcher.`]);
     ['Le Pop-up qui attaque : même fenêtre corrompue, l\'écran s\'ouvre en grand comme une bouche sombre, les lambeaux d\'énergie violette se dressent vers l\'avant.',
      'Le Spamling en plein bond : même enveloppe noircie, rabat grand ouvert, pattes griffues repliées sous lui, en l\'air.'],
     'Joins aussi le Spamling (jeu-spirit/images/donjon1/spamling.png) si tu l\'as encore.');
-  carte('d1', 'donjons', 'Salle du Terrier avec ses portes', 'Plus de battants collés : la salle entière, dessinée avec ses portes. Le jeu prend chaque mur dans l\'image qui correspond à l\'état de sa porte (ouverte, grille, clé, boss ou pas de porte). Fais les 5 étapes dans la même conversation ChatGPT, dans l\'ordre.', ['salle', 'battant'],
+  carte('d1', 'donjons', 'Salle du Terrier avec ses portes', 'Plus de battants collés : la salle entière, dessinée avec ses portes. Le jeu prend chaque mur dans l\'image qui correspond à l\'état de sa porte (ouverte, grille, clé, boss ou pas de porte). Fais les 5 étapes dans la même conversation ChatGPT, dans l\'ordre.', ['plan-salle-4-portes', 'salle', 'battant'],
     SALLE_PORTES('un repaire souterrain creusé par une puissance numérique maléfique, pierre sombre bleu-violet, fissures violettes lumineuses.').split('\n\n').slice(1).join('\n\n'), ['Les quatre portes ouvertes.'], null, SUITES_PORTES);
   carte('d1', 'donjons', 'Pièges et mécanismes du Terrier', 'Les nouvelles salles du plan : bandeaux, redirections, notifications, disjoncteur.', ['salle', 'statue', 'popup'],
     ELEM + `\n\nMême univers que la salle jointe : pierre sombre bleu-violet, fissures violettes, technologie maléfique.`,
@@ -546,7 +545,7 @@ Le centre de la pièce reste dégagé pour marcher.`]);
         ECRAN(R.bord, R.ecrans[k] + (R.eau ? ' ' + R.eau : ''), [...new Set(sorties)]), ['Une seule image, aucun texte.'], null, suitesPorte(R.ecrans[k]));
     }
     carte(e, 'decors', `${R.nom} : objets à poser`, 'Les seuls éléments posés par-dessus les écrans : ceux qu\'on coupe, casse, pousse ou lit.', ['decor-plaine', 'arbre'], ELEM, R.inter);
-    carte(e, 'donjons', `${R.donjon} : la salle et ses portes`, 'La salle entière dessinée avec ses portes, puis la même avec les portes fermées de chaque façon. 5 étapes dans la même conversation ChatGPT, dans l\'ordre.', ['salle'],
+    carte(e, 'donjons', `${R.donjon} : la salle et ses portes`, 'La salle entière dessinée avec ses portes, puis la même avec les portes fermées de chaque façon. 5 étapes dans la même conversation ChatGPT, dans l\'ordre.', ['plan-salle-4-portes', 'salle'],
       SALLE_PORTES(R.salle).split('\n\n').slice(1).join('\n\n'), ['Les quatre portes ouvertes.'], null, SUITES_PORTES);
     carte(e, 'donjons', `${R.donjon} : objets de salle`, 'Bloc à pousser, statue, lumière, pot et coffres, dans le thème du donjon.', ['bloc', 'statue', 'coffre'],
       ELEM + `\n\nThème du donjon : ${R.salle}\n\nTous ces objets à la même échelle, faits dans la même conversation que la salle, avec ses couleurs et sa lumière. Chacun est vu bien de face, jamais en biais (arêtes horizontales et verticales, parallèles aux joints du sol), sa base occupe exactement une dalle de la salle. Pas de traînée au sol.`,
@@ -589,7 +588,7 @@ Le centre de la pièce reste dégagé pour marcher.`]);
   carte('fin', 'donjons', 'La Tour du Clickbait : objets et pièges', 'Ce qui meuble les salles de la tour.', ['bloc', 'statue', 'coffre'],
     ELEM + `\n\nThème : ${TOUR}`,
     ['Un bloc à pousser en métal noir strié de néon.', 'Une statue du Roi Clickbait en miniature, sur socle.', 'Un néon sur pied qui éclaire en violet.', 'Un coffre noir et violet fermé.', 'Le même coffre ouvert, vide, le couvercle basculé vers l\'arrière.', 'Un panneau publicitaire au sol qui clignote (piège), sans texte.']);
-  carte('fin', 'donjons', 'La salle du trône', 'Là où tu affrontes le Roi Clickbait.', ['salle', 'reine'],
+  carte('fin', 'donjons', 'La salle du trône', 'Là où tu affrontes le Roi Clickbait.', ['plan-salle-sans-porte', 'salle', 'reine'],
     salleVide('la salle du trône au sommet de la tour : un trône immense fait d\'écrans empilés contre le mur du haut, tapis violet jusqu\'au centre, grandes baies ouvertes sur un ciel d\'orage violet.'), ['La salle du trône, sans personnage.']);
   carte('fin', 'ennemis', 'Sbires d\'élite de la tour', 'Les versions renforcées des sbires, pour la dernière ligne droite.', ['popup', 'clic'], SBIRE,
     ['Le Pop-up d\'élite : la fenêtre corrompue en version dorée et noire, plus grande, couronnée de petites pointes.', 'Le Clic d\'élite : le curseur en métal noir et or, deux fois plus grand, lames sur les jambes.', 'Le Troll d\'élite : un Trollinet en armure de néon violet.']);
@@ -815,48 +814,8 @@ Le centre de la pièce reste dégagé pour marcher.`]);
       box.insertBefore(b, avant || null);
     }
   }
-  let outil = lire('cat-outil', 'chatgpt');
-  puces('outil', [['chatgpt', 'ChatGPT'], ['scenario', 'Scenario']], outil, (k) => { outil = k; ecrire('cat-outil', k); });
   puces('etapes', ETAPES, etape, (k) => { etape = k; ecrire('cat-etape', k); });
   puces('categories', CATS, cat, (k) => { cat = k; ecrire('cat-cat', k); });
-
-  // ---------------------------------------------------------------- version Scenario : un prompt court par image
-  const QUEUE = {
-    spirit: 'Personnage Spirit (modèle « Spirit ») : lettres SG cyan sur chaque écouteur du casque et SG sur le tee-shirt. Personnage entier, centré, vue de dessus plongeante façon Zelda 2D, fond uni gris #808080, toon HD, contours noirs épais, pas d\'ombre, aucun texte.',
-    element: 'Style du jeu (modèle « Spirit Personnages »). Élément seul, entier, centré, vu bien de face avec une légère plongée façon Zelda 2D, fond uni gris #808080, toon HD, contours noirs épais, pas d\'ombre au sol, aucun texte, jamais de sang.',
-    ecran: 'Écran de jeu entier vu de dessus façon Zelda 2D (modèle « Spirit Décors »), 1672 × 941. Sol vierge : aucun rocher, touffe ni objet isolé là où l\'on marche. Bordure épaisse infranchissable sauf aux sorties, chemins d\'au moins deux cases de large qui touchent le bord. Contours nets pour l\'eau, les trous, la lave et les falaises. Aucun personnage, aucun texte.',
-    salle: 'Salle vue de dessus façon Zelda 2D (modèle « Spirit Décors »), 1672 × 941. Suis exactement l\'image de structure jointe : murs épais tout autour, sol de 13 × 6 dalles carrées régulières, portes en tunnel au milieu des murs. Sol vide, aucun objet, aucun personnage, aucun texte.',
-    illustration: 'Illustration de cinématique (modèle « Spirit Décors »), 1672 × 941, toon HD, contours épais, lumière travaillée, aucun texte.',
-  };
-  function versionScenario(c) {
-    const st = c.style || '';
-    const avecSpirit = /Spirit(?!Gamer)/.test(st + (c.items || []).join(' '));
-    // retouches d'une image existante : mode édition
-    if (!c.style) return { modele: 'Mode édition (Edit), en joignant l\'image d\'origine', format: 'mêmes dimensions que l\'image d\'origine', structure: '', prompts: c.prompts };
-    let modele, format = 'carré 1024 × 1024', structure = '', queue, sujets = c.items;
-    if (/Un écran entier d'un jeu d'aventure/.test(st)) {
-      modele = 'Spirit Décors'; format = '16:9, 1672 × 941'; queue = QUEUE.ecran;
-      const sorties = (st.match(/Sorties \(un chemin praticable qui touche le bord de l'image\) : ([^.]*)\./) || [])[1] || '';
-      const bord = (st.match(/le tour de l'écran est fermé par ([^,]*),/) || [])[1] || '';
-      const ecran = (st.match(/Cet écran : ([\s\S]*)$/) || [])[1] || '';
-      sujets = [`${ecran.trim()} Bordure : ${bord}. Sorties : ${sorties}.`];
-    } else if (/Une salle de donjon/.test(st)) {
-      modele = 'Spirit Décors'; format = '16:9, 1672 × 941'; queue = QUEUE.salle;
-      structure = /sans aucune porte/.test(st) ? 'plan-salle-sans-porte.png' : 'plan-salle-4-portes.png';
-      const theme = (st.match(/Thème : ([\s\S]*)$/) || [])[1] || '';
-      sujets = (c.items || []).map((x) => `${x} Thème : ${theme.trim()}`);
-    } else if (/Une pièce vue de dessus|Un couloir intérieur/.test(st)) {
-      modele = 'Spirit Décors'; format = '16:9, 1672 × 941'; queue = QUEUE.salle.replace('Suis exactement l\'image de structure jointe : murs épais tout autour, sol de 13 × 6 dalles carrées régulières, portes en tunnel au milieu des murs. Sol vide, aucun objet, aucun personnage, aucun texte.', 'Murs épais en blocs de pierre gris-bleu, meubles collés aux murs, portes creusées dans l\'épaisseur du mur où un personnage tient entier. Aucun personnage, aucun texte.');
-    } else if (/1672 × 941/.test(st)) {
-      modele = 'Spirit Décors'; format = '16:9, 1672 × 941'; queue = QUEUE.illustration;
-    } else if (avecSpirit && (c.cat === 'perso' || /Spirit/.test(c.titre))) {
-      modele = 'Spirit'; queue = QUEUE.spirit;
-    } else {
-      modele = 'Spirit Personnages'; queue = QUEUE.element;
-    }
-    const prompts = (sujets || []).map((x) => `${c.titre} : ${x}\n${queue}`);
-    return { modele, format, structure, prompts: prompts.concat((c.suites || []).map((x) => 'Mode édition (Edit), en joignant l\'image que tu viens de faire : ' + x)) };
-  }
 
   function elCarte(c) {
     const a = document.createElement('article');
@@ -872,24 +831,10 @@ Le centre de la pièce reste dégagé pour marcher.`]);
     a.querySelector('.pourquoi').textContent = c.pourquoi;
     if (c.note) a.querySelector('.note-ref').textContent = c.note;
     const zone = a.querySelector('.prompts');
-    let liste = c.prompts;
-    if (outil === 'scenario') {
-      const v = versionScenario(c);
-      liste = v.prompts;
-      const r = document.createElement('div'); r.className = 'reglages-scenario';
-      r.innerHTML = '<span class="etiq">Réglages Scenario</span><ul></ul>';
-      const ul = r.querySelector('ul');
-      for (const [k, val] of [['Modèle', v.modele], ['Format', v.format], ['Image de structure', v.structure]]) if (val) { const li = document.createElement('li'); li.innerHTML = '<b></b> '; li.querySelector('b').textContent = k + ' :'; if (k === 'Image de structure') { const l = document.createElement('a'); l.href = 'refs/' + val; l.target = '_blank'; l.rel = 'noopener'; l.textContent = val; li.append(l); } else li.append(val); ul.appendChild(li); }
-      if (liste.length > 1) {
-        const li = document.createElement('li'); li.innerHTML = '<b>Tout d\'un coup :</b> '; const bt = document.createElement('button'); bt.type = 'button'; bt.className = 'copier-tout'; bt.textContent = `Copier les ${liste.length} prompts (un par ligne)`;
-        bt.addEventListener('click', () => { const t = liste.map((x) => x.replace(/\n/g, ' ')).join('\n'); try { navigator.clipboard.writeText(t).then(() => { bt.textContent = 'Copiés'; }, () => { bt.textContent = 'Copie impossible : copie-les un par un'; }); } catch (e) { bt.textContent = 'Copie impossible : copie-les un par un'; } });
-        li.appendChild(bt); ul.appendChild(li);
-      }
-      zone.appendChild(r);
-    }
+    const liste = c.prompts;
     liste.forEach((texte, i) => {
       const bloc = document.createElement('div'); bloc.className = 'bloc-prompt';
-      const nom = liste.length > 1 ? (outil === 'scenario' ? `Image ${i + 1} sur ${liste.length}` : `Étape ${i + 1} sur ${liste.length}`) : 'Prompt';
+      const nom = liste.length > 1 ? `Étape ${i + 1} sur ${liste.length}` : 'Prompt';
       bloc.innerHTML = `<span class="etiq"></span><pre class="prompt"></pre><div class="actions"><button type="button" class="copier">Copier</button><button type="button" class="fait"></button></div>`;
       bloc.querySelector('.etiq').textContent = nom;
       const pre = bloc.querySelector('.prompt'); pre.textContent = texte;
