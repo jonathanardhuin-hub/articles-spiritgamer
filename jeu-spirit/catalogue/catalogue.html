@@ -621,8 +621,13 @@ Le centre de la pièce reste dégagé pour marcher.`]);
   const CATS = [['tout', 'Tout'], ['perso', 'Spirit'], ['objets', 'Objets'], ['ennemis', 'Ennemis'], ['boss', 'Boss'], ['pnj', 'Gardiens et habitants'], ['effets', 'Effets'], ['donjons', 'Donjons'], ['decors', 'Décors extérieurs'], ['interface', 'Interface']];
   const lire = (k, d) => { try { const v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); } catch (e) { return d; } };
   const ecrire = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} };
-  let etape = 'nouveau', cat = lire('cat-cat', 'tout');
+  let etape = lire('cat-reset-r2-vu', false) ? 'nouveau' : 'r2', cat = lire('cat-cat', 'tout');
   const faites = new Set(lire('cat-faites', []).map((x) => (x.includes('#') ? x : x + '#0')));
+  // les codes du donjon 2 ont changé (objets avant la pose de Spirit) : on remet ses cartes à faire, une seule fois
+  if (!lire('cat-reset-r2', false)) {
+    for (const k of [...faites]) if (k.startsWith('R2-')) faites.delete(k);
+    ecrire('cat-faites', [...faites]); ecrire('cat-reset-r2', true);
+  }
   const carteFaite = (c) => c.prompts.every((_, i) => faites.has(c.id + '#' + i));
 
   function puces(conteneur, liste, actuel, choisir) {
@@ -699,6 +704,7 @@ Le centre de la pièce reste dégagé pour marcher.`]);
     compter();
   }
   document.getElementById('masquer-faites').addEventListener('change', afficher);
+  ecrire('cat-reset-r2-vu', true);
   afficher();
 })();
 </script>
