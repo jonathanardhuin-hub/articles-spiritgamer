@@ -17,7 +17,7 @@ ECRANS = {
   '1,2': ('plaine/ecran-1-2-la-clairiere.png', [
       R(0, 0, 595, 70), R(690, 0, 1280, 80), R(0, 0, 70, 320), R(0, 0, 130, 150),
       R(1090, 0, 1280, 110), R(1205, 0, 1280, 320),
-      R(90, 70, 235, 275), R(305, 70, 455, 280), R(235, 70, 305, 160),          # rochers de la grotte (entrée libre)
+      R(90, 70, 235, 275), R(305, 70, 455, 280), R(235, 70, 305, 234),          # rochers de la grotte (on entre dès le seuil)
       R(0, 410, 70, 720), R(0, 560, 170, 720), R(0, 600, 1280, 720),
       R(1210, 405, 1280, 720), R(1110, 560, 1280, 720)]),
   '1,1': ('plaine/ecran-1-1-le-carrefour.png', [
@@ -97,6 +97,27 @@ def masque(cle):
         if g[r][c] == '.': g[r][c] = '~'
     for c, r in dec['pieds']:
         g[r][c] = '#'
+    # sorties de côté : le couloir suit la largeur réelle du chemin peint (le chemin entier, pas une bande étroite)
+    import numpy as np
+    from PIL import Image
+    sol = os.path.join(os.path.dirname(__file__), '..', 'images', 'plaine', 'sol', 'ecran-' + cle.replace(',', '-') + '.png')
+    if os.path.exists(sol):
+        a = np.array(Image.open(sol).convert('RGB').resize((1280, 720))).astype(int)
+        for col, xs, cols in ((0, slice(5, 60), range(0, 6)), (COLS - 1, slice(1220, 1275), range(COLS - 6, COLS))):
+            ouv = [r for r in range(ROWS) if g[r][col] == '.']
+            if not ouv:
+                continue
+            b = a[:, xs]
+            sable = ((b[..., 0] > 170) & (b[..., 0] > b[..., 1] + 20)).mean(1) > 0.5
+            y0, y1 = max(0, ouv[0] * 20 - 80), min(720, (ouv[-1] + 1) * 20 + 80)
+            ys = [y for y in range(y0, y1) if sable[y]]
+            if not ys:
+                continue
+            haut, bas = min(ys) - 6, max(ys) + 14
+            for r in range(ROWS):
+                if r * 20 + 20 > haut and r * 20 < bas:
+                    for c in cols:
+                        g[r][c] = '.'
     return [''.join(l) for l in g]
 
 if __name__ == '__main__':

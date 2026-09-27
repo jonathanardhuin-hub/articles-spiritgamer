@@ -16,7 +16,7 @@ SG.MONDE = {
   // x,y : colonne et ligne de l'écran dans la Plaine
   '1,2': {
     nom: 'La Clairière',
-    image: 'ecran-1-2', grotte: { x0: 238, x1: 302, y: 205 },
+    image: 'ecran-1-2', grotte: { x0: 232, x1: 308, y: 274 },
     carte: [
       '................',
       '................',

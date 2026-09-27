@@ -105,6 +105,9 @@ def pieces_touffes(k, masque, a, sombre, exclus):
         x, y, ww, hh, ar = st[j]
         if ww < 32 or hh < 28 or ww > 240 or hh > 200:
             continue
+        # pas de touffe au bord de l'écran : elle emporterait un morceau d'arbre de la lisière (sorties gauche et droite)
+        if x < 80 * F or x + ww > (1280 - 80) * F:
+            continue
         comp = (lab == j).astype(np.uint8) * 255
         pts = cv2.findNonZero(comp)
         hull = np.zeros((h, w), np.uint8)
@@ -316,10 +319,8 @@ def traiter(k, apercus=None):
             e['garde'] = True
         liste.append(e)
     # falaise de la grotte : toutes ses pierres (arche comprise) passent devant Spirit tant qu'il est dans l'entrée
-    fond_grotte = max([e['b'] for e in liste if e.get('garde')] or [0])
-    for e in liste:
-        if e.pop('garde', False):
-            e['b'] = fond_grotte
+    # la falaise de la grotte reste peinte dans le décor : Spirit entre dans la grotte dès qu'il touche le seuil
+    liste = [e for e in liste if not e.get('garde')]
     if apercus:
         v = sol.copy()
         for p in pieces:

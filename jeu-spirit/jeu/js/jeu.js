@@ -1099,12 +1099,8 @@ SG.Jeu = class {
     const D = SG.DECOUPES && SG.DECOUPES[this.ecran], pl = I['decoupes-' + this.ecran.replace(',', '-')];
     if (D && pl && pl.width) D.forEach((p, i) => {
       const [sx, sy, sw, sh] = p.s, [x, y, w, h] = p.d;
-      if (p.t === 'h' && this.coupes.has('t' + i)) {
-        // touffe coupée : il reste le pied, ras du sol
-        const k = 0.3;
-        liste.push({ y: -40, dessiner: (ctx) => ctx.drawImage(pl, sx, sy + sh * (1 - k), sw, sh * k, x, y + h * (1 - k), w, h * k) });
-        return;
-      }
+      // touffe coupée : elle disparaît, le sol peint dessous est déjà propre
+      if (p.t === 'h' && this.coupes.has('t' + i)) return;
       liste.push({ y: p.b - (p.t === 'h' ? 6 : 0), dessiner: (ctx) => ctx.drawImage(pl, sx, sy, sw, sh, x, y, w, h) });
     });
     for (let r = 0; r < SG.ROWS; r++) {
