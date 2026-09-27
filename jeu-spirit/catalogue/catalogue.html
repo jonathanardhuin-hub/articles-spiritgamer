@@ -180,7 +180,7 @@
     numero[code] = (numero[code] || 0) + 1;
     const n = items.length;
     // Spirit apparaît dans l'image : on rappelle toujours le SG sur le casque (sauf pour sa copie maléfique, le Plagiaire)
-    if (style && /Spirit/.test(style + items.join(' ')) && !/SG en cyan/.test(style) && !/Plagiaire/.test(titre)) {
+    if (style && /Spirit(?!Gamer)/.test(style + items.join(' ').replace(/loge de Spirit/g, '')) && !/SG en cyan/.test(style) && !/Plagiaire/.test(titre)) {
       style += `\n\nSpirit est la mascotte des images jointes (petit personnage blanc, casque-micro noir et bleu, tee-shirt bleu). Détail obligatoire, à ne jamais oublier : les lettres SG en cyan sur la face extérieure de chaque écouteur de son casque, bien lisibles, et le logo SG sur le devant de son tee-shirt.`;
       if (!refs.includes('spirit-officiel')) refs = refs.concat('spirit-officiel');
     }
@@ -644,13 +644,15 @@ Le centre de la pièce reste dégagé pour marcher.`]);
     ]));
 
   // cartes terminées (images reçues par Claude) : elles disparaissent du catalogue
-  const RECUES = new Set(['QG-09', 'R2-01', 'PL-02', 'PL-03', 'PL-04', 'PL-05', 'PL-06', 'PL-07', 'PRO-04', 'PL-08', 'PL-09', 'PL-10', 'PRO-02', 'D1-12', 'D1-13', 'D1-16', 'QG-01', 'QG-02', 'QG-03', 'QG-05', 'QG-06', 'QG-07']);
+  const RECUES = new Set(['QG-08', 'QG-10', 'QG-09', 'R2-01', 'PL-02', 'PL-03', 'PL-04', 'PL-05', 'PL-06', 'PL-07', 'PRO-04', 'PL-08', 'PL-09', 'PL-10', 'PRO-02', 'D1-12', 'D1-13', 'D1-16', 'QG-01', 'QG-02', 'QG-03', 'QG-05', 'QG-06', 'QG-07']);
   for (let i = cartes.length - 1; i >= 0; i--) if (RECUES.has(cartes[i].id)) cartes.splice(i, 1);
 
   // PRO-01 : reçues l'irruption du Roi (image 2) et la Source brisée (image 3)
   { const c = cartes.find((x) => x.id === 'PRO-01'); if (c) { const p = c.prompts[0]; c.pourquoi = 'Il te reste 4 images sur 6 : la fête (1), les monstres (4), Spirit endormi (5) et le réveil (6). L\'irruption du Roi et la Source brisée sont reçues.'; c.prompts = [p.replace(/^Crée 6 images/, 'Crée 4 images').replace(/\n2\) L'irruption[^\n]*\n3\) La Source brisée[^\n]*/, '').replace('\n4) ', '\n2) ').replace('\n5) ', '\n3) ').replace('\n6) ', '\n4) ')]; c.n = 4; } }
   // PRO-03 : la porte grande ouverte sur le portail est reçue, il reste la porte entrouverte
   { const c = cartes.find((x) => x.id === 'PRO-03'); if (c) { c.pourquoi = 'Il te reste l\'étape de la porte entrouverte (la porte grande ouverte sur le portail est reçue). Joins l\'image de ta loge.'; c.prompts = [c.prompts[0]]; c.n = 1; } }
+  // QG-04 : hall (fermé et ouvert) et chambre de Lila reçus, il reste la salle d'arcade
+  { const c = cartes.find((x) => x.id === 'QG-04'); if (c) { c.pourquoi = 'Il te reste la salle d\'arcade (le hall et la chambre de Lila sont reçus). Mêmes murs que ta loge.'; c.prompts = [c.prompts[0].replace(/^Crée 3 images[^\n]*/, 'Crée 1 image, seule dans son fichier.').replace(/\n1\) Le hall[^\n]*\n2\) La maison de Lila[^\n]*\n3\) /, '\n')]; c.n = 1; } }
   // D1-17 : toutes les étapes reçues sauf le mur éventré (étape 9)
   { const c = cartes.find((x) => x.id === 'D1-17'); if (c) { c.pourquoi = 'Il ne te reste que cette étape : le mur de droite éventré. Toutes les autres variantes sont reçues.'; c.prompts = [c.prompts[8]]; c.n = 1; } }
 

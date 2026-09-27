@@ -1,0 +1,19 @@
+SPIRIT ET LE ROI CLICKBAIT (version de test : prologue, Plaine des Pixels, Terrier des Pop-ups)
+
+Pour jouer :
+1. Décompresse ce dossier (clic droit > Extraire tout).
+2. Double-clique sur index.html : le jeu s'ouvre dans ton navigateur (Chrome ou Edge conseillés).
+3. F : plein écran.
+
+Commandes au clavier :
+- Flèches ou ZQSD : se déplacer
+- Espace : attaquer, parler, ouvrir
+- C : utiliser l'objet équipé (la Manette, une fois trouvée)
+- Entrée : objets et pause
+- Tab : carte
+- M : couper le son
+
+Sur téléphone ou tablette : joystick à gauche, boutons A et B à droite.
+
+La partie est sauvegardée automatiquement dans le navigateur.
+Note tout ce qui te paraît bizarre (bug, endroit où l'on reste coincé, texte mal placé) avec l'écran et ce que tu faisais.

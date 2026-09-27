@@ -164,6 +164,17 @@ SG.MONDE = {
   },
 };
 
+// Prologue : la loge de Spirit, cachée derrière la scène du QG (pièce peinte, sans voisins)
+SG.MONDE.loge = {
+  nom: 'La loge de Spirit',
+  image: 'loge',
+  interieur: true,
+  carte: Array(9).fill('................'),
+  ennemis: [],
+};
+SG.LOGE = { reveil: { x: 805, y: 372 }, depart: { x: 805, y: 430 }, portail: { x0: 548, x1: 722, y: 660 } };
+SG.ARRIVEE_PLAINE = { ecran: '1,2', x: 640, y: 390 };
+
 SG.ECRAN_DEPART = '1,2';
 SG.DEPART = { x: 7.5 * SG.T, y: 5.8 * SG.T };
 SG.SORTIE_GROTTE = { ecran: '1,2', x: 270, y: 290 };
@@ -188,8 +199,16 @@ SG.TEXTES = {
     'Puis une fenêtre publicitaire s\'est ouverte au milieu de la foule, et le Roi Clickbait en est sorti.',
     'Il a brisé la Source, la lumière de toutes les infos vérifiées, en huit fragments. Les huit Gardiens des rubriques ont disparu avec eux.',
     'Depuis, le Bruit a pris corps. Des monstres rôdent partout dans le Réseau.',
-    'Spirit dormait en coulisses, son casque sur les oreilles. Il n\'a rien entendu. Il est le seul à ne pas avoir été touché.',
-    'Son micro capte un faible signal. Il vient d\'une grotte, tout près d\'ici.',
+  ],
+  reveil: [
+    [null, 'Pendant ce temps, dans sa loge cachée derrière la scène du QG, Spirit dormait, son casque sur les oreilles. Il n\'a rien entendu. Il est le seul à ne pas avoir été touché.'],
+    ['spirit', 'Hein ? Qu\'est-ce que c\'est que ce grésillement dans mon casque ?'],
+    [null, 'Son micro capte un faible signal. Au même instant, la porte de la loge s\'ouvre toute seule sur une lumière inconnue.'],
+  ],
+  portailFerme: 'La porte est fermée. Le signal dans le casque de Spirit est encore trop faible.',
+  arriveePlaine: [
+    [null, 'Spirit traverse la lumière et atterrit au milieu d\'un monde inconnu : la Plaine des Pixels, le premier pays du Réseau.'],
+    ['spirit', 'Le signal est plus fort ici. Il vient de cette grotte, tout près.'],
   ],
   ermiteDon: [
     ['ermite', 'Te voilà enfin. Je sens ton signal depuis ce matin.'],
