@@ -66,14 +66,14 @@ Les sous-sols ne ressemblent pas au donjon : ce sont les coulisses techniques du
 | Lanterne RGB | Donjon 3 | Éclaire les salles noires, allume les braseros. |
 | Micro Pro, Micro d'Or | Donjons 3 et 5 | Onde plus large, puis plus puissante. |
 | Câble Grappin | Donjon 4 | S'accroche aux poteaux, fait traverser les ravins. |
-| Planche Wi-Fi | Donjon 5 | Glisse sur l'eau calme (bleu clair) : îlots, pontons, salles inondées. L'eau profonde (bleu nuit, remous) reste infranchissable. |
+| Planche Wi-Fi | Donjon 5 | Glisse librement sur l'eau calme (plus libre que le radeau de Zelda, validé) (bleu clair) : îlots, pontons, salles inondées. L'eau profonde (bleu nuit, remous) reste infranchissable. |
 | Baskets Turbo | Donjon 6 | Foncer, casser les piles de caisses. |
 | Aimant | Donjon 7 | Attire les blocs de métal. |
 | Lunettes de Vérif | Donjon 8 | Révèlent les faux murs et les faux sols. |
 | Pare-feu, Pare-feu Pro | Boutique de Mona | Bracelet qui projette un bouclier d'énergie en hexagones devant Spirit : arrête les projectiles de face. |
 
-## Proposition : les mises à jour du casque (à valider)
+## Les mises à jour du casque (validé)
 À la place des tenues bleue et rouge de Zelda : le casque de Spirit reçoit des mises à jour.
 - Casque 2.0 (trésor caché du donjon 4) : Spirit encaisse deux fois moins de dégâts. Les lettres SG et le liseré du casque passent du cyan à l'or.
 - Casque 3.0 (trésor caché du donjon 7) : quatre fois moins de dégâts. SG et liseré en violet lumineux.
-Seules les couleurs du casque changent, le reste de Spirit ne bouge pas.
+Seules les couleurs du casque changent, le reste de Spirit ne bouge pas. Chaque pose de Spirit existe donc en trois versions (cyan, or, violet), faites par ChatGPT (cartes R4-36 et R7-35) : une recoloration par le code touchait aussi les yeux, le tee-shirt et les baskets. Toute nouvelle pose de Spirit devra aussi être déclinée en or et en violet.
