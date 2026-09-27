@@ -191,6 +191,11 @@ SG.QG = {
   'bureau-lynx': [{ x0: 576, x1: 696, bas: 606, vers: 'couloir', arrivee: [940, 226, 'bas'], variante: 'bureau-lynx-ouvert', cx: 636 }],
   hall: [{ x0: 594, x1: 690, haut: 150, vers: 'couloir', arrivee: [640, 540, 'haut'], variante: 'hall-ouvert', cx: 642 }],
   portesHall: { x0: 560, x1: 720, y: 560 },
+  // écrans du bureau de Mika (contours relevés sur l'image) : la pub du Roi les a envahis
+  ecransMika: [
+    { courbe: [[515, 182], [660, 170], [729, 183], [729, 233], [660, 219], [520, 225]] },
+    { poly: [[753, 190], [810, 203], [798, 242], [743, 233]] },
+  ],
   lynx: { x: 905, y: 452 },
   gus: { x: 405, y: 312 },
 };

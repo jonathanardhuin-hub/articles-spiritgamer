@@ -899,6 +899,28 @@ SG.Jeu = class {
     return !!this.reveil && (!this.reveil.parle || (this.dlg && this.etat === 'dialogue' && this.dlg.i === 0));
   }
 
+  // l'écran incurvé et le portable de Mika affichent la pub du Roi Clickbait, comme ceux de Spirit
+  dessinerEcransMika(ctx) {
+    const im = SG.img['intro-2'];
+    if (!im || !im.width || (SG.img['bureau-lynx-pub'] && SG.img['bureau-lynx-pub'].width)) return;
+    const k = im.width / SG.W;
+    for (const e of SG.QG.ecransMika) {
+      ctx.save(); ctx.beginPath();
+      if (e.courbe) {
+        const [a, m, b, c, n, d] = e.courbe;
+        ctx.moveTo(a[0], a[1]); ctx.quadraticCurveTo(m[0], m[1] - 12, b[0], b[1]);
+        ctx.lineTo(c[0], c[1]); ctx.quadraticCurveTo(n[0], n[1] - 12, d[0], d[1]); ctx.closePath();
+      } else { e.poly.forEach(([x, y], i) => (i ? ctx.lineTo(x, y) : ctx.moveTo(x, y))); ctx.closePath(); }
+      ctx.clip();
+      const xs = (e.courbe || e.poly).map((q) => q[0]), ys = (e.courbe || e.poly).map((q) => q[1]);
+      const x0 = Math.min(...xs) - 4, y0 = Math.min(...ys) - 8, w = Math.max(...xs) - x0 + 8, h = Math.max(...ys) - y0 + 12;
+      ctx.drawImage(im, 330 * k, 40 * k, 620 * k, 300 * k, x0, y0, w, h);
+      ctx.fillStyle = 'rgba(0,0,0,0.18)';
+      for (let yy = y0 + ((this.t * 30) % 4); yy < y0 + h; yy += 4) ctx.fillRect(x0, yy, w, 1);
+      ctx.restore();
+    }
+  }
+
   dessinerEcransLoge(ctx) {
     // les écrans peints (catalogue PRO-10) remplacent ces effets dessinés
     if (SG.img['loge-ecrans-pub'] && SG.img['loge-ecrans-pub'].width) return;
@@ -1028,6 +1050,7 @@ SG.Jeu = class {
       ctx.drawImage(this.fond(this.ecran), 0, 0, SG.W, SG.H);
     }
     if (this.ecran === 'loge') this.dessinerEcransLoge(ctx);
+    if (this.ecran === 'bureau-lynx') this.dessinerEcransMika(ctx);
     // tout ce qui a une hauteur est trié par la position des pieds
     const liste = [];
     if (this.estDonjon()) this.objetsSalle(liste);
@@ -1171,6 +1194,7 @@ SG.Jeu = class {
     if (this.fonds[cle]) return this.fonds[cle];
     const e = SG.MONDE[cle];
     const nomImage = cle === 'loge' && this.porteLoge ? 'loge-portail' : (this.varianteQG(cle) || e.image);
+    if (cle === 'bureau-lynx' && !this.varianteQG(cle) && SG.img['bureau-lynx-pub'] && SG.img['bureau-lynx-pub'].width) return SG.img['bureau-lynx-pub'];
     const ok = (n) => SG.img[n] && SG.img[n].width;
     if (cle === 'loge' && !this.porteLoge) {
       if (this.evtPortail && this.evtPortail.t < 1.8 && ok('loge-ecran-sg-brouille')) return SG.img['loge-ecran-sg-brouille'];

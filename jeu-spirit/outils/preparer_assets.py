@@ -96,6 +96,7 @@ LISTE = {
 # images « porte ouverte » : on ne garde de la version ouverte que la zone de la porte (et sa lumière au sol),
 # posée sur l'image de base, pour que rien d'autre ne bouge quand la porte s'ouvre
 COMPOSITES = {
+    'bureau-lynx-pub': ('qg/bureau-du-lynx.png', (495, 155, 830, 260)),
     'loge-ecrans-jeu': ('prologue/loge-de-spirit.webp', (410, 120, 900, 220)),
     'loge-ecrans-pub': ('prologue/loge-de-spirit.webp', (410, 120, 900, 260)),
     'loge-ecran-sg-brouille': ('prologue/loge-de-spirit.webp', (410, 120, 900, 260)),
@@ -121,6 +122,7 @@ def composer(nom, im):
 
 
 FACULTATIVES = {
+    'bureau-lynx-pub': ('qg/bureau-de-mika-pub.png', 'w', 836, ''),
     'loge-ecrans-jeu': ('prologue/loge-ecrans-jeu.png', 'w', 836, ''),
     'loge-ecrans-pub': ('prologue/loge-ecrans-pub.png', 'w', 836, ''),
     'loge-ecran-sg-brouille': ('prologue/loge-ecran-sg-brouille.png', 'w', 836, ''),
