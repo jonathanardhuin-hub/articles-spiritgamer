@@ -220,7 +220,7 @@
 – Plafond : un balai de course de sorcier en mode Harry Potter, en bois verni avec des cerclages dorés, qui flotte au-dessus de la pièce, suspendu à deux chaînettes dorées.
 – Sol : parquet de pin clair.
 Le centre de la pièce reste dégagé pour marcher.`]);
-  carte('pro', 'decors', 'La porte de la loge qui s\'ouvre sur le Réseau', 'Pas d\'objet posé : c\'est la même image que la loge (PRO-02), retouchée, avec la porte du bas qui s\'ouvre sur le portail. À faire dans la même conversation que PRO-02, ou en joignant l\'image de la loge.', ['salle', 'titre'],
+  carte('pro', 'decors', 'La porte de la loge qui s\'ouvre sur le Réseau', 'Pas d\'objet posé : c\'est la même image que ta loge (celle que tu as validée), retouchée, avec la porte du bas qui s\'ouvre sur le portail. À faire dans la même conversation que PRO-02, ou en joignant l\'image de la loge.', ['salle', 'titre'],
     null, [], null, [
       `Reprends l'image de la loge de Spirit. Garde exactement les mêmes dimensions (1672 × 941 pixels, sans recadrer, sans bordure ajoutée) et garde absolument tout identique : meubles, murs, lumière, cadrage. Change uniquement la porte en accordéon du mur du bas : elle est entrouverte, ses panneaux repliés restent dans l'embrasure du mur, sans avancer dans la pièce ni sortir par le bas de l'image, et une lumière cyan vive filtre par l'ouverture et à travers les panneaux de verre dépoli, en projetant un rai de lumière vers le haut de l'image, sur le parquet et le paillasson, à l'intérieur de la pièce.`,
       `Reprends à nouveau l'image de la loge de Spirit. Mêmes dimensions (1672 × 941 pixels), tout identique. Change uniquement la porte en accordéon du mur du bas : elle est grande ouverte, ses panneaux repliés en accordéon contre un côté de l'embrasure, sans avancer dans la pièce ni sortir par le bas de l'image, et dans l'encadrement on ne voit plus le couloir mais un portail de lumière cyan et blanche qui tourbillonne, bords scintillants, comme une page web qui s'ouvre sur un autre monde. La lumière du portail entre dans la pièce et éclaire le parquet devant la porte, vers le haut de l'image, jamais vers le bord de l'image.`,
@@ -629,7 +629,7 @@ Le centre de la pièce reste dégagé pour marcher.`]);
     ]));
 
   // cartes terminées (images reçues par Claude) : elles disparaissent du catalogue
-  const RECUES = new Set(['D1-12', 'D1-13', 'D1-16', 'QG-01', 'QG-02', 'QG-03', 'QG-05', 'QG-06', 'QG-07']);
+  const RECUES = new Set(['PRO-02', 'D1-12', 'D1-13', 'D1-16', 'QG-01', 'QG-02', 'QG-03', 'QG-05', 'QG-06', 'QG-07']);
   for (let i = cartes.length - 1; i >= 0; i--) if (RECUES.has(cartes[i].id)) cartes.splice(i, 1);
 
   // D1-17 : toutes les étapes reçues sauf le mur éventré (étape 9)
