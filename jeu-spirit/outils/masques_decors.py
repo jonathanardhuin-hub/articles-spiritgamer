@@ -100,7 +100,7 @@ def masque(cle):
     # sorties de côté : le couloir suit la largeur réelle du chemin peint (le chemin entier, pas une bande étroite)
     import numpy as np
     from PIL import Image
-    sol = os.path.join(os.path.dirname(__file__), '..', 'images', 'plaine', 'sol', 'ecran-' + cle.replace(',', '-') + '.png')
+    sol = os.path.join(os.path.dirname(__file__), '..', 'images', src)
     if os.path.exists(sol):
         a = np.array(Image.open(sol).convert('RGB').resize((1280, 720))).astype(int)
         for col, xs, cols in ((0, slice(5, 60), range(0, 6)), (COLS - 1, slice(1220, 1275), range(COLS - 6, COLS))):

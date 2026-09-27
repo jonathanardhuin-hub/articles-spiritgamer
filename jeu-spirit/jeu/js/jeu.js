@@ -1049,8 +1049,6 @@ SG.Jeu = class {
     } else {
       ctx.drawImage(this.fond(this.ecran), 0, 0, SG.W, SG.H);
     }
-    if (this.ecran === 'loge') this.dessinerEcransLoge(ctx);
-    if (this.ecran === 'bureau-lynx') this.dessinerEcransMika(ctx);
     // tout ce qui a une hauteur est trié par la position des pieds
     const liste = [];
     if (this.estDonjon()) this.objetsSalle(liste);

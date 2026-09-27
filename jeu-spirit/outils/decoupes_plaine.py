@@ -27,6 +27,8 @@ F = W0 / 1280  # pixels d'origine par pixel logique
 # bouts de chemin sans issue collés au bord (effet de pavé) : remplacés par de l'herbe
 EFFACER = {'2,0': [(0, 270, 160, 410)]}
 
+RETOUCHER = False  # True : ancienne méthode (touffes découpées et sol reconstitué), abandonnée
+
 GARDER = {('1,2', 6), ('1,2', 7), ('1,2', 8)}
 
 
@@ -226,7 +228,8 @@ def traiter(k, apercus=None):
     for p in rochers:
         h, w = p['m'].shape
         tout_roc[p['y']:p['y'] + h, p['x']:p['x'] + w] |= p['m']
-    touffes = pieces_touffes(k, base, a, sombre, tout_roc)
+    # plus aucune retouche du sol peint (pas de collage) : les touffes restent dans l'image en attendant des écrans à sol vierge
+    touffes = [] if not RETOUCHER else pieces_touffes(k, base, a, sombre, tout_roc)
     # sol : herbe propre = herbe verte, sans trait noir, sans fleur, sans touffe
     sol = a.copy()
     trait = cv2.dilate(sombre, elli(5))
@@ -251,7 +254,7 @@ def traiter(k, apercus=None):
         if reboucher(sol, trou, propre):
             gardees.append(p)
     touffes = gardees
-    for (x0, y0, x1, y1) in EFFACER.get(k, []):
+    for (x0, y0, x1, y1) in (EFFACER.get(k, []) if RETOUCHER else []):
         z = np.zeros((H0, W0), np.uint8)
         z[int(y0 * F):int(y1 * F), int(x0 * F):int(x1 * F)] = 255
         sab = cv2.dilate(((R > G) & (R > 150)).astype(np.uint8) * 255, elli(9)) & z
@@ -263,7 +266,8 @@ def traiter(k, apercus=None):
                 if t.any():
                     if not reboucher(sol, t, propre, 0.05):
                         sol[:] = cv2.inpaint(sol, t, 7, cv2.INPAINT_TELEA)
-    prolonger_bords(sol, base)
+    if RETOUCHER:
+        prolonger_bords(sol, base)
     pieces = rochers + touffes
     pl = planche(pieces, a)
     # pieds des rochers : la moitié basse de la silhouette bloque, on passe derrière le haut

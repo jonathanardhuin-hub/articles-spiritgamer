@@ -197,7 +197,7 @@ SG.TEXTES.donjon = {
   carte: 'Tu as trouvé la carte du Terrier ! Appuie sur Tab (ou le bouton carte) pour voir toutes les salles du donjon.',
   boussole: 'Tu as trouvé la boussole ! Sur la carte, elle montre les coffres pas encore ouverts et la salle du boss.',
   cleBoss: 'Tu as trouvé la grande clé ! Elle ouvre la porte de la Reine Pop-up.',
-  manette: 'Tu as obtenu la Manette Retour ! Appuie sur B (C au clavier) pour la lancer : elle revient toujours dans ta main. Elle étourdit les monstres, active les cristaux à distance et rapporte les objets hors de portée.',
+  manette: 'Tu as obtenu la Manette Retour ! Appuie sur B (C au clavier) pour la lancer : elle revient toujours dans ta main. Elle étourdit les monstres, casse les pots, active les cristaux à distance et rapporte les objets hors de portée.',
   resolu: 'Un déclic résonne dans la salle.',
   coeurOr: 'Tu as obtenu un Cœur d\'or ! Ta vie augmente d\'un cœur, et elle est entièrement rechargée.',
   bossDebut: [[null, 'La Reine Pop-up surgit dans un fracas de fenêtres ! Son écran est protégé : il faudra l\'étourdir pour l\'atteindre.']],
@@ -205,8 +205,8 @@ SG.TEXTES.donjon = {
     ['flash', 'Hou hou ! Enfin libre ! Merci, petit. Je suis Flash, le Gardien de l\'Actu.'],
     ['flash', 'La Reine Pop-up me forçait à crier des titres mensongers toute la journée. Mes plumes en frémissent encore.'],
     ['spirit', 'Tu sais où sont les autres Gardiens ?'],
-    ['flash', 'La Gardienne des Tests est retenue au nord, dans la Forêt des Forums. Une barrière de Bruit ferme la route, près de l\'étang du nord.'],
-    ['flash', 'Ta Manette peut frapper le cristal qui la commande, de l\'autre côté de l\'eau. Et prends ceci : c\'est un fragment de la Source.'],
+    ['flash', 'La Gardienne des Tests est retenue au nord, dans la Forêt des Forums. Une barrière de Bruit ferme la route du nord, au bord de l\'étang.'],
+    ['flash', 'Lance ta Manette sur le cristal qui la commande, sur l\'îlot au milieu de l\'étang. Et prends ceci : c\'est un fragment de la Source.'],
   ],
   source: 'Tu as obtenu le premier fragment de la Source ! Plus que sept. Le Roi Clickbait commence à perdre des forces.',
   apresFlash: 'Flash t\'ouvre un passage de lumière vers la sortie.',
@@ -215,7 +215,7 @@ SG.TEXTES.donjon = {
 // descriptions des objets, pour l'écran des objets
 SG.OBJETS = {
   ampli: { nom: 'Ampli', touche: 'A', texte: 'Transforme ta voix en onde sonore. Elle bat les monstres, coupe l\'herbe, casse les pots et détruit les projectiles. Cœurs pleins : l\'onde part au loin.' },
-  manette: { nom: 'Manette Retour', touche: 'B', texte: 'Lance-la, elle revient dans ta main. Elle étourdit les monstres, frappe les cristaux à distance et rapporte les objets hors de portée.' },
+  manette: { nom: 'Manette Retour', touche: 'B', texte: 'Lance-la, elle revient dans ta main. Elle étourdit les monstres, casse les pots, active les cristaux (eux seuls y réagissent) et rapporte les objets hors de portée.' },
 };
 
 // ---------------------------------------------------------------- monstres du donjon

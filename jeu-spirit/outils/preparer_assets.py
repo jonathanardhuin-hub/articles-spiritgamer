@@ -212,7 +212,7 @@ def main():
     # écrans de la Plaine : sol sans les touffes découpées (outils/decoupes_plaine.py), s'il existe
     for nom in list(LISTE):
         sol = os.path.join('plaine', 'sol', nom + '.png')
-        if nom.startswith('ecran-') and os.path.exists(os.path.join(IMG, sol)):
+        if False and nom.startswith('ecran-') and os.path.exists(os.path.join(IMG, sol)):
             LISTE[nom] = (sol,) + tuple(LISTE[nom][1:])
     seules = sys.argv[1:]  # noms donnés en argument : on ne refait que ceux-là
     for nom, (src, axe, taille, opt) in LISTE.items():

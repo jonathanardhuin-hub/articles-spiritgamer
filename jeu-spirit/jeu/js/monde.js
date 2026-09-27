@@ -127,7 +127,7 @@ SG.MONDE = {
       '................',
     ],
     ennemis: [['crache', 4, 6], ['gresille', 12, 2], ['gresille', 13, 6]],
-    panneaux: { '6,2': 'Route de la Forêt des Forums. Une barrière de Bruit ferme le passage. Le cristal sur l\'îlot, de l\'autre côté de l\'eau, semble la commander.' },
+    panneaux: { '6,2': 'Route de la Forêt des Forums. Une barrière de Bruit ferme le passage. Le cristal sur l\'îlot, au milieu de l\'étang, semble la commander. Il est hors de portée de main.' },
   },
   '0,0': {
     nom: 'Le Bois aux Grésilles',
@@ -229,12 +229,12 @@ SG.TEXTES = {
   reveil: [
     [null, 'Pendant ce temps, au fond du QG, Spirit s\'était endormi devant son écran, le casque sur les oreilles. Il n\'a rien entendu de la fête ni de l\'attaque.'],
     ['spirit', 'Hein ? Qu\'est-ce que c\'est que ce grésillement dans mon casque ?'],
-    ['spirit', 'Et mes écrans qui affichent tous la même pub... Il se passe un truc. Je vais voir si Mika a le même problème.'],
+    ['spirit', 'Il se passe un truc. Je vais voir si Mika entend la même chose.'],
   ],
   lynx: [
     ['lynx', 'Ah, enfin ! Tu tombes bien, j\'allais justement régler le problème. Tout seul, évidemment.'],
-    ['spirit', 'Tes écrans aussi affichent la pub avec la couronne ?'],
-    ['lynx', 'Mon PC a planté en plein raid. En plein raid ! Moi qui étais à deux doigts de tout gagner.'],
+    ['spirit', 'Toi aussi, tu entends ce grésillement ?'],
+    ['lynx', 'Moi ? Non. Par contre mon PC s\'est figé en plein raid. En plein raid ! Moi qui étais à deux doigts de tout gagner.'],
     ['lynx', 'Bon. Gus te cherche dans le hall. Dis-lui que c\'est moi qui t\'envoie : ici, c\'est moi le boss.'],
   ],
   lynxApres: [['lynx', 'Va voir Gus dans le hall. Moi je garde le QG, il faut bien que quelqu\'un dirige.']],
@@ -255,10 +255,10 @@ SG.TEXTES = {
   portailFerme: 'La porte est fermée. Le signal dans le casque de Spirit est encore trop faible.',
   arriveePlaine: [
     [null, 'Spirit traverse la lumière et atterrit au milieu d\'un monde inconnu : la Plaine des Pixels, le premier pays du Réseau.'],
-    ['spirit', 'Le signal est plus fort ici. Il vient de cette grotte, tout près.'],
+    ['spirit', 'Le grésillement est plus net ici. On dirait qu\'il vient de cette grotte, tout près.'],
   ],
   ermiteDon: [
-    ['ermite', 'Te voilà enfin. Je sens ton signal depuis ce matin.'],
+    ['ermite', 'Te voilà enfin. Je sens ton signal depuis le début de la soirée.'],
     ['spirit', 'Il y a des monstres partout dans la Plaine. Qu\'est-ce qui se passe ?'],
     ['ermite', 'Le Roi Clickbait a brisé la Source et donné corps à la rumeur. Ces créatures sont faites de Bruit.'],
     ['ermite', 'Ton casque t\'a protégé. Mais un casque ne suffira pas pour te défendre.'],
@@ -267,7 +267,6 @@ SG.TEXTES = {
   ermiteApres: [
     ['ermite', 'Quand ton cœur est plein, ton onde porte beaucoup plus loin. Garde-le en tête.'],
     ['ermite', 'Le Bruit a creusé un terrier sous le Bois aux Grésilles, au nord-ouest de la Plaine. Le premier Gardien, Flash, y est retenu.'],
-    ['ermite', 'Fouille aussi les buissons et les hautes herbes : le Bruit y cache parfois des choses.'],
   ],
   ermiteRevoir: [
     ['ermite', 'Le Terrier des Pop-ups est au nord-ouest, dans le Bois aux Grésilles. Reviens me voir si tu as besoin de reprendre des forces.'],
