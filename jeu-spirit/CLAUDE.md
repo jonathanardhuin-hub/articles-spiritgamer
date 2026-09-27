@@ -32,7 +32,7 @@ Ne jamais dessiner, recoller ou reconstituer quoi que ce soit par-dessus une ima
 - La Plaine et toutes les régions du Réseau sont de jour : Spirit a changé de dimension en passant le vortex, la nuit du QG ne s'y applique pas.
 - 8 régions et 8 donjons (Plaine/Terrier des Pop-ups, Forêt des Forums/Labyrinthe des Fils, Monts Hardware/Forge Surchauffée, Désert du Lag/Salle Obscure, Lac des Streams/Arène Engloutie, Cité des Bulles/Bibliothèque des Bulles, Marais Rétro/Château 8 bits, Toundra du Cloud/Archives Gelées), puis le Cratère du Clickbait pour la fin.
 - Pour tout ce qui bouge, il faut ses images : chaque ennemi a ses poses et son animation (marche, vol, flottement, sortie de terre), chaque projectile son vol et son impact, chaque objet son effet d'utilisation, chaque région son environnement animé (reflets et ronds dans l'eau, bulles et gouttes de lave avec ombre d'avertissement, pluie, neige, sable, brume, sortie de terre et trou qui se referme). Le code ne fait que les animer (déplacement, apparition, fondu, particules).
-- Une porte ouverte garde exactement les mêmes battants que fermée : seul l'angle change.
+- Une porte ouverte garde exactement les mêmes battants que fermée : seul l'angle change. Une porte qui relie deux pièces est la même des deux côtés (nombre de battants, bois, vitres, encadrement, largeur) : la loge a une double porte, donc le couloir aussi.
 
 ## Images
 - Les prompts se donnent uniquement dans le catalogue, jamais dans la discussion : Jonathan s'y retrouve mieux.
