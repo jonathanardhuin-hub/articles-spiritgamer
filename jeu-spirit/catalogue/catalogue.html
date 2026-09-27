@@ -54,6 +54,7 @@
   .puce:hover { color: var(--texte); border-color: var(--cyan); }
   .puce[aria-pressed="true"] { background: var(--cyan); color: #04122e; border-color: var(--cyan); }
   .puce:focus-visible, button:focus-visible, a:focus-visible { outline: 3px solid var(--violet); outline-offset: 2px; }
+  .masquer { font: 700 14px var(--corps); color: var(--texte-doux); display: flex; gap: 6px; align-items: center; margin-left: 8px; cursor: pointer; }
   .compte { margin-left: auto; font-size: 14px; color: var(--texte-doux); font-variant-numeric: tabular-nums; }
 
   section.categorie { margin-top: 34px; }
@@ -120,7 +121,7 @@
 
   <nav class="filtres" aria-label="Filtres">
     <div class="rangee" id="etapes"><span class="etiq">Étape</span></div>
-    <div class="rangee" id="categories"><span class="etiq">Catégorie</span><span class="compte" id="compte"></span></div>
+    <div class="rangee" id="categories"><span class="etiq">Catégorie</span><label class="masquer"><input type="checkbox" id="masquer-faites" checked> Cacher les cartes faites</label><span class="compte" id="compte"></span></div>
   </nav>
 
   <main id="liste"></main>
@@ -606,6 +607,10 @@ Le centre de la pièce reste dégagé pour marcher.`]);
       'la salle du Gardien : un cercle de lumière douce et chaude au centre du sol, dalles propres et nettes.',
     ]));
 
+  // cartes terminées (images reçues par Claude) : elles disparaissent du catalogue
+  const RECUES = new Set(['QG-07']);
+  for (let i = cartes.length - 1; i >= 0; i--) if (RECUES.has(cartes[i].id)) cartes.splice(i, 1);
+
   // cartes ajoutées ou modifiées lors de la dernière mise à jour
   const NOUVEAUX = new Set(['PRO-03', 'D1-17', 'QG-01', 'QG-02', 'R3-11', 'R4-11', 'R5-11', 'R6-11', 'R7-11', 'R8-11', 'FIN-08']);
 
@@ -665,12 +670,13 @@ Le centre de la pièce reste dégagé pour marcher.`]);
       ecrire('cat-faites', [...faites]);
       const f = faites.has(c.id);
       bf.setAttribute('aria-pressed', String(f)); bf.textContent = f ? 'Fait' : 'Marquer comme fait';
-      a.classList.toggle('faite', f); compter();
+      a.classList.toggle('faite', f);
+      if (f && document.getElementById('masquer-faites').checked) afficher(); else compter();
     });
     return a;
   }
 
-  function visibles() { return cartes.filter((c) => (etape === 'tout' || c.etape === etape || (etape === 'nouveau' && NOUVEAUX.has(c.id))) && (cat === 'tout' || c.cat === cat)); }
+  function visibles() { const cacher = document.getElementById('masquer-faites').checked; return cartes.filter((c) => !(cacher && faites.has(c.id)) && (etape === 'tout' || c.etape === etape || (etape === 'nouveau' && NOUVEAUX.has(c.id))) && (cat === 'tout' || c.cat === cat)); }
   function compter() {
     const v = visibles(), nImg = v.reduce((s, c) => s + c.n, 0), f = v.filter((c) => faites.has(c.id)).length;
     document.getElementById('compte').textContent = `${v.length} prompts · ${nImg} images · ${f} faits`;
@@ -689,6 +695,7 @@ Le centre de la pièce reste dégagé pour marcher.`]);
     if (!v.length) main.innerHTML = '<p class="vide">Rien dans cette combinaison. Choisis une autre étape ou une autre catégorie.</p>';
     compter();
   }
+  document.getElementById('masquer-faites').addEventListener('change', afficher);
   afficher();
 })();
 </script>
