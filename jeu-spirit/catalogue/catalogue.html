@@ -142,7 +142,7 @@
     'spirit-officiel': 'Spirit officiel', 'spirit-face': 'Spirit face', 'spirit-dos': 'Spirit dos', 'spirit-profil': 'Spirit profil',
     'spirit-attaque': 'Spirit attaque', 'spirit-portrait': 'Portrait Spirit', 'spirit-pousse': 'Spirit pousse',
     'monstres': 'Monstres Plaine', 'cornu': 'Cornu', 'cornu-pas': 'Cornu qui marche', 'popup': 'Pop-up', 'clic': 'Clic', 'reine': 'Reine Pop-up',
-    'decor-plaine': 'Décor Plaine (modèle de style)', 'arbre': 'Arbre', 'salle': 'Salle du Terrier (ancienne, modèle de style)', 'grotte': 'Grotte', 'ampli': 'Ampli', 'manette': 'Manette',
+    'decor-plaine': 'Décor Plaine (modèle de style seulement : ne pas recopier ses objets)', 'arbre': 'Arbre', 'salle': 'Salle du Terrier (ancienne, modèle de style)', 'grotte': 'Grotte', 'ampli': 'Ampli', 'manette': 'Manette',
     'coffre': 'Coffre (ancien, modèle)', 'statue': 'Gargouille (ancienne, modèle)', 'bloc': 'Bloc (ancien, modèle)', 'flash': 'Flash (ancien, modèle)', 'portrait-flash': 'Portrait Flash (ancien, modèle)', 'ermite': 'Ermite',
     'ui': 'Cadre interface', 'battant': 'Battant de porte (ancien, modèle)', 'sol-herbe': 'Sol herbe', 'titre': 'Écran titre', 'projectiles': 'Projectiles', 'entree': 'Entrée du Terrier',
     'plan-salle-4-portes': 'Plan de salle (4 portes)', 'plan-salle-sans-porte': 'Plan de salle (sans porte)',
@@ -277,17 +277,17 @@ Le centre de la pièce reste dégagé pour marcher.`]);
   // ================================================================== PLAINE DES PIXELS : écrans entiers
   const PLAINE_BORD = 'des arbres touffus vert vif aux troncs bruns, comme sur le décor joint';
   const PLAINE = [
-    ['0,0', 'Le Bois aux Grésilles', 'tout le haut de l\'écran est une falaise de roche grise dans laquelle s\'ouvre, au milieu, l\'entrée sombre du Terrier des Pop-ups (un trou large d\'une case et demie, étayé de racines et de câbles, lueur violette) ; un chemin de terre y monte depuis la sortie de droite ; quelques arbres isolés dans l\'herbe.', ['droite']],
+    ['0,0', 'Le Bois aux Grésilles', 'tout le haut de l\'écran est une falaise de roche grise dans laquelle s\'ouvre, au milieu, l\'entrée sombre du Terrier des Pop-ups (un trou large d\'une case et demie, étayé de racines et de câbles, lueur violette) ; un chemin de terre y monte depuis la sortie de droite ; le reste est de l\'herbe rase.', ['droite']],
     ['1,0', 'La Route du Nord', 'un chemin de terre en croix ; en haut à droite, un petit étang avec un îlot de roche au centre (on y posera un cristal) ; au milieu du bord du haut, le chemin mène vers la forêt.', ['haut', 'bas', 'gauche', 'droite']],
-    ['2,0', 'Le Vieux Chêne', 'un grand chêne majestueux au centre-haut, quelques rochers en bordure, prairie fleurie.', ['gauche']],
-    ['0,1', 'La Lisière', 'bosquets denses qui forment de petites clairières, un chemin qui vient de la droite et se perd dans l\'herbe.', ['droite']],
-    ['1,1', 'Le Carrefour', 'grand croisement de deux chemins de terre au centre, prairie de part et d\'autre.', ['haut', 'bas', 'gauche', 'droite']],
-    ['2,1', 'Le Rocher fissuré', 'amas de rochers gris en haut à droite, prairie, un chemin qui vient de la gauche et descend vers le bas.', ['gauche', 'bas']],
+    ['2,0', 'Le Vieux Chêne', 'un grand chêne majestueux au centre-haut, collé à la bordure du haut ; le reste est de l\'herbe rase avec quelques petites fleurs peintes à plat dans l\'herbe.', ['gauche']],
+    ['0,1', 'La Lisière', 'des bosquets denses collés à la bordure qui forment de petites clairières, un chemin qui vient de la droite et se termine dans une clairière d\'herbe rase.', ['droite']],
+    ['1,1', 'Le Carrefour', 'grand croisement de deux chemins de terre au centre, herbe rase de part et d\'autre.', ['haut', 'bas', 'gauche', 'droite']],
+    ['2,1', 'Le Rocher fissuré', 'une avancée de falaise grise en haut à droite, collée à la bordure (le grand rocher fissuré y sera posé par le jeu), herbe rase, un chemin qui vient de la gauche et descend vers le bas.', ['gauche', 'bas']],
     ['0,2', 'L\'Étang', 'un grand étang d\'eau bleue aux berges douces au centre-gauche, un chemin qui vient de la droite et longe l\'eau.', ['droite']],
-    ['1,2', 'La Clairière', 'en haut à gauche, une petite falaise de roche avec l\'entrée sombre d\'une grotte (la grotte de l\'ermite) ; un chemin horizontal traverse l\'écran et un autre monte vers le haut ; c\'est l\'écran de départ, accueillant.', ['haut', 'gauche', 'droite']],
-    ['2,2', 'Les Rochers', 'rochers gris dispersés, deux amas de rochers en haut à gauche et à droite, un chemin qui vient de la gauche et monte vers le haut.', ['haut', 'gauche']],
+    ['1,2', 'La Clairière', 'en haut à gauche, une petite falaise de roche avec l\'entrée sombre d\'une grotte (la grotte de l\'ermite) ; un chemin horizontal traverse l\'écran et un autre monte vers le haut ; c\'est l\'écran de départ, accueillant ; le reste est de l\'herbe rase.', ['haut', 'gauche', 'droite']],
+    ['2,2', 'Les Rochers', 'deux avancées de falaise grise en haut à gauche et à droite, collées à la bordure (les rochers isolés seront posés par le jeu), herbe rase, un chemin qui vient de la gauche et monte vers le haut.', ['haut', 'gauche']],
   ];
-  for (const [k, nom, desc, sorties] of PLAINE) carte('pl', 'decors', `${nom} (écran ${k})`, `L'écran entier, avec sol, chemins, eau et arbres de bordure peints dedans. Position ${k} sur la carte de la Plaine (colonne, ligne).`, [planEcran(sorties), 'decor-plaine', 'sol-herbe', 'arbre'], ECRAN(PLAINE_BORD, desc, sorties), ['Une seule image, aucun texte.']);
+  for (const [k, nom, desc, sorties] of PLAINE) carte('pl', 'decors', `${nom} (écran ${k})`, `L'écran entier, avec sol, chemins, eau et arbres de bordure peints dedans. Position ${k} sur la carte de la Plaine (colonne, ligne). Joins aussi ton sol d'herbe rase (carte PL-13).`, [planEcran(sorties), 'decor-plaine', 'arbre'], ECRAN(PLAINE_BORD, desc, sorties), ['Une seule image, aucun texte.']);
   carte('pl', 'decors', 'Plaine : objets à poser', 'Les seuls éléments posés par-dessus les écrans.', ['decor-plaine'], ELEM,
     ['Un buisson vert vif rond (on le coupe avec l\'onde).', 'Une touffe de hautes herbes.', 'Un rocher gris fissuré.', 'Un panneau de bois, sans texte.']);
   carte('pl', 'decors', 'La barrière de Bruit (route du nord)', 'La barrière qui ferme la route du nord et disparaît quand la Manette frappe le cristal de l\'étang. Deux images : fermée, puis en train de se dissiper. Noms : barriere.png, barriere-dissipe.png.', ['decor-plaine', 'monstres'],
@@ -554,7 +554,7 @@ Le centre de la pièce reste dégagé pour marcher.`]);
       const k = `${x},${y}`, sorties = [];
       if (y > 0) sorties.push('haut'); if (y < 2) sorties.push('bas'); if (x > 0) sorties.push('gauche'); if (x < 2) sorties.push('droite');
       if (k === '1,0') sorties.unshift('haut'); if (k === '1,2') sorties.push('bas');
-      carte(e, 'decors', `${R.nom} : écran ${k}`, `Un écran entier de la région, avec tout son sol peint dedans (chemins, eau, relief). Position ${k} sur la carte de la région (colonne, ligne).`, [planEcran([...new Set(sorties)]), 'decor-plaine', 'sol-herbe'],
+      carte(e, 'decors', `${R.nom} : écran ${k}`, `Un écran entier de la région, avec tout son sol peint dedans (chemins, eau, relief). Position ${k} sur la carte de la région (colonne, ligne).`, [planEcran([...new Set(sorties)]), 'decor-plaine'],
         ECRAN(R.bord, R.ecrans[k] + (R.eau ? ' ' + R.eau : ''), [...new Set(sorties)]), ['Une seule image, aucun texte.'], null, suitesPorte(R.ecrans[k]));
     }
     carte(e, 'decors', `${R.nom} : objets à poser`, 'Les seuls éléments posés par-dessus les écrans : ceux qu\'on coupe, casse, pousse ou lit.', ['decor-plaine', 'arbre'], ELEM, R.inter);
@@ -721,6 +721,8 @@ Le centre de la pièce reste dégagé pour marcher.`]);
   }
   carte('pl', 'effets', 'Environnement animé : Plaine des Pixels', 'Ce qui bouge dans la Plaine : les reflets de l\'étang et les ennemis qui surgissent du sol.', ['projectiles', 'decor-plaine'], EFFET,
     ['Des reflets qui scintillent sur l\'eau : trois petites étincelles blanches et cyan de tailles différentes.', 'Des ronds dans l\'eau qui s\'élargissent.', 'Un ennemi qui sort de terre dans l\'herbe : le sol se fend en étoile, mottes de terre et brins d\'herbe qui sautent.', 'Le trou qui reste après la sortie, puis qui se referme.']);
+  carte('pl', 'decors', 'Sol d\'herbe rase (à faire en premier)', 'Le modèle de sol de toute la Plaine : de l\'herbe rase, sans aucune touffe. Joins-le ensuite à chaque écran de la Plaine, à la place de l\'ancien carré d\'herbe touffu. Nom : sol-herbe-rase.png.', ['sol-herbe'],
+    null, [], null, [`Reprends le carré d'herbe joint. Garde le même rendu toon HD, la même couleur verte et le même format carré. Fais-en une version d'herbe rase et régulière, comme une pelouse tondue vue de dessus : de légères variations de vert et de minuscules brins peints à plat, sans aucune touffe dressée, sans hautes herbes, sans contour noir épais sur les brins. Garde seulement quelques rares petites fleurs blanches et roses peintes à plat. Le motif doit pouvoir se répéter sans raccord visible. Aucun objet, aucun texte.`]);
   carte('qg', 'decors', 'Le couloir : portes ouvertes à refaire', 'Sur les images reçues, les portes ouvertes ne sont pas les mêmes que les portes fermées. À refaire à partir de l\'image du couloir aux portes fermées (joins-la) : seul l\'angle des battants change. Noms : couloir-porte-loge-ouverte.png, couloir-porte-lynx-ouverte.png.', ['decor-plaine'],
     null, [], null,
     [PORTE_OUVERTE('la porte en accordéon du mur du haut, à gauche (et seulement elle) ; ses panneaux repliés restent dans l\'embrasure et la lumière chaude de la loge descend sur le parquet du couloir'),
@@ -797,7 +799,7 @@ Le centre de la pièce reste dégagé pour marcher.`]);
   { const c = cartes.find((x) => x.id === 'QG-04'); if (c) { c.pourquoi = 'Il te reste la salle d\'arcade (le hall et la chambre de Lila sont reçus). Mêmes murs que ta loge.'; c.prompts = [c.prompts[0].replace(/^Crée 3 images[^\n]*/, 'Crée 1 image, seule dans son fichier.').replace(/\n1\) Le hall[^\n]*\n2\) La maison de Lila[^\n]*\n3\) /, '\n')]; c.n = 1; } }
 
   // cartes ajoutées ou modifiées lors de la dernière mise à jour
-  const NOUVEAUX = new Set(['QG-12', 'QG-10', 'PRO-10', 'QG-13', 'PRO-03', 'PRO-08', 'R2-29', 'R4-36', 'R7-35', 'QG-16', 'QG-17', 'QG-06', 'R2-28', 'R5-28', 'PL-02', 'PL-03', 'PL-04', 'PL-05', 'PL-06', 'PL-07', 'PL-08', 'PL-09', 'PL-10', 'D1-09', 'D1-17', 'D1-18', 'D1-22', 'QG-15', 'QG-14', 'R2-31', 'R2-32', 'R3-31', 'R3-32', 'R4-32', 'R4-33', 'R5-31', 'R5-32', 'R6-31', 'R6-32', 'R7-31', 'R7-32', 'R8-32', 'R8-33', 'PL-11', 'D1-20', 'D1-21', 'D1-22', 'QG-13', 'PRO-10', 'D1-09', 'D1-17', 'D1-19', 'D1-18', 'PRO-08', 'PRO-09', 'PRO-05', 'PRO-06', 'PRO-07', 'QG-10', 'PRO-01', 'D1-17', 'QG-04', 'QG-08', 'QG-09', 'PRO-03', 'D1-17', 'R2-28', 'R2-29', 'R3-28', 'R3-29', 'R4-28', 'R4-29', 'R5-28', 'R5-29', 'R6-28', 'R6-29', 'R7-28', 'R7-29', 'R8-28', 'R8-29', 'R3-11', 'R4-11', 'R5-11', 'R6-11', 'R7-11', 'R8-11', 'FIN-08']);
+  const NOUVEAUX = new Set(['PL-13', 'PRO-06', 'QG-12', 'QG-10', 'PRO-10', 'QG-13', 'PRO-03', 'PRO-08', 'R2-29', 'R4-36', 'R7-35', 'QG-16', 'QG-17', 'QG-06', 'R2-28', 'R5-28', 'PL-02', 'PL-03', 'PL-04', 'PL-05', 'PL-06', 'PL-07', 'PL-08', 'PL-09', 'PL-10', 'D1-09', 'D1-17', 'D1-18', 'D1-22', 'QG-15', 'QG-14', 'R2-31', 'R2-32', 'R3-31', 'R3-32', 'R4-32', 'R4-33', 'R5-31', 'R5-32', 'R6-31', 'R6-32', 'R7-31', 'R7-32', 'R8-32', 'R8-33', 'PL-11', 'D1-20', 'D1-21', 'D1-22', 'QG-13', 'PRO-10', 'D1-09', 'D1-17', 'D1-19', 'D1-18', 'PRO-08', 'PRO-09', 'PRO-05', 'PRO-06', 'PRO-07', 'QG-10', 'PRO-01', 'D1-17', 'QG-04', 'QG-08', 'QG-09', 'PRO-03', 'D1-17', 'R2-28', 'R2-29', 'R3-28', 'R3-29', 'R4-28', 'R4-29', 'R5-28', 'R5-29', 'R6-28', 'R6-29', 'R7-28', 'R7-29', 'R8-28', 'R8-29', 'R3-11', 'R4-11', 'R5-11', 'R6-11', 'R7-11', 'R8-11', 'FIN-08']);
   for (const c of cartes) if (/^R\d-3[1-9]$/.test(c.id) || ['PL-12', 'QG-15'].includes(c.id)) NOUVEAUX.add(c.id);
 
   // ------------------------------------------------------------------ affichage
@@ -809,7 +811,7 @@ Le centre de la pièce reste dégagé pour marcher.`]);
   const faites = new Set(lire('cat-faites', []).map((x) => (x.includes('#') ? x : x + '#0')));
   // la pose de Spirit avec le pétard (R2-29) revient dans la liste, même si elle avait été cochée
   if (!lire('cat-reset-r229', false)) { for (const k of [...faites]) if (k.startsWith('R2-29#')) faites.delete(k); ecrire('cat-faites', [...faites]); ecrire('cat-reset-r229', true); }
-  if (!lire('cat-reset-loge6', false)) { for (const k of [...faites]) if (/^(PRO-0[378]|PRO-10|QG-1[0-3])#/.test(k)) faites.delete(k); ecrire('cat-faites', [...faites]); ecrire('cat-reset-loge6', true); }
+  if (!lire('cat-reset-loge7', false)) { for (const k of [...faites]) if (/^(PRO-0[3678]|PRO-10|QG-1[0-3])#/.test(k)) faites.delete(k); ecrire('cat-faites', [...faites]); ecrire('cat-reset-loge7', true); }
   // les codes du donjon 2 ont changé (objets avant la pose de Spirit) : on remet ses cartes à faire, une seule fois
   if (!lire('cat-reset-r2', false)) {
     for (const k of [...faites]) if (k.startsWith('R2-')) faites.delete(k);
