@@ -174,9 +174,9 @@ SG.MONDE.loge = {
 };
 SG.LOGE = { reveil: { x: 805, y: 372 }, chaise: { x: 805, y: 270 }, depart: { x: 805, y: 430 }, portail: { x0: 548, x1: 722, y: 660 } };
 
-// Le QG : la loge, le couloir, le bureau du Lynx et le hall (pièces peintes)
+// Le QG : la loge, le couloir, le bureau de Mika (le Lynx) et le hall (pièces peintes)
 SG.MONDE.couloir = { nom: 'Le couloir du QG', image: 'couloir', interieur: true, carte: Array(9).fill('................'), ennemis: [] };
-SG.MONDE['bureau-lynx'] = { nom: 'Le bureau du Lynx', image: 'bureau-lynx', interieur: true, carte: Array(9).fill('................'), ennemis: [] };
+SG.MONDE['bureau-lynx'] = { nom: 'Le bureau de Mika', image: 'bureau-lynx', interieur: true, carte: Array(9).fill('................'), ennemis: [] };
 SG.MONDE.hall = { nom: 'Le hall du QG', image: 'hall', interieur: true, carte: Array(9).fill('................'), ennemis: [] };
 // portes : zone de passage (x0..x1), sens, pièce d'arrivée et position d'arrivée
 SG.QG = {
@@ -222,7 +222,7 @@ SG.TEXTES = {
   reveil: [
     [null, 'Pendant ce temps, au fond du QG, Spirit s\'était endormi devant son écran, le casque sur les oreilles. Il n\'a rien entendu de la fête ni de l\'attaque.'],
     ['spirit', 'Hein ? Qu\'est-ce que c\'est que ce grésillement dans mon casque ?'],
-    ['spirit', 'Et mes écrans qui affichent tous la même pub... Il se passe un truc. Je vais voir les autres.'],
+    ['spirit', 'Et mes écrans qui affichent tous la même pub... Il se passe un truc. Je vais voir si Mika a le même problème.'],
   ],
   lynx: [
     ['lynx', 'Ah, te voilà ! Mon PC a planté en plein raid. Depuis, il n\'affiche plus qu\'une pub avec une couronne.'],

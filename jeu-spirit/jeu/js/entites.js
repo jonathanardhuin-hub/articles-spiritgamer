@@ -486,7 +486,7 @@ SG.Ermite = class {
   }
 };
 
-// habitant du QG (le Lynx, Gus) : immobile, il respire et regarde Spirit
+// habitant du QG (Mika le lynx, Gus) : immobile, il respire et regarde Spirit
 SG.Personnage = class {
   constructor(x, y, nom) { this.x = x; this.y = y; this.nom = nom; this.pw = 56; this.ph = 28; this.t = Math.random() * 3; }
   corps() { return { x: this.x - 35, y: this.y - 140, w: 70, h: 140 }; }

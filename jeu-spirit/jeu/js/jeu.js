@@ -1380,7 +1380,7 @@ SG.Jeu = class {
       if (im && im.width) SG.dessinerPied(ctx, im, px + pw / 2, py + ph - 20, { echelle: 0.8 });
       else if (qui === 'flash') { ctx.translate(px + pw / 2, py + ph / 2 + 60); ctx.scale(1.3, 1.3); new SG.Flash(0, 0).dessiner(ctx); }
       ctx.restore();
-      SG.texte(ctx, { spirit: 'Spirit', ermite: 'L\'ermite', flash: 'Flash', lynx: 'Le Lynx', gus: 'Gus' }[qui], x + 262, y + 58, 30, '#7fe8ff', 'left', null, null, true);
+      SG.texte(ctx, { spirit: 'Spirit', ermite: 'L\'ermite', flash: 'Flash', lynx: 'Mika', gus: 'Gus' }[qui], x + 262, y + 58, 30, '#7fe8ff', 'left', null, null, true);
       tx = x + 262;
     }
     SG.texteMultiligne(ctx, texte.slice(0, Math.floor(d.car)), tx, y + (qui ? 96 : 80), w - (tx - x) - 70, 26, 34, '#ffffff');
