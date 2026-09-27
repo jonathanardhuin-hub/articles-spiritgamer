@@ -118,7 +118,7 @@
       <li><b>Images supprimées de ton PC</b>Tu n'en as plus besoin : toutes les images à joindre sont dans le catalogue, sous « À joindre ». Clique dessus pour les ouvrir et les enregistrer. Celles marquées « ancienne » ou « modèle » servent seulement de modèle de style ou de base à corriger. Quand une carte dit de joindre une image faite avec une autre carte (par exemple la nouvelle salle de D1-09 pour D1-17, ou la nouvelle Clairière de PL-08 pour PRO-06), fais d'abord cette autre carte.</li>
       <li><b>Planches</b>Pour les personnages, monstres, objets et effets, ChatGPT fait une seule grande image avec tous les éléments de la carte bien séparés, dans l'ordre de la liste. Envoie-moi la planche telle quelle : je découpe chaque élément moi-même.</li>
       <li><b>1 carte = 1 nouvelle conversation ChatGPT</b>Ouvre une nouvelle conversation pour chaque carte, et fais toutes les étapes de la carte dans cette même conversation (par exemple l'image puis sa version porte ouverte). Si ChatGPT commence à déformer Spirit ou à oublier une consigne, recommence la carte dans une nouvelle conversation. Joins les images montrées sous « À joindre » (clique dessus pour les ouvrir en grand et les enregistrer), et pour les salles le plan de salle gris.</li>
-      <li><b>Dans l'ordre des étapes</b>Commence par « Donjon 1 » : c'est ce que je code maintenant. Chaque étape suivante contient sa région et son donjon complet (catégorie Donjons : salles, portes, mécanismes, sous-sols).</li>
+      <li><b>Dans l'ordre des étapes</b>Choisis l'étape en haut (Prologue, Plaine, Donjon 1…) : chaque carte est rangée dans son étape et sa catégorie. Les cartes marquées « À faire » sont celles à faire ou à refaire en ce moment.</li>
       <li><b>Range les images dans Google Drive</b>Dossier « Spirit images », puis un sous-dossier par carte, nommé avec son code (par exemple D1-03). Dis-moi ensuite quels codes sont prêts : je les récupère moi-même.</li>
       <li><b>Portes et passages</b>Chaque écran qui a une porte contient une étape de plus : la même image avec la porte ouverte. Fais-la dans la même conversation, juste après.</li>
       <li><b>Coche chaque étape</b>Chaque prompt a son bouton « fait ». Une carte ne disparaît que quand toutes ses étapes sont faites (par exemple l'image puis sa version porte ouverte).</li>
@@ -803,11 +803,12 @@ Le centre de la pièce reste dégagé pour marcher.`]);
   for (const c of cartes) if (/^R\d-3[1-9]$/.test(c.id) || ['PL-12', 'QG-15'].includes(c.id)) NOUVEAUX.add(c.id);
 
   // ------------------------------------------------------------------ affichage
-  const ETAPES = [['nouveau', 'Nouveautés'], ['tout', 'Tout'], ['pro', 'Prologue'], ['pl', 'Plaine'], ['d1', 'Donjon 1'], ['qg', 'Parvis du QG'], ['r2', 'Forêt + Donjon 2'], ['r3', 'Monts + Donjon 3'], ['r4', 'Désert + Donjon 4'], ['r5', 'Lac + Donjon 5'], ['r6', 'Cité + Donjon 6'], ['r7', 'Marais + Donjon 7'], ['r8', 'Toundra + Donjon 8'], ['fin', 'Tour finale']];
+  const ETAPES = [['tout', 'Tout'], ['pro', 'Prologue'], ['pl', 'Plaine'], ['d1', 'Donjon 1'], ['qg', 'Parvis du QG'], ['r2', 'Forêt + Donjon 2'], ['r3', 'Monts + Donjon 3'], ['r4', 'Désert + Donjon 4'], ['r5', 'Lac + Donjon 5'], ['r6', 'Cité + Donjon 6'], ['r7', 'Marais + Donjon 7'], ['r8', 'Toundra + Donjon 8'], ['fin', 'Tour finale']];
   const CATS = [['tout', 'Tout'], ['perso', 'Spirit'], ['objets', 'Objets'], ['ennemis', 'Ennemis'], ['boss', 'Boss'], ['pnj', 'Gardiens et habitants'], ['effets', 'Effets'], ['donjons', 'Donjons'], ['decors', 'Décors extérieurs'], ['interface', 'Interface']];
   const lire = (k, d) => { try { const v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); } catch (e) { return d; } };
   const ecrire = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} };
-  let etape = lire('cat-reset-r2-vu', false) ? 'nouveau' : 'r2', cat = lire('cat-cat', 'tout');
+  let etape = lire('cat-etape', 'pro'), cat = lire('cat-cat', 'tout');
+  if (etape === 'nouveau') etape = 'pro';
   const faites = new Set(lire('cat-faites', []).map((x) => (x.includes('#') ? x : x + '#0')));
   // la pose de Spirit avec le pétard (R2-29) revient dans la liste, même si elle avait été cochée
   if (!lire('cat-reset-r229', false)) { for (const k of [...faites]) if (k.startsWith('R2-29#')) faites.delete(k); ecrire('cat-faites', [...faites]); ecrire('cat-reset-r229', true); }
@@ -838,7 +839,7 @@ Le centre de la pièce reste dégagé pour marcher.`]);
     a.className = 'carte' + (carteFaite(c) ? ' faite' : '');
     const refs = c.refs.map((r) => `<a class="vignette" href="refs/${r}.webp" target="_blank" rel="noopener"><img src="refs/${r}.webp" alt="${REFS[r]}" loading="lazy"><span>${REFS[r]}</span></a>`).join('');
     a.innerHTML = `
-      <div class="entete"><span class="code">${c.id}</span>${NOUVEAUX.has(c.id) ? '<span class="neuf">Nouveau</span>' : ''}<h3></h3><span class="nb">${c.n} image${c.n > 1 ? 's' : ''}</span></div>
+      <div class="entete"><span class="code">${c.id}</span>${NOUVEAUX.has(c.id) ? '<span class="neuf">À faire</span>' : ''}<h3></h3><span class="nb">${c.n} image${c.n > 1 ? 's' : ''}</span></div>
       <p class="pourquoi"></p>
       <div class="joindre"><span class="etiq">À joindre</span><div class="vignettes">${refs}</div>${c.note ? '<div class="note-ref"></div>' : ''}</div>
       <div class="prompts"></div>
