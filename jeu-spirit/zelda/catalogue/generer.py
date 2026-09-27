@@ -50,7 +50,8 @@ SPIRIT = ("Le personnage est Spirit, la mascotte de l'image jointe (où il saute
           "– Sous la tête, un petit corps : tee-shirt de 12 pixels de large sur 7 de haut (assez grand pour le logo SG), petits bras blancs de 3 pixels, short de 3 pixels, jambes blanches de 2 pixels, baskets de 3 pixels. La tête fait environ 70 % de la hauteur (style chibi).\n"
           "– Casque : un arceau de 3 pixels posé sur le haut de la tête ; de face et de dos, un écouteur rond de 6 × 8 pixels de chaque côté de la tête, à hauteur des yeux, avec une touche cyan ; "
           "de profil, un seul écouteur au milieu de la tête ; une fine tige de micro noire descend de l'écouteur gauche vers la bouche.\n"
-          "– Yeux : 4 × 5 pixels chacun, bleus avec 1 pixel de reflet blanc en haut ; de profil, un seul œil, près du bord avant de la tête. Petite bouche.\n"
+          "– Yeux : 4 × 5 pixels chacun, bleus avec 1 pixel de reflet blanc en haut ; de profil, un seul œil, près du bord avant de la tête. Petite bouche. "
+          "De face, les deux yeux sont toujours identiques et symétriques, même quand l'expression change (jamais un œil normal et l'autre différent).\n"
           "Vues strictes : « de face » = tourné vers nous ; « de dos » = on ne voit pas le visage ; « de profil » = tourné vers la droite. Jamais de trois quarts.")
 
 VUES = "Vues strictes : « de face » = tourné vers nous ; « de dos » = on ne voit pas son visage ; « de profil » = tourné vers la droite. Jamais de trois quarts. Même taille et mêmes proportions dans toutes les cases."
@@ -76,7 +77,7 @@ def entete(n_images=1):
 # ================================================================ SPIRIT
 REFS_SPIRIT = ['spirit-officiel']
 carte('sp', 'perso', 'Spirit : toutes ses poses de jeu (grande planche)',
-      "La planche de référence de tout le jeu : ses proportions servent pour tout le reste. Une seule grande image de 24 poses, dans une nouvelle conversation. Joins seulement l'image officielle de Spirit (celle où il saute). Étape 2 si la tête change de forme d'une case à l'autre. Étape 3 si ta planche est déjà faite mais avec un cœur sur la poitrine à la place du SG : tu la corriges sans tout refaire.",
+      "La planche de référence de tout le jeu : ses proportions servent pour tout le reste. Une seule grande image de 24 poses, dans une nouvelle conversation. Joins seulement l'image officielle de Spirit (celle où il saute). Étape 2 si la tête change de forme d'une case à l'autre. Étape 3 si ta planche est déjà faite mais avec un cœur sur la poitrine à la place du SG : tu la corriges sans tout refaire. Étape 4 pour refaire les cases 23 (aspiré, yeux ratés) et 24 (atterrit, pose ratée).",
       REFS_SPIRIT,
       f"{entete()}\n\n{grille(6, 4, 40)}\n\n{STYLE}\n\n{SPIRIT}",
       ['de face, immobile, bras le long du corps', 'de face, marche : pied gauche en avant, bras droit en avant', 'de face, marche : pied droit en avant, bras gauche en avant',
@@ -89,7 +90,12 @@ carte('sp', 'perso', 'Spirit : toutes ses poses de jeu (grande planche)',
        "debout, il s'étire, bras levés, yeux fermés, bouche ouverte (bâillement)", "aspiré par un vortex : vu de face, bras et jambes écartés, yeux en panique", "il atterrit : un genou au sol, une main posée au sol, vu de face"],
       suites=["Si ta planche a un cœur ou un autre symbole sur la poitrine, dans la même conversation : garde exactement la même planche, même dessin, mêmes poses, même taille de pixels, même fond magenta. "
               "Change uniquement le devant du tee-shirt dans toutes les cases où Spirit est vu de face : le symbole est remplacé par les lettres SG en cyan #35d6ff, "
-              "un S et un G de 3 pixels de large et 5 de haut chacun, séparés d'une colonne de 1 pixel, centrés sur la poitrine et bien lisibles. Si le tee-shirt est trop petit pour les lettres, agrandis-le de 2 pixels en largeur, sans toucher à la tête."],
+              "un S et un G de 3 pixels de large et 5 de haut chacun, séparés d'une colonne de 1 pixel, centrés sur la poitrine et bien lisibles. Si le tee-shirt est trop petit pour les lettres, agrandis-le de 2 pixels en largeur, sans toucher à la tête.",
+              "Toujours dans la même conversation : garde exactement la même planche, toutes les cases identiques au pixel près, sauf les deux dernières cases en bas à droite (cases 23 et 24), que tu redessines. "
+              "Même taille de pixels, même tête ronde de 24 pixels, mêmes couleurs, logo SG sur la poitrine. "
+              "Case 23, Spirit aspiré par un vortex, vu de face : il flotte, bras levés et écartés, jambes écartées et pliées, les deux yeux identiques grands ouverts de peur (deux ovales bleus avec un petit reflet blanc chacun, exactement pareils), petite bouche ronde ouverte. "
+              "Case 24, Spirit qui atterrit, vu de face : accroupi, genou droit posé au sol, jambe gauche pliée avec le pied à plat, main droite posée au sol devant lui, main gauche sur le genou, dos droit, tête bien droite et ronde, "
+              "air déterminé et calme (sourcils un peu froncés, deux yeux identiques et normaux comme dans la case 1, petit sourire). Les jambes, les bras et les baskets restent simples et lisibles, rien d'emmêlé."],
       maintenant=True)
 carte('sp', 'perso', 'Spirit : portraits des dialogues',
       "Les grands portraits affichés à côté du texte. Ici les lettres SG du casque doivent être lisibles. Fais-la après la grande planche, dans la même conversation ou en joignant ta planche validée.",
