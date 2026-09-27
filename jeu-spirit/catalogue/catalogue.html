@@ -804,7 +804,7 @@ Le centre de la pièce reste dégagé pour marcher.`]);
   // toutes les cartes de la Plaine sont à refaire
   for (const c of cartes) if (c.etape === 'pl') NOUVEAUX.add(c.id);
   // les cartes à refaire repartent de zéro, même si elles avaient été cochées avant
-  if (!lire('cat-reset-refaire-1', false)) {
+  if (localStorage && (() => { try { return !localStorage.getItem('cat-reset-refaire-1'); } catch (e) { return false; } })()) {
     try { const f = JSON.parse(localStorage.getItem('cat-faites') || '[]').filter((k) => !NOUVEAUX.has(k.split('#')[0])); localStorage.setItem('cat-faites', JSON.stringify(f)); localStorage.setItem('cat-reset-refaire-1', 'true'); } catch (e) {}
   }
 
