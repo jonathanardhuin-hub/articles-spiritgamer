@@ -104,6 +104,9 @@
   .actions button.copier { background: var(--cyan); color: #04122e; }
   .actions button.fait[aria-pressed="true"] { background: var(--ok); border-color: var(--ok); color: #03220f; }
   .vide { color: var(--texte-doux); padding: 30px 0; }
+  .reglages-scenario { display: grid; gap: 6px; margin-bottom: 10px; }
+  .reglages-scenario ul { margin: 0; padding-left: 18px; display: grid; gap: 4px; }
+  .copier-tout { font: 800 13px/1 var(--corps); border-radius: 8px; padding: 8px 12px; cursor: pointer; border: 1px solid var(--cyan); background: var(--cyan); color: #04122e; }
   @media (prefers-reduced-motion: no-preference) { .puce, .actions button { transition: background 0.15s, color 0.15s, border-color 0.15s; } }
 </style>
 
@@ -115,11 +118,13 @@
       <li><b>Dans l'ordre des étapes</b>Commence par « Donjon 1 » : c'est ce que je code maintenant. Chaque étape suivante contient sa région et son donjon complet (catégorie Donjons : salles, portes, mécanismes, sous-sols).</li>
       <li><b>Range les images dans Google Drive</b>Dossier « Spirit images », puis un sous-dossier par carte, nommé avec son code (par exemple D1-03). Dis-moi ensuite quels codes sont prêts : je les récupère moi-même.</li>
       <li><b>Portes et passages</b>Chaque écran qui a une porte contient une étape de plus : la même image avec la porte ouverte. Fais-la dans la même conversation, juste après.</li>
+      <li><b>Avec Scenario</b>Choisis « Scenario » dans la ligne Outil : chaque carte donne alors un prompt court par image, le modèle à utiliser (Spirit, Spirit Personnages ou Spirit Décors), le format, et pour les salles le plan à mettre en image de structure. Le bouton « Copier les prompts » les copie tous d'un coup, un par ligne.</li>
       <li><b>Coche chaque étape</b>Chaque prompt a son bouton « fait ». Une carte ne disparaît que quand toutes ses étapes sont faites (par exemple l'image puis sa version porte ouverte).</li>
     </ul>
   </header>
 
   <nav class="filtres" aria-label="Filtres">
+    <div class="rangee" id="outil"><span class="etiq">Outil</span></div>
     <div class="rangee" id="etapes"><span class="etiq">Étape</span></div>
     <div class="rangee" id="categories"><span class="etiq">Catégorie</span><label class="masquer"><input type="checkbox" id="masquer-faites" checked> Cacher les cartes faites</label><span class="compte" id="compte"></span></div>
   </nav>
@@ -192,7 +197,7 @@
     }
     const liste = n === 1 ? items[0] : items.map((x, i) => `${i + 1}) ${x}`).join('\n');
     cartes.push({
-      id: `${code}-${String(numero[code]).padStart(2, '0')}`, etape, cat, titre, pourquoi, refs, note,
+      id: `${code}-${String(numero[code]).padStart(2, '0')}`, etape, cat, titre, pourquoi, refs, note, items, style, suites,
       n: style === null ? suites.length : n + (suites ? suites.length : 0),
       prompts: style === null ? suites : [`${entete(n)}\n\n${style}\n\n${liste}`].concat(suites || []),
     });
@@ -810,8 +815,48 @@ Le centre de la pièce reste dégagé pour marcher.`]);
       box.insertBefore(b, avant || null);
     }
   }
+  let outil = lire('cat-outil', 'chatgpt');
+  puces('outil', [['chatgpt', 'ChatGPT'], ['scenario', 'Scenario']], outil, (k) => { outil = k; ecrire('cat-outil', k); });
   puces('etapes', ETAPES, etape, (k) => { etape = k; ecrire('cat-etape', k); });
   puces('categories', CATS, cat, (k) => { cat = k; ecrire('cat-cat', k); });
+
+  // ---------------------------------------------------------------- version Scenario : un prompt court par image
+  const QUEUE = {
+    spirit: 'Personnage Spirit (modèle « Spirit ») : lettres SG cyan sur chaque écouteur du casque et SG sur le tee-shirt. Personnage entier, centré, vue de dessus plongeante façon Zelda 2D, fond uni gris #808080, toon HD, contours noirs épais, pas d\'ombre, aucun texte.',
+    element: 'Style du jeu (modèle « Spirit Personnages »). Élément seul, entier, centré, vu bien de face avec une légère plongée façon Zelda 2D, fond uni gris #808080, toon HD, contours noirs épais, pas d\'ombre au sol, aucun texte, jamais de sang.',
+    ecran: 'Écran de jeu entier vu de dessus façon Zelda 2D (modèle « Spirit Décors »), 1672 × 941. Sol vierge : aucun rocher, touffe ni objet isolé là où l\'on marche. Bordure épaisse infranchissable sauf aux sorties, chemins d\'au moins deux cases de large qui touchent le bord. Contours nets pour l\'eau, les trous, la lave et les falaises. Aucun personnage, aucun texte.',
+    salle: 'Salle vue de dessus façon Zelda 2D (modèle « Spirit Décors »), 1672 × 941. Suis exactement l\'image de structure jointe : murs épais tout autour, sol de 13 × 6 dalles carrées régulières, portes en tunnel au milieu des murs. Sol vide, aucun objet, aucun personnage, aucun texte.',
+    illustration: 'Illustration de cinématique (modèle « Spirit Décors »), 1672 × 941, toon HD, contours épais, lumière travaillée, aucun texte.',
+  };
+  function versionScenario(c) {
+    const st = c.style || '';
+    const avecSpirit = /Spirit(?!Gamer)/.test(st + (c.items || []).join(' '));
+    // retouches d'une image existante : mode édition
+    if (!c.style) return { modele: 'Mode édition (Edit), en joignant l\'image d\'origine', format: 'mêmes dimensions que l\'image d\'origine', structure: '', prompts: c.prompts };
+    let modele, format = 'carré 1024 × 1024', structure = '', queue, sujets = c.items;
+    if (/Un écran entier d'un jeu d'aventure/.test(st)) {
+      modele = 'Spirit Décors'; format = '16:9, 1672 × 941'; queue = QUEUE.ecran;
+      const sorties = (st.match(/Sorties \(un chemin praticable qui touche le bord de l'image\) : ([^.]*)\./) || [])[1] || '';
+      const bord = (st.match(/le tour de l'écran est fermé par ([^,]*),/) || [])[1] || '';
+      const ecran = (st.match(/Cet écran : ([\s\S]*)$/) || [])[1] || '';
+      sujets = [`${ecran.trim()} Bordure : ${bord}. Sorties : ${sorties}.`];
+    } else if (/Une salle de donjon/.test(st)) {
+      modele = 'Spirit Décors'; format = '16:9, 1672 × 941'; queue = QUEUE.salle;
+      structure = /sans aucune porte/.test(st) ? 'plan-salle-sans-porte.png' : 'plan-salle-4-portes.png';
+      const theme = (st.match(/Thème : ([\s\S]*)$/) || [])[1] || '';
+      sujets = (c.items || []).map((x) => `${x} Thème : ${theme.trim()}`);
+    } else if (/Une pièce vue de dessus|Un couloir intérieur/.test(st)) {
+      modele = 'Spirit Décors'; format = '16:9, 1672 × 941'; queue = QUEUE.salle.replace('Suis exactement l\'image de structure jointe : murs épais tout autour, sol de 13 × 6 dalles carrées régulières, portes en tunnel au milieu des murs. Sol vide, aucun objet, aucun personnage, aucun texte.', 'Murs épais en blocs de pierre gris-bleu, meubles collés aux murs, portes creusées dans l\'épaisseur du mur où un personnage tient entier. Aucun personnage, aucun texte.');
+    } else if (/1672 × 941/.test(st)) {
+      modele = 'Spirit Décors'; format = '16:9, 1672 × 941'; queue = QUEUE.illustration;
+    } else if (avecSpirit && (c.cat === 'perso' || /Spirit/.test(c.titre))) {
+      modele = 'Spirit'; queue = QUEUE.spirit;
+    } else {
+      modele = 'Spirit Personnages'; queue = QUEUE.element;
+    }
+    const prompts = (sujets || []).map((x) => `${c.titre} : ${x}\n${queue}`);
+    return { modele, format, structure, prompts: prompts.concat((c.suites || []).map((x) => 'Mode édition (Edit), en joignant l\'image que tu viens de faire : ' + x)) };
+  }
 
   function elCarte(c) {
     const a = document.createElement('article');
@@ -827,9 +872,24 @@ Le centre de la pièce reste dégagé pour marcher.`]);
     a.querySelector('.pourquoi').textContent = c.pourquoi;
     if (c.note) a.querySelector('.note-ref').textContent = c.note;
     const zone = a.querySelector('.prompts');
-    c.prompts.forEach((texte, i) => {
+    let liste = c.prompts;
+    if (outil === 'scenario') {
+      const v = versionScenario(c);
+      liste = v.prompts;
+      const r = document.createElement('div'); r.className = 'reglages-scenario';
+      r.innerHTML = '<span class="etiq">Réglages Scenario</span><ul></ul>';
+      const ul = r.querySelector('ul');
+      for (const [k, val] of [['Modèle', v.modele], ['Format', v.format], ['Image de structure', v.structure]]) if (val) { const li = document.createElement('li'); li.innerHTML = '<b></b> '; li.querySelector('b').textContent = k + ' :'; if (k === 'Image de structure') { const l = document.createElement('a'); l.href = 'refs/' + val; l.target = '_blank'; l.rel = 'noopener'; l.textContent = val; li.append(l); } else li.append(val); ul.appendChild(li); }
+      if (liste.length > 1) {
+        const li = document.createElement('li'); li.innerHTML = '<b>Tout d\'un coup :</b> '; const bt = document.createElement('button'); bt.type = 'button'; bt.className = 'copier-tout'; bt.textContent = `Copier les ${liste.length} prompts (un par ligne)`;
+        bt.addEventListener('click', () => { const t = liste.map((x) => x.replace(/\n/g, ' ')).join('\n'); try { navigator.clipboard.writeText(t).then(() => { bt.textContent = 'Copiés'; }, () => { bt.textContent = 'Copie impossible : copie-les un par un'; }); } catch (e) { bt.textContent = 'Copie impossible : copie-les un par un'; } });
+        li.appendChild(bt); ul.appendChild(li);
+      }
+      zone.appendChild(r);
+    }
+    liste.forEach((texte, i) => {
       const bloc = document.createElement('div'); bloc.className = 'bloc-prompt';
-      const nom = c.prompts.length > 1 ? `Étape ${i + 1} sur ${c.prompts.length}` : 'Prompt';
+      const nom = liste.length > 1 ? (outil === 'scenario' ? `Image ${i + 1} sur ${liste.length}` : `Étape ${i + 1} sur ${liste.length}`) : 'Prompt';
       bloc.innerHTML = `<span class="etiq"></span><pre class="prompt"></pre><div class="actions"><button type="button" class="copier">Copier</button><button type="button" class="fait"></button></div>`;
       bloc.querySelector('.etiq').textContent = nom;
       const pre = bloc.querySelector('.prompt'); pre.textContent = texte;
