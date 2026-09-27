@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#050a19">
+<title>Spirit et le Roi Clickbait</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@500;700&display=swap">
+<style>
+  html, body { margin: 0; height: 100%; background: #050a19; overflow: hidden; touch-action: none;
+    -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+  body { display: flex; align-items: center; justify-content: center; font-family: "Trebuchet MS", Verdana, sans-serif; }
+  #jeu { display: block; background: #000; image-rendering: pixelated; }
+
+  /* commandes tactiles : visibles seulement sur écran tactile */
+  .tactile-seul { display: none; }
+  body.tactile .tactile-seul { display: block; }
+  #zone-joy { position: fixed; left: 0; top: 15%; width: 45%; bottom: 0; z-index: 2; }
+  #joy-base { position: fixed; width: 140px; height: 140px; border-radius: 50%; display: none; z-index: 3; pointer-events: none;
+    background: rgba(42, 212, 255, 0.12); border: 3px solid rgba(42, 212, 255, 0.55); }
+  #joy-bouton { position: absolute; left: 40px; top: 40px; width: 60px; height: 60px; border-radius: 50%;
+    background: rgba(42, 212, 255, 0.55); border: 3px solid #fff; }
+  .btn { position: fixed; z-index: 3; border-radius: 50%; border: 3px solid rgba(255,255,255,0.8);
+    color: #fff; font-weight: bold; display: none; align-items: center; justify-content: center; }
+  body.tactile .btn { display: flex; }
+  #btn-a { right: 4%; bottom: 14%; width: 92px; height: 92px; font-size: 36px; background: rgba(42, 212, 255, 0.45); }
+  #btn-b { right: calc(4% + 110px); bottom: 6%; width: 74px; height: 74px; font-size: 28px; background: rgba(255, 79, 216, 0.35); }
+  #btn-menu { right: 16%; top: 12px; width: 56px; height: 56px; font-size: 22px; background: rgba(10, 20, 40, 0.6); border-radius: 14px; }
+  #btn-carte { right: calc(16% + 70px); top: 12px; width: 56px; height: 56px; font-size: 24px; background: rgba(10, 20, 40, 0.6); border-radius: 14px; }
+  .btn.appuye { transform: scale(0.92); filter: brightness(1.4); }
+
+  /* téléphone en portrait : on demande de le tourner */
+  #tourner { display: none; position: fixed; inset: 0; z-index: 10; background: #050a19; color: #fff;
+    text-align: center; padding: 30px; box-sizing: border-box; align-items: center; justify-content: center; flex-direction: column; font-size: 22px; }
+  #tourner .icone { font-size: 70px; margin-bottom: 20px; transform: rotate(90deg); }
+  @media (orientation: portrait) and (max-width: 900px) { body.tactile #tourner { display: flex; } }
+</style>
+</head>
+<body>
+<canvas id="jeu" width="256" height="200"></canvas>
+
+<div id="zone-joy" class="tactile-seul"></div>
+<div id="joy-base"><div id="joy-bouton"></div></div>
+<div id="btn-a" class="btn tactile-seul">A</div>
+<div id="btn-b" class="btn tactile-seul">B</div>
+<div id="btn-menu" class="btn tactile-seul">II</div>
+<div id="btn-carte" class="btn tactile-seul">&#9776;</div>
+
+<div id="tourner"><div class="icone">&#9647;</div>Tourne ton téléphone à l'horizontale pour jouer.</div>
+
+<script src="js/base.js"></script>
+<script src="js/pixel.js"></script>
+<script src="js/art.js"></script>
+<script src="js/carte.js"></script>
+<script src="js/jeu.js"></script>
+</body>
+</html>

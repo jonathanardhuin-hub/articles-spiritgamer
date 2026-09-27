@@ -2,6 +2,14 @@
 
 Ces règles viennent de Jonathan, au fil des tests. Elles valent pour toute modification du jeu, du plan ou des prompts du catalogue.
 
+## Nouvelle direction (septembre 2026) : pixel art façon Zelda
+Jonathan a décidé de tout refaire proprement « à la Zelda ». La nouvelle version est dans `zelda/` ; l'ancienne (toon HD, images ChatGPT) reste dans `jeu/` comme archive, rien n'est supprimé.
+- Style : pixel art 16 bits façon A Link to the Past / Minish Cap. Tuiles de 16 px, écrans de 16 × 11 tuiles, bandeau de 24 px au-dessus, image agrandie sans lissage.
+- Claude dessine tout, par le code (`zelda/js/pixel.js` pour les outils, `zelda/js/art.js` pour les dessins) : aucune image ChatGPT, aucun fichier image. Les règles « Images » et le catalogue plus bas concernent l'ancienne version.
+- On garde l'histoire et la logique du moteur (dialogues, objets, monstres, donjons) ; l'affichage passe aux tuiles.
+- Les écrans se décrivent en lettres dans `zelda/js/carte.js` ; les bords se raccordent d'un écran à l'autre ; collisions à la tuile.
+- Spirit garde ses couleurs (blanc, casque noir et bleu aux écouteurs cyan, tee-shirt bleu au logo cyan, short et baskets bleus). À 16 px, les lettres SG ne sont pas lisibles : elles apparaîtront sur les portraits des dialogues.
+
 ## Cohérence entre le texte et ce qu'on voit
 Après chaque modification, relire les textes concernés (SG.TEXTES dans `jeu/js/monde.js`, SG.TEXTES.donjon et SG.OBJETS dans `jeu/js/donjon.js`, panneaux) :
 - ce que disent les personnages, les panneaux et les descriptions d'objets doit correspondre exactement à ce qui est à l'écran et à ce que le jeu permet (un écran décrit comme planté doit l'être à l'image, un objet décrit comme cassant les pots doit les casser) ;
