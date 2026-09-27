@@ -37,7 +37,7 @@ def grille(cols, rangs, reel, fois, cadre='carré'):
 
 ORDRE = "Les éléments sont rangés dans l'ordre de la liste, de gauche à droite puis de haut en bas (case 1 en haut à gauche). Une case marquée « vide » reste entièrement magenta."
 
-SPIRIT = ("Le personnage est Spirit, la mascotte des images jointes, traduite en pixel art. Couleurs exactes : "
+SPIRIT = ("Le personnage est Spirit, la mascotte de l'image jointe (où il saute), traduite en pixel art. Couleurs exactes : "
           "corps et tête blancs (#ffffff, ombre #c9d3e6, ombre profonde #8f9bb8) ; casque-micro noir #23273a avec un liseré bleu #2f4fa0 et des touches cyan #35d6ff ; "
           "grands yeux bleus #1c56c8 avec un reflet blanc ; tee-shirt bleu #2f72e6 (ombre #1f50b4) avec un petit logo cyan sur la poitrine ; "
           "short bleu foncé #1b3c8c avec une bande cyan ; baskets bleues #2f72e6 à semelle blanche.\n\n"
@@ -60,6 +60,7 @@ SUITE_VERIF = ("Vérifie la planche : même taille et mêmes proportions dans to
 cartes = []
 num = {}
 def carte(etape, cat, titre, pourquoi, refs, prompt_elements, elements, suites=None, maintenant=False):
+    refs = [r for r in refs if r == 'spirit-officiel' or r.startswith('@')]
     code = {'sp': 'SP', 'pro': 'PRO', 'pl': 'PL', 'd1': 'D1', 'qg': 'QG', 'r2': 'R2', 'r3': 'R3', 'r4': 'R4', 'r5': 'R5', 'r6': 'R6', 'r7': 'R7', 'r8': 'R8', 'fin': 'FIN'}[etape]
     num[code] = num.get(code, 0) + 1
     liste = '\n'.join(f"{i + 1}) {e}" for i, e in enumerate(elements))
@@ -71,9 +72,9 @@ def entete(n_images=1):
     return "Crée 1 image, seule dans son fichier." if n_images == 1 else f"Crée {n_images} images, une par une."
 
 # ================================================================ SPIRIT
-REFS_SPIRIT = ['spirit-officiel', 'spirit-face', 'spirit-dos', 'spirit-profil']
+REFS_SPIRIT = ['spirit-officiel']
 carte('sp', 'perso', 'Spirit : toutes ses poses de jeu (grande planche)',
-      "La planche de référence de tout le jeu : ses proportions servent pour tout le reste. Une seule grande image de 24 poses, dans une nouvelle conversation. Joins les 4 images de Spirit. Si la tête change de forme d'une case à l'autre, fais l'étape 2 (vérification) dans la même conversation.",
+      "La planche de référence de tout le jeu : ses proportions servent pour tout le reste. Une seule grande image de 24 poses, dans une nouvelle conversation. Joins seulement l'image officielle de Spirit (celle où il saute). Si la tête change de forme d'une case à l'autre, fais l'étape 2 (vérification) dans la même conversation.",
       REFS_SPIRIT,
       f"{entete()}\n\n{grille(6, 4, 32, 8)}\n\n{STYLE}\n\n{SPIRIT}",
       ['de face, immobile, bras le long du corps', 'de face, marche : pied gauche en avant, bras droit en avant', 'de face, marche : pied droit en avant, bras gauche en avant',
@@ -154,7 +155,7 @@ def pnj(etape, titre, persos, refs=None):
         portraits += [f"portrait de {nom} : buste et tête de face, expression neutre", f"portrait de {nom} : il parle, bouche ouverte, expression vive"]
     portraits += ['vide'] * (6 - len(portraits))
     carte(etape, 'pnj', titre + ' : portraits', "Les portraits affichés à côté du texte des dialogues.", (refs or []) + ['@SP-02'],
-          f"{entete()}\n\n{grille(3, 2, 64, 8)}\n\n{STYLE}\n\nPortraits cadrés en buste, de face, dessinés à 64 × 64 pixels réels, même style et même cadrage que les portraits de Spirit joints.",
+          f"{entete()}\n\n{grille(3, 2, 64, 8)}\n\n{STYLE}\n\nPortraits cadrés en buste, de face, dessinés à 64 × 64 pixels réels, même style et même cadrage que les portraits de Spirit joints (ta planche SP-02).",
           portraits)
 
 def objets(etape, titre, pourquoi, elements, refs=None):
@@ -174,7 +175,7 @@ sols('pro', 'Intérieur du QG : sols, murs et portes',
      'parquet clair', 'tapis bleu nuit à motif discret', 'reflet de lumière sur le parquet', 'mur en gros blocs de pierre gris-bleu', 'double porte vitrée',
      ['mur du haut en gros blocs de pierre gris-bleu avec une applique carrée en verre dépoli qui diffuse une lumière chaude (2 tuiles de haut : cette case est le haut)', 'le bas du même mur', 'coin de mur haut gauche', 'coin de mur haut droit',
       'double porte en bois foncé à panneaux de verre dépoli, fermée, vue de face dans le mur du haut (partie gauche)', 'même double porte fermée (partie droite)', 'même double porte ouverte : les deux battants repliés contre l\'encadrement (partie gauche)', 'même double porte ouverte (partie droite)'])
-planche_decor('pro', 'Ta loge : les meubles', "Les meubles de ta loge, posés sur le sol par le jeu. Joins aussi tes photos de bureau pour les détails.",
+planche_decor('pro', 'Ta loge : les meubles', "Les meubles de ta loge, posés sur le sol par le jeu.",
               ['un long bureau noir vu de dessus avec trois écrans éteints (occupe toute la case)', 'le même bureau, écrans allumés : un jeu en pause à gauche, un tchat au milieu, le logo SG en veille sur l\'écran incurvé de droite',
                'le même bureau, les trois écrans envahis par une pub rouge et violette avec un visage jaune souriant', 'le même bureau, l\'écran de droite brouillé de parasites, logo SG déformé',
                'un fauteuil gamer bordeaux et beige vu de dessus', 'une bibliothèque en bois clair pleine de figurines (chouette blanche, petites créatures, château de sorciers en briques), vue de face',
