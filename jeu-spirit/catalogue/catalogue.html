@@ -114,6 +114,7 @@
   <header class="tete">
     <h1>Catalogue d'images<small>Spirit et le Roi Clickbait · toutes les images du jeu</small></h1>
     <ul class="mode-emploi">
+      <li><b>Planches</b>Pour les personnages, monstres, objets et effets, ChatGPT fait une seule grande image avec tous les éléments de la carte bien séparés, dans l'ordre de la liste. Envoie-moi la planche telle quelle : je découpe chaque élément moi-même.</li>
       <li><b>1 carte = 1 nouvelle conversation ChatGPT</b>Ouvre une nouvelle conversation pour chaque carte, et fais toutes les étapes de la carte dans cette même conversation (par exemple l'image puis sa version porte ouverte). Si ChatGPT commence à déformer Spirit ou à oublier une consigne, recommence la carte dans une nouvelle conversation. Joins les images montrées sous « À joindre » (clique dessus pour les ouvrir en grand et les enregistrer), et pour les salles le plan de salle gris.</li>
       <li><b>Dans l'ordre des étapes</b>Commence par « Donjon 1 » : c'est ce que je code maintenant. Chaque étape suivante contient sa région et son donjon complet (catégorie Donjons : salles, portes, mécanismes, sous-sols).</li>
       <li><b>Range les images dans Google Drive</b>Dossier « Spirit images », puis un sous-dossier par carte, nommé avec son code (par exemple D1-03). Dis-moi ensuite quels codes sont prêts : je les récupère moi-même.</li>
@@ -147,6 +148,11 @@
   };
 
   // ------------------------------------------------------------------ morceaux de prompt communs
+  // plusieurs personnages, objets ou effets : une seule planche, éléments bien séparés (je les découpe ensuite)
+  const planche = (n) => {
+    const nb = Math.ceil(n / 6), par = Math.ceil(n / nb), cols = par <= 3 ? par : Math.ceil(par / 2);
+    return `${nb === 1 ? 'Crée une seule grande image' : `Crée ${nb} grandes images (${par} éléments par image, dans l'ordre de la liste)`} au format paysage 1536 × 1024 : une planche qui réunit ${nb === 1 ? `les ${n} éléments` : 'les éléments'} ci-dessous, rangés en grille de ${cols} colonnes, dans l'ordre de la liste, de gauche à droite puis de haut en bas. Chaque élément est entier, dans sa propre case, séparé des autres par au moins 60 pixels de fond gris vide : rien ne se touche, rien ne se chevauche, aucun élément coupé par le bord. Tous à la même échelle exactement, posés sur la même ligne de base dans chaque rangée. Aucune ombre, aucun cadre, aucune case dessinée, aucun numéro, aucun texte. Les consignes ci-dessous (« seul », « centré », fond gris) s\'appliquent à chaque élément dans sa case.`;
+  };
   const entete = (n) => n === 1
     ? `Crée 1 image, seule dans son fichier.`
     : `Crée ${n} images distinctes, une par une, chacune dans un fichier à part que je peux télécharger séparément. Ne les assemble jamais dans une même image, pas de planche.`;
@@ -198,7 +204,7 @@
     cartes.push({
       id: `${code}-${String(numero[code]).padStart(2, '0')}`, etape, cat, titre, pourquoi, refs, note, items, style, suites,
       n: style === null ? suites.length : n + (suites ? suites.length : 0),
-      prompts: style === null ? suites : [`${entete(n)}\n\n${style}\n\n${liste}`].concat(suites || []),
+      prompts: style === null ? suites : [`${n > 1 && ['perso', 'ennemis', 'boss', 'pnj', 'objets', 'effets'].includes(cat) && !/1672 × 941/.test(style) ? planche(n) : entete(n)}\n\n${style}\n\n${liste}`].concat(suites || []),
     });
     return cartes[cartes.length - 1].id;
   }
