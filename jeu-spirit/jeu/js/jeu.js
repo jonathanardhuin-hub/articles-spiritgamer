@@ -291,7 +291,7 @@ SG.Jeu = class {
     this.couperDecor(zone);
     const c0 = Math.floor(zone.x / SG.T), c1 = Math.floor((zone.x + zone.w) / SG.T);
     const r0 = Math.floor(zone.y / SG.T), r1 = Math.floor((zone.y + zone.h) / SG.T);
-    for (let r = r0; r <= r1; r++) for (let c = c0; c <= c1; c++) if (this.caseEn(c, r) === 'X') this.toucherCristalEn(c * SG.T + 40, r * SG.T + 40);
+    // les cristaux ne réagissent qu'à la Manette : on ne les active jamais au corps à corps
   }
 
   // coupe les buissons et hautes herbes dans la zone ; renvoie le nombre de cases coupées
@@ -474,6 +474,9 @@ SG.Jeu = class {
     if (dir === 'droite') s.x = s.pw / 2 + 2 + m;
     if (dir === 'haut') s.y = don ? SG.H - SG.T - 12 : SG.H - 4;
     if (dir === 'bas') s.y = don ? SG.T + 130 : s.ph + 4;
+    // on arrive toujours bien au milieu de la porte d'en face
+    if (don && (dir === 'gauche' || dir === 'droite')) s.y = 392;
+    if (don && (dir === 'haut' || dir === 'bas')) s.x = 640;
     s.recul = null;
     this.entrerEcran(cle);
     if (this.collision(SG.boitePieds(s), s)) {
@@ -660,6 +663,12 @@ SG.Jeu = class {
     }
     if (s.x - s.pw / 2 < 2 && this.voisin('gauche')) this.glisserVers('gauche');
     else if (s.x + s.pw / 2 > SG.W - 2 && this.voisin('droite')) this.glisserVers('droite');
+    // dans un donjon, on change de salle dès que Spirit s'engage dans l'embrasure, comme dans Zelda :
+    // il n'est jamais à moitié dans le mur ni coincé contre le haut de la porte
+    else if (this.estDonjon() && s.dir === 'haut' && s.y < 104 && this.voisin('haut')) this.glisserVers('haut');
+    else if (this.estDonjon() && s.dir === 'gauche' && s.x < 96 && this.voisin('gauche')) this.glisserVers('gauche');
+    else if (this.estDonjon() && s.dir === 'droite' && s.x > 1184 && this.voisin('droite')) this.glisserVers('droite');
+    else if (this.estDonjon() && s.dir === 'bas' && s.y > 640 && this.voisin('bas')) this.glisserVers('bas');
     else if (s.y - s.ph < 2 && this.voisin('haut')) this.glisserVers('haut');
     else if (s.y > SG.H - 2 && this.voisin('bas')) this.glisserVers('bas');
     else { s.x = SG.clamp(s.x, s.pw / 2, SG.W - s.pw / 2); s.y = SG.clamp(s.y, s.ph, SG.H); }

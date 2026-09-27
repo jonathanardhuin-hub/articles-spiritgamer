@@ -73,7 +73,10 @@ SG.Spirit = class {
       // bloqué contre un obstacle : il pousse, même si rien ne bouge
       const x0 = this.x, y0 = this.y;
       SG.deplacer(jeu, this, a.x * v, a.y * v);
-      this.poussePose = Math.hypot(this.x - x0, this.y - y0) < v * 0.15 ? 0.15 : 0;
+      // pose « pousse » seulement contre un bloc qu'on peut pousser (jamais contre un mur, une porte ou un arbre)
+      const d = SG.DIRS[this.dir];
+      const devant = jeu.caseSalle && jeu.estDonjon && jeu.estDonjon() ? jeu.caseSalle(Math.floor((this.x + d.x * 40) / SG.T), Math.floor((this.y - 11 + d.y * 40) / SG.T)) : null;
+      this.poussePose = devant === 'B' && Math.hypot(this.x - x0, this.y - y0) < v * 0.15 ? 0.15 : 0;
       this.tempsMarche += dt;
     } else {
       this.tempsMarche = 0; this.poussePose = 0;
@@ -515,7 +518,8 @@ SG.Projectile = class {
     // l'onde lointaine coupe herbes et buissons sur son passage (un buisson l'arrête)
     if (this.ami) jeu.couperDecor(this.boite());
     // les cristaux ne réagissent qu'à la Manette (et à l'onde proche), pas à l'onde lointaine
-    if (this.ami && !(this instanceof SG.OndeLointaine) && jeu.toucherCristalEn(this.x, this.y + 30)) { this.fini = true; jeu.effets.push(new SG.Eclat(this.x, this.y)); return; }
+    // les ondes s'écrasent sur un cristal sans l'activer : seule la Manette le fait
+    if (this.ami && jeu.caseEn && jeu.caseEn(Math.floor(this.x / SG.T), Math.floor((this.y + 30) / SG.T)) === 'X' && jeu.obstacleHaut(this.x, this.y + 30)) { this.fini = true; jeu.effets.push(new SG.Eclat(this.x, this.y)); return; }
     if (jeu.obstacleHaut(this.x, this.y + 30)) { this.fini = true; this.quandBloque(jeu); return; }
     if (this.ami) {
       for (const m of jeu.monstres) {

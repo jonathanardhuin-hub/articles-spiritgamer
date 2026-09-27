@@ -82,15 +82,15 @@ SG.DONJON1 = {
     },
     '2,2': {
       nom: 'La Salle des Plaques',
-      image: 'salle-plaque', imageResolue: 'salle-plaque-enfoncee', decalBloc: 40, decalBlocY: -22,
+      image: 'salle-plaque', imageResolue: 'salle-plaque-enfoncee', decalBloc: 40, decalBlocY: -22, decalObjets: 40, decalObjetsY: -22,
       plan: [
         '################',
         '#..............#',
-        '#.o..o.G..o..o.#',
+        '#.o..G...o..o..#',
         '#..............#',
         '#......I.......#',
         '#..............#',
-        '#.o..o....o..o.#',
+        '#.o..o...o..o..#',
         '#..............#',
         '################',
       ],
@@ -649,14 +649,15 @@ Object.assign(SG.Jeu.prototype, {
       if (!pied) continue;
       let cx = c * T + 40;
       if (ch === 'X') cx += S.cristalDx || 0;
-      if ((ch === 'o' || ch === 'F') && this.imageSalle()) cx = SG.xDalle(cx);
+      if ((ch === 'o' || ch === 'F') && S.decalObjets) cx += S.decalObjets;
+      else if ((ch === 'o' || ch === 'F') && this.imageSalle()) cx = SG.xDalle(cx);
       if (ch === 'B') {
         const bl = (this.blocs || []).find((q) => q.r === r && (q.c === c || (S.decalBloc && q.c + 1 === c)));
         if (bl) { if (bl.c !== c) continue; cx = bl.c * T + 40 + (S.decalBloc || 0); }
         if (bl) { const [hw, hh] = pied, yb = r * T + T - 4 + (S.decalBlocY || 0); if (SG.boitesSeTouchent(b, { x: cx - hw, y: yb - hh, w: hw * 2, h: hh })) return true; continue; }
       }
-      const [hw, hh] = pied;
-      if (SG.boitesSeTouchent(b, { x: cx - hw, y: r * T + T - 4 - hh, w: hw * 2, h: hh })) return true;
+      const [hw, hh] = pied, dy = ch === 'o' && S.decalObjetsY ? S.decalObjetsY : 0;
+      if (SG.boitesSeTouchent(b, { x: cx - hw, y: r * T + T - 4 - hh + dy, w: hw * 2, h: hh })) return true;
     }
     return false;
   },
@@ -965,8 +966,10 @@ Object.assign(SG.Jeu.prototype, {
     const S = this.salle(), k = this.salleCle(), D = this.etatDonjon(), T = SG.T;
     for (let r = 0; r < SG.ROWS; r++) for (let c = 0; c < SG.COLS; c++) {
       const ch = this.caseSalle(c, r), x = c * T + 40, y = r * T + T;
-      const xd = this.imageSalle() ? SG.xDalle(x) : x;
-      if (ch === 'o') liste.push({ y, dessiner: (ctx) => SG.dessinStatue(ctx, xd, y) });
+      // alignement : décalage propre à la salle (statues alignées sur la gargouille et la plaque), sinon milieu des dalles
+      const xd = (ch === 'o' || ch === 'F') && S.decalObjets ? x + S.decalObjets : this.imageSalle() ? SG.xDalle(x) : x;
+      const yd = ch === 'o' && S.decalObjetsY ? y + S.decalObjetsY : y;
+      if (ch === 'o') liste.push({ y: yd, dessiner: (ctx) => SG.dessinStatue(ctx, xd, yd) });
       else if (ch === 'F') liste.push({ y, dessiner: (ctx) => SG.dessinBrasero(ctx, xd, y) });
       else if (ch === 'p') liste.push({ y, dessiner: (ctx) => SG.dessinPot(ctx, x, y) });
       else if (ch === 'C') liste.push({ y, dessiner: (ctx) => SG.dessinCoffre(ctx, x, y, D.coffres.includes(k)) });
@@ -985,9 +988,8 @@ Object.assign(SG.Jeu.prototype, {
       liste.push({ y, dessiner: (ctx) => {
         if (!b.statue) { SG.dessinBloc(ctx, x, y); return; }
         if (SG.img['gargouille-poussable'] && SG.img['gargouille-poussable'].width) { SG.dessinerPied(ctx, SG.img['gargouille-poussable'], x, y); return; }
-        // en attendant son image : la gargouille à pousser porte la lueur cyan de la plaque, les autres non
-        ctx.save(); ctx.filter = `drop-shadow(0 0 ${6 + Math.sin(this.t * 3) * 3}px rgba(95,243,255,0.9))`;
-        SG.dessinStatue(ctx, x, y); ctx.restore();
+        // la gargouille à pousser ressemble exactement aux autres : au joueur de la trouver
+        SG.dessinStatue(ctx, x, y);
       } });
     }
     // portes (toujours derrière les personnages : dessinées sur le fond)
@@ -1004,7 +1006,7 @@ Object.assign(SG.Jeu.prototype, {
     if (!sp || !this.imageSalle()) return;
     const zones = [];
     // portes de côté : le mur au-dessus de l'ouverture est derrière Spirit, rien ne passe devant lui
-    if (sp.y < 124 && this.porteOuverte('haut')) zones.push([560, 0, 160, 34], [522, 0, 58, 124], [700, 0, 58, 124]);
+    if (sp.y < 124 && this.porteOuverte('haut')) zones.push([522, 0, 58, 124], [700, 0, 58, 124]);
     if (sp.y > 606 && this.porteOuverte('bas')) zones.push([566, 680, 148, 40], [522, 588, 66, 132], [692, 588, 66, 132]);
     if (!zones.length) return;
     const cv = this.fondSalle(this.ecran), k = cv.width / SG.W;
