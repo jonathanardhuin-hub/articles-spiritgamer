@@ -53,3 +53,27 @@ Les sous-sols ne ressemblent pas au donjon : ce sont les coulisses techniques du
 | 6 Bibliothèque des Bulles | Livre | Statues cracheuses, sols qui s'effritent | Baskets Turbo |
 | 7 Château 8 bits | Épée | Blocs de métal, armures | Aimant |
 | 8 Archives Gelées | Flocon | Faux murs, faux sols, glace | Lunettes de Vérif |
+
+## Les objets et à quoi ils servent
+
+| Objet | Où | Ce qu'il fait |
+|---|---|---|
+| Ampli | Grotte de l'ermite | Onde sonore : bat les monstres, coupe l'herbe, casse les pots, détruit les projectiles. Cœurs pleins : l'onde part au loin. |
+| Manette Retour | Donjon 1 | Se lance et revient. Étourdit, casse les pots, active les cristaux, rapporte les objets. |
+| Mégaphone | Donjon 1 (sous-sol) | Tire une onde sonore à distance. |
+| Pétards Confettis | Donjon 2 | Se posent et explosent : ouvrent les murs fêlés. |
+| Manette Pro | Donjon 2 | Plus rapide et deux fois plus de portée que la Manette (comme le boomerang magique de Zelda). |
+| Lanterne RGB | Donjon 3 | Éclaire les salles noires, allume les braseros. |
+| Micro Pro, Micro d'Or | Donjons 3 et 5 | Onde plus large, puis plus puissante. |
+| Câble Grappin | Donjon 4 | S'accroche aux poteaux, fait traverser les ravins. |
+| Planche Wi-Fi | Donjon 5 | Glisse sur l'eau calme (bleu clair) : îlots, pontons, salles inondées. L'eau profonde (bleu nuit, remous) reste infranchissable. |
+| Baskets Turbo | Donjon 6 | Foncer, casser les piles de caisses. |
+| Aimant | Donjon 7 | Attire les blocs de métal. |
+| Lunettes de Vérif | Donjon 8 | Révèlent les faux murs et les faux sols. |
+| Pare-feu, Pare-feu Pro | Boutique de Mona | Bracelet qui projette un bouclier d'énergie en hexagones devant Spirit : arrête les projectiles de face. |
+
+## Proposition : les mises à jour du casque (à valider)
+À la place des tenues bleue et rouge de Zelda : le casque de Spirit reçoit des mises à jour.
+- Casque 2.0 (trésor caché du donjon 4) : Spirit encaisse deux fois moins de dégâts. Les lettres SG et le liseré du casque passent du cyan à l'or.
+- Casque 3.0 (trésor caché du donjon 7) : quatre fois moins de dégâts. SG et liseré en violet lumineux.
+Seules les couleurs du casque changent, le reste de Spirit ne bouge pas.
