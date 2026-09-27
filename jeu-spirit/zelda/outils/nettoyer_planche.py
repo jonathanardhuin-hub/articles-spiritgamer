@@ -21,20 +21,41 @@ def est_fond(c):
     # magenta, même mêlé au contour par le flou ; le violet des monstres (bleu plus fort que le rouge) reste
     return g < 60 and r > 100 and b > 100 and abs(r - b) < 50
 
+def grille_pixels(im):
+    """ChatGPT ne respecte pas toujours la taille demandée : on mesure la taille des gros pixels et le décalage de leur grille"""
+    import numpy as np
+    a = np.asarray(im.convert('L')).astype(float)
+    res = []
+    for g in (np.abs(np.diff(a, axis=1)).sum(0), np.abs(np.diff(a, axis=0)).sum(1)):
+        x = np.arange(len(g)) + 1                     # un bord se trouve entre deux pixels
+        _, p = max((abs((g * np.exp(2j * np.pi * x / p)).sum()), p) for p in np.arange(4, 16, 0.02))
+        phase = np.angle((g * np.exp(2j * np.pi * x / p)).sum())
+        res.append((p, (phase / (2 * np.pi) * p) % p))
+    return res
+
 def nettoyer(chemin, cols, rangs, reel, sortie, noms, couleurs=48):
     im = Image.open(chemin).convert('RGB')
     W, H = im.size
     cw, ch = W / cols, H / rangs
+    (px, ox), (py, oy) = grille_pixels(im)
+    if reel == 0:
+        reel = round(cw / px)
+        print('taille réelle mesurée :', reel, 'pixels par case, pixel de', round(px, 2), '×', round(py, 2))
+    else:
+        px, py, ox, oy = cw / reel, ch / reel, 0, 0
     os.makedirs(sortie, exist_ok=True)
     k = 0
     for j in range(rangs):
         for i in range(cols):
             spr = Image.new('RGBA', (reel, reel), (0, 0, 0, 0))
             vide = True
+            # premier gros pixel de la case, calé sur la grille mesurée
+            gx0 = round((i * cw - ox) / px); gy0 = round((j * ch - oy) / py)
             for y in range(reel):
                 for x in range(reel):
-                    x0 = i * cw + x * cw / reel; y0 = j * ch + y * ch / reel
-                    c = couleur_bloc(im, x0, y0, x0 + cw / reel, y0 + ch / reel)
+                    x0 = ox + (gx0 + x) * px; y0 = oy + (gy0 + y) * py
+                    if x0 < 0 or y0 < 0 or x0 + px > W or y0 + py > H: continue
+                    c = couleur_bloc(im, x0, y0, x0 + px, y0 + py)
                     if not est_fond(c):
                         spr.putpixel((x, y), c + (255,)); vide = False
             nom = noms[k] if k < len(noms) else f'case-{k + 1:02d}'

@@ -26,12 +26,11 @@ STYLE = ("Style : vrai pixel art 16 bits, comme Zelda A Link to the Past (Super 
          "Contour de 1 pixel très sombre (bleu nuit #1b1f3a, ou brun très sombre pour le décor) autour de chaque personnage et de chaque objet. "
          "Lumière qui vient d'en haut à gauche : chaque couleur a au plus 3 teintes (ombre, base, lumière). Palette limitée, couleurs franches et saturées comme sur Super Nintendo.")
 
-def grille(cols, rangs, reel, fois, cadre='carré'):
-    case = reel * fois
-    larg, haut = cols * case, rangs * case
-    return (f"Format {larg} × {haut} pixels. C'est une planche de sprites rangée sur une grille invisible de {cols} colonnes et {rangs} rangées de cases de {case} × {case} pixels "
-            f"(aucun trait de grille dessiné). Chaque case contient un seul élément dessiné à {reel} × {reel} pixels réels puis agrandi exactement {fois} fois : "
-            f"chaque pixel réel est un carré plein de {fois} × {fois} pixels, aligné sur le coin haut gauche de sa case. "
+def grille(cols, rangs, reel, fois=None, cadre='carré'):
+    case = 1536 // cols
+    return (f"Format 1536 × 1024 pixels. C'est une planche de sprites rangée sur une grille invisible de {cols} colonnes et {rangs} rangées de cases égales "
+            f"(aucun trait de grille dessiné). Chaque case contient un seul élément dessiné à {reel} × {reel} pixels réels, agrandi pour remplir sa case : "
+            f"chaque pixel réel devient un carré plein d'environ {round(case / reel, 1)} × {round(case / reel, 1)} pixels, tous exactement de la même taille sur toute la planche. "
             "Fond uni magenta pur #FF00FF partout autour des éléments (couleur jamais utilisée dans les dessins). "
             "Aucun texte, aucun chiffre, aucun cadre, aucune ombre portée au sol. Chaque élément est entier, rien ne dépasse de sa case.")
 
@@ -39,16 +38,19 @@ ORDRE = "Les éléments sont rangés dans l'ordre de la liste, de gauche à droi
 
 SPIRIT = ("Le personnage est Spirit, la mascotte de l'image jointe (où il saute), traduite en pixel art. Couleurs exactes : "
           "corps et tête blancs (#ffffff, ombre #c9d3e6, ombre profonde #8f9bb8) ; casque-micro noir #23273a avec un liseré bleu #2f4fa0 et des touches cyan #35d6ff ; "
-          "grands yeux bleus #1c56c8 avec un reflet blanc ; tee-shirt bleu #2f72e6 (ombre #1f50b4) avec un petit logo cyan sur la poitrine ; "
+          "grands yeux bleus #1c56c8 avec un reflet blanc ; tee-shirt bleu #2f72e6 (ombre #1f50b4) ; "
           "short bleu foncé #1b3c8c avec une bande cyan ; baskets bleues #2f72e6 à semelle blanche.\n\n"
+          "LOGO SUR LA POITRINE : quand on voit Spirit de face, les lettres SG en cyan #35d6ff sont écrites sur le devant du tee-shirt, bien lisibles : "
+          "un S et un G de 3 pixels de large et 5 pixels de haut chacun, séparés d'une colonne de 1 pixel, centrés sur la poitrine. Jamais de cœur ni d'autre symbole à la place. "
+          "De profil, on voit seulement le bord du logo ; de dos, le tee-shirt est uni.\n\n"
           "PROPORTIONS, identiques dans toutes les cases (c'est le point le plus important) :\n"
-          "– Spirit mesure 26 pixels réels de haut et 18 de large, centré dans sa case de 32 × 32, les pieds toujours sur la même ligne, 2 pixels au-dessus du bas de la case.\n"
-          "– La tête est une boule parfaitement ronde de 16 × 16 pixels réels. Elle garde exactement la même taille et la même rondeur de face, de dos et de profil : "
+          "– Spirit mesure 34 pixels réels de haut, centré dans sa case de 40 × 40, les pieds toujours sur la même ligne, 3 pixels au-dessus du bas de la case.\n"
+          "– La tête est une boule parfaitement ronde de 24 × 24 pixels réels. Elle garde exactement la même taille et la même rondeur de face, de dos et de profil : "
           "jamais carrée, jamais ovale, jamais aplatie ni allongée. De profil, la tête n'est pas plus étroite qu'à la face : c'est la même boule vue de côté.\n"
-          "– Sous la tête, un petit corps : tee-shirt de 8 pixels de large sur 5 de haut, petits bras blancs de 2 pixels, short de 2 pixels, jambes blanches de 2 pixels, baskets de 2 pixels. La tête fait environ 60 % de la hauteur (style chibi).\n"
-          "– Casque : un arceau de 2 pixels posé sur le haut de la tête ; de face et de dos, un écouteur rond de 5 × 6 pixels de chaque côté de la tête, à hauteur des yeux, avec un point cyan ; "
+          "– Sous la tête, un petit corps : tee-shirt de 12 pixels de large sur 7 de haut (assez grand pour le logo SG), petits bras blancs de 3 pixels, short de 3 pixels, jambes blanches de 2 pixels, baskets de 3 pixels. La tête fait environ 70 % de la hauteur (style chibi).\n"
+          "– Casque : un arceau de 3 pixels posé sur le haut de la tête ; de face et de dos, un écouteur rond de 6 × 8 pixels de chaque côté de la tête, à hauteur des yeux, avec une touche cyan ; "
           "de profil, un seul écouteur au milieu de la tête ; une fine tige de micro noire descend de l'écouteur gauche vers la bouche.\n"
-          "– Yeux : 3 × 4 pixels chacun, bleus avec 1 pixel de reflet blanc en haut ; de profil, un seul œil, près du bord avant de la tête. Petite bouche de 2 pixels.\n"
+          "– Yeux : 4 × 5 pixels chacun, bleus avec 1 pixel de reflet blanc en haut ; de profil, un seul œil, près du bord avant de la tête. Petite bouche.\n"
           "Vues strictes : « de face » = tourné vers nous ; « de dos » = on ne voit pas le visage ; « de profil » = tourné vers la droite. Jamais de trois quarts.")
 
 VUES = "Vues strictes : « de face » = tourné vers nous ; « de dos » = on ne voit pas son visage ; « de profil » = tourné vers la droite. Jamais de trois quarts. Même taille et mêmes proportions dans toutes les cases."
@@ -74,9 +76,9 @@ def entete(n_images=1):
 # ================================================================ SPIRIT
 REFS_SPIRIT = ['spirit-officiel']
 carte('sp', 'perso', 'Spirit : toutes ses poses de jeu (grande planche)',
-      "La planche de référence de tout le jeu : ses proportions servent pour tout le reste. Une seule grande image de 24 poses, dans une nouvelle conversation. Joins seulement l'image officielle de Spirit (celle où il saute). Si la tête change de forme d'une case à l'autre, fais l'étape 2 (vérification) dans la même conversation.",
+      "La planche de référence de tout le jeu : ses proportions servent pour tout le reste. Une seule grande image de 24 poses, dans une nouvelle conversation. Joins seulement l'image officielle de Spirit (celle où il saute). Étape 2 si la tête change de forme d'une case à l'autre. Étape 3 si ta planche est déjà faite mais avec un cœur sur la poitrine à la place du SG : tu la corriges sans tout refaire.",
       REFS_SPIRIT,
-      f"{entete()}\n\n{grille(6, 4, 32, 8)}\n\n{STYLE}\n\n{SPIRIT}",
+      f"{entete()}\n\n{grille(6, 4, 40)}\n\n{STYLE}\n\n{SPIRIT}",
       ['de face, immobile, bras le long du corps', 'de face, marche : pied gauche en avant, bras droit en avant', 'de face, marche : pied droit en avant, bras gauche en avant',
        'de dos, immobile', 'de dos, marche : pied gauche en avant', 'de dos, marche : pied droit en avant',
        'de profil, immobile', 'de profil, marche : jambe avant tendue, jambe arrière pliée', 'de profil, marche : jambes croisées sous le corps (pas de passage)',
@@ -85,19 +87,22 @@ carte('sp', 'perso', 'Spirit : toutes ses poses de jeu (grande planche)',
        "de face, il brandit un objet au-dessus de sa tête à deux mains (l'objet n'est pas dessiné, mains vides levées), air fier", "de face, il prend un coup : recule, yeux plissés, bras écartés", "de face, il tombe : bras levés, jambes repliées",
        'assis par terre, KO, yeux en spirale, casque de travers', 'un genou au sol, il se relève, main sur le casque, air déterminé', "endormi assis, tête penchée sur le côté, yeux fermés, un petit « z » bleu au-dessus (le seul signe autorisé)",
        "debout, il s'étire, bras levés, yeux fermés, bouche ouverte (bâillement)", "aspiré par un vortex : vu de face, bras et jambes écartés, yeux en panique", "il atterrit : un genou au sol, une main posée au sol, vu de face"],
+      suites=["Si ta planche a un cœur ou un autre symbole sur la poitrine, dans la même conversation : garde exactement la même planche, même dessin, mêmes poses, même taille de pixels, même fond magenta. "
+              "Change uniquement le devant du tee-shirt dans toutes les cases où Spirit est vu de face : le symbole est remplacé par les lettres SG en cyan #35d6ff, "
+              "un S et un G de 3 pixels de large et 5 de haut chacun, séparés d'une colonne de 1 pixel, centrés sur la poitrine et bien lisibles. Si le tee-shirt est trop petit pour les lettres, agrandis-le de 2 pixels en largeur, sans toucher à la tête."],
       maintenant=True)
 carte('sp', 'perso', 'Spirit : portraits des dialogues',
       "Les grands portraits affichés à côté du texte. Ici les lettres SG du casque doivent être lisibles. Fais-la après la grande planche, dans la même conversation ou en joignant ta planche validée.",
       REFS_SPIRIT + ['@SP-01'],
-      f"{entete()}\n\n{grille(3, 2, 64, 8)}\n\n{STYLE}\n\n{SPIRIT}\n\nCes six cases sont des portraits : la tête et le haut du tee-shirt de Spirit, de face, cadrés en buste, dessinés à 64 × 64 pixels réels (la tête fait 44 pixels de large, bien ronde). À cette taille, les lettres SG en cyan sont lisibles sur la face extérieure de chaque écouteur, et le logo SG cyan sur le tee-shirt.",
+      f"{entete()}\n\n{grille(3, 2, 64, 8)}\n\n{STYLE}\n\n{SPIRIT}\n\nCes six cases sont des portraits : la tête et le haut du tee-shirt de Spirit, de face, cadrés en buste, dessinés à 64 × 64 pixels réels (la tête fait 46 pixels de large, bien ronde). À cette taille, les lettres SG en cyan sont lisibles sur la poitrine, et aussi sur la face extérieure de chaque écouteur si la place le permet.",
       ['neutre, petit sourire', 'il parle : bouche ouverte', 'étonné : yeux grands ouverts, petite bouche ronde', 'déterminé : sourcils froncés, sourire en coin', 'inquiet : sourcils relevés au centre, bouche serrée', 'content : grand sourire, yeux plissés de joie'],
       maintenant=True)
 
 # ================================================================ décor et personnages communs
 REF_STYLE = ['@SP-01']
-def planche_decor(etape, titre, pourquoi, elements, refs=None, reel=32, fois=8, cols=6, rangs=4, extra=''):
+def planche_decor(etape, titre, pourquoi, elements, refs=None, reel=48, fois=None, cols=6, rangs=4, extra=''):
     carte(etape, 'decors', titre, pourquoi, (refs or []) + REF_STYLE,
-          f"{entete()}\n\n{grille(cols, rangs, reel, fois)}\n\n{STYLE}\n\n{DESSUS}\n\nMême pixel art et même taille de pixel que la planche de Spirit jointe : un élément de 1 case fait la taille d'une tuile de sol de 16 × 16 pixels réels agrandie, et Spirit fait 26 pixels de haut à côté.{extra}",
+          f"{entete()}\n\n{grille(cols, rangs, reel, fois)}\n\n{STYLE}\n\n{DESSUS}\n\nMême pixel art et même taille de pixel que la planche de Spirit jointe : un petit élément (buisson, rocher, pot) fait 24 × 24 pixels réels comme une tuile de sol, un grand élément (arbre, entrée, porte) 48 × 48 et remplit sa case ; Spirit fait 34 pixels de haut à côté.{extra}",
           elements)
 
 def sols(etape, titre, sol, chemin, liquide, falaise, entree, extra_elements=None, refs=None):
@@ -118,12 +123,12 @@ def sols(etape, titre, sol, chemin, liquide, falaise, entree, extra_elements=Non
                 f"{entree} : moitié haut gauche (l'entrée fait 2 × 2 tuiles, creusée dans la paroi)", f"{entree} : moitié haut droite", f"{entree} : moitié bas gauche, avec l'ouverture sombre", f"{entree} : moitié bas droite",
                 "des marches d'escalier, vues de dessus"] + (extra_elements or [])
     carte(etape, 'tuiles', titre,
-          "Les tuiles de sol de 16 × 16 pixels : je construis tous les écrans avec. Les bords s'emboîtent : garde toute la planche dans la même conversation.",
+          "Les tuiles de sol de 24 × 24 pixels : je construis tous les écrans avec. Les bords s'emboîtent : garde toute la planche dans la même conversation.",
           (refs or []) + REF_STYLE,
-          f"{entete()}\n\n{grille(12, 8, 16, 8)}\n\n{STYLE}\n\n{DESSUS}\n\nTuiles de sol : chaque tuile de 16 × 16 pixels réels se raccorde sans couture à ses voisines de la même série (mêmes couleurs aux bords). Les bords et coins forment des morceaux qui s'emboîtent comme un puzzle : le côté {sol} de chaque bord a exactement le même dessin que la tuile de {sol}.",
+          f"{entete()}\n\n{grille(12, 8, 24)}\n\n{STYLE}\n\n{DESSUS}\n\nTuiles de sol : chaque tuile de 24 × 24 pixels réels se raccorde sans couture à ses voisines de la même série (mêmes couleurs aux bords). Les bords et coins forment des morceaux qui s'emboîtent comme un puzzle : le côté {sol} de chaque bord a exactement le même dessin que la tuile de {sol}.",
           elements)
 
-def monstre(etape, nom, description, mode='marche', projectile=None, refs=None, taille=32):
+def monstre(etape, nom, description, mode='marche', projectile=None, refs=None, taille=40):
     pas = (('ailes levées', 'ailes baissées') if mode == 'vol' else ('étiré vers le haut', 'tassé vers le bas') if mode == 'flotte' else ('pied gauche en avant', 'pied droit en avant'))
     el = [f"de face, immobile", f"de face, {pas[0]}", f"de face, {pas[1]}", "de dos, immobile", f"de dos, {pas[0]}", f"de dos, {pas[1]}",
           "de profil, immobile", f"de profil, {pas[0]}", f"de profil, {pas[1]}", "de face, il attaque", "de profil, il attaque", "de face, touché : recule, yeux plissés"]
@@ -132,14 +137,14 @@ def monstre(etape, nom, description, mode='marche', projectile=None, refs=None, 
     el += ["il disparaît : il éclate en petits carrés violets et en fumée (image 1)", "image 2 de la disparition, plus éclatée", "image 3, presque rien", "vide", "vide", "vide"]
     el += ['vide'] * (24 - len(el))
     carte(etape, 'ennemis', nom, f"Toutes les images de ce monstre sur une seule planche.", (refs or []) + REF_STYLE,
-          f"{entete()}\n\n{grille(6, 4, taille, 8 if taille == 32 else 4)}\n\n{STYLE}\n\n{DESSUS}\n\n{MONSTRE}\n\nLe monstre : {description}\n\nIl est à la même échelle que Spirit sur la planche jointe (Spirit fait 26 pixels de haut). {VUES}",
+          f"{entete()}\n\n{grille(6, 4, taille)}\n\n{STYLE}\n\n{DESSUS}\n\n{MONSTRE}\n\nLe monstre : {description}\n\nIl est à la même échelle que Spirit sur la planche jointe (Spirit fait 34 pixels de haut dans une case de 40). {VUES}",
           el)
 
 def boss(etape, nom, description, projectile, refs=None, deuxieme=None):
     el = ["de face, immobile et menaçant", "de face, il attaque", "de face, étourdi : tête basse, yeux qui clignotent, fissures qui s'éteignent", "de face, touché : il recule, tout blanc (image de flash)",
           f"son projectile : {projectile}", deuxieme or "il est vaincu : il se désagrège en carrés violets et en fumée"]
     carte(etape, 'boss', nom, "Le boss sur une planche de 6 grandes cases.", (refs or []) + REF_STYLE,
-          f"{entete()}\n\n{grille(3, 2, 64, 8)}\n\n{STYLE}\n\n{DESSUS}\n\n{MONSTRE}\n\nLe boss : {description}\n\nIl est grand : 60 pixels réels de haut, plus de deux fois Spirit (26 pixels).",
+          f"{entete()}\n\n{grille(3, 2, 64, 8)}\n\n{STYLE}\n\n{DESSUS}\n\n{MONSTRE}\n\nLe boss : {description}\n\nIl est grand : 60 pixels réels de haut, presque deux fois Spirit (34 pixels).",
           el)
 
 def pnj(etape, titre, persos, refs=None):
@@ -148,7 +153,7 @@ def pnj(etape, titre, persos, refs=None):
         el += [f"{nom} ({d}) de face, immobile", f"{nom} de face, pied gauche en avant", f"{nom} de face, pied droit en avant", f"{nom} de dos", f"{nom} de profil", f"{nom} de face : {action}"]
     el += ['vide'] * (24 - len(el))
     carte(etape, 'pnj', titre, "Les personnages qui marchent et parlent. Une rangée par personnage.", (refs or []) + REF_STYLE,
-          f"{entete()}\n\n{grille(6, 4, 32, 8)}\n\n{STYLE}\n\n{DESSUS}\n\nPersonnages inventés (animaux qui se tiennent debout), sympathiques, à la même échelle et dans les mêmes proportions chibi que Spirit sur la planche jointe : grosse tête, petit corps, environ 26 pixels réels de haut. {VUES}",
+          f"{entete()}\n\n{grille(6, 4, 40)}\n\n{STYLE}\n\n{DESSUS}\n\nPersonnages inventés (animaux qui se tiennent debout), sympathiques, à la même échelle et dans les mêmes proportions chibi que Spirit sur la planche jointe : grosse tête, petit corps, environ 34 pixels réels de haut dans une case de 40. {VUES}",
           el)
     portraits = []
     for nom, d, action in persos[:3]:
@@ -161,13 +166,13 @@ def pnj(etape, titre, persos, refs=None):
 def objets(etape, titre, pourquoi, elements, refs=None):
     elements = elements + ['vide'] * (24 - len(elements)) if len(elements) <= 24 else elements
     carte(etape, 'objets', titre, pourquoi, (refs or []) + REF_STYLE,
-          f"{entete()}\n\n{grille(6, 4, 32, 8)}\n\n{STYLE}\n\nObjets et effets vus de face ou de dessus comme dans Zelda A Link to the Past, chacun centré dans sa case. Un objet que Spirit tient ou ramasse fait environ 12 à 16 pixels réels, à la même échelle que Spirit sur la planche jointe (26 pixels de haut).",
+          f"{entete()}\n\n{grille(6, 4, 40)}\n\n{STYLE}\n\nObjets et effets vus de face ou de dessus comme dans Zelda A Link to the Past, chacun centré dans sa case. Un objet que Spirit tient ou ramasse fait environ 16 à 20 pixels réels, à la même échelle que Spirit sur la planche jointe (34 pixels de haut).",
           elements)
 
 def poses_spirit(etape, titre, pose, effet=None):
     el = [f"de face : {pose}", f"de dos : {pose}", f"de profil : {pose}"] + ([f"{effet}, image 1", f"{effet}, image 2", f"{effet}, image 3"] if effet else ['vide'] * 3)
     carte(etape, 'perso', titre, "Spirit qui utilise cet objet. Joins ta planche de Spirit validée pour garder exactement ses proportions.", REFS_SPIRIT[:1] + ['@SP-01'],
-          f"{entete()}\n\n{grille(3, 2, 32, 16)}\n\n{STYLE}\n\n{SPIRIT}\n\nMêmes proportions exactes que sur la planche de Spirit jointe : copie sa tête, son corps et son casque, seule la pose change.",
+          f"{entete()}\n\n{grille(3, 2, 80)}\n\n{STYLE}\n\n{SPIRIT}\n\nMêmes proportions exactes que sur la planche de Spirit jointe : copie sa tête, son corps et son casque, seule la pose change. Spirit fait toujours 34 pixels de haut ; la place en plus dans la case sert aux effets.",
           el)
 
 # ================================================================ PROLOGUE (QG, la nuit)
@@ -213,9 +218,9 @@ monstre('pl', 'Crache-pierres', "une bête de pierre sombre à quatre pattes tra
 monstre('pl', 'Cornu', "un guerrier trapu au corps de pierre sombre fissurée de violet, masque d'os de taureau aux grandes cornes, armure de cuir rouillée, une lance à la main. Il lance sa lance.", 'marche', "une lance qui file, pointe en avant", refs=['m-cornu'])
 monstre('pl', 'Grésille', "une petite flaque de bruit noir-bleu qui se désagrège en pixels violets, deux yeux violets lumineux. Elle glisse et bondit.", 'flotte', refs=['m-gresille'])
 pnj('pl', "L'ermite", [("l'ermite", "un vieil ermite sous une grande cape grise à capuche, yeux bleus lumineux dans l'ombre, longue barbe blanche, bâton de bois surmonté d'une pierre bleue", 'il lève son bâton')], refs=['ermite'])
-planche_decor('pl', "La grotte de l'ermite : intérieur", "Les tuiles de l'intérieur de la grotte.",
+planche_decor('pl', "La grotte de l'ermite : intérieur", "Les tuiles de l'intérieur de la grotte (24 × 24 pixels).",
               ['sol de terre battue de la grotte (se répète)', 'variante du sol', 'mur de roche sombre vu de dessus (se répète)', 'paroi de roche vue de face (bas du mur)', 'coin de mur haut gauche', 'coin de mur haut droit',
-               'feu de camp, image 1', 'feu de camp, image 2', 'feu de camp, image 3', 'une caisse en bois', 'un tonneau', 'une natte au sol'], reel=16, fois=16)
+               'feu de camp, image 1', 'feu de camp, image 2', 'feu de camp, image 3', 'une caisse en bois', 'un tonneau', 'une natte au sol'], reel=24)
 
 # ================================================================ OBJETS, INTERFACE ET EFFETS COMMUNS
 objets('pl', 'Objets, cœurs, Pixels et interface', "Tout ce qui s'affiche dans le bandeau du haut et ce qu'on ramasse.",
