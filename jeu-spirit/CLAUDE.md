@@ -21,6 +21,14 @@ Ne jamais dessiner, recoller ou reconstituer quoi que ce soit par-dessus une ima
 - Les cristaux ne réagissent qu'à la Manette. Les énigmes ne donnent pas la solution (pas de halo sur l'objet à pousser).
 - Pas de mécanisme qui demande un objet que le joueur n'a pas encore (pas de mur fêlé sans bombes).
 
+- Continuité entre écrans, comme dans Zelda : l'écran qui part et celui qui arrive forment un seul paysage (chemin à la même position et largeur de chaque côté du bord, même sol, même bordure). Le passage glisse d'un écran à l'autre.
+- Contours précis : les masques de collision suivent les bords peints (eau, lave, trous, falaises, rochers), obtenus par segmentation des couleurs de l'image, jamais par de grands rectangles. Eau et trous : on ne marche pas dedans mais les projectiles passent au-dessus ; lave : on ne marche pas dedans.
+- Chaque région a ses propres éléments de décor (câbles, cactus de verre, roseaux, poubelles, blocs de glace…), listés dans sa carte « objets à poser », pas seulement des rochers et des touffes.
+- Carte du Réseau : elle se dévoile région par région (image carte-reseau et sa version sous la brume) ; la carte de la région montre les écrans visités.
+- Passages d'au moins deux fois la largeur de Spirit. Aucun blocage définitif : un bloc ou une statue mal poussé revient à sa place quand on ressort de la salle.
+- Les ennemis n'apparaissent jamais dans l'eau, la lave, un mur ou devant l'entrée.
+- Un objet qu'on peut casser, couper, pousser ou ouvrir se distingue d'un simple décor ; chaque secret a un indice quelque part (panneau, carnet, dialogue).
+
 ## Images
 - Tout prompt avec Spirit rappelle le SG sur le casque. Dimensions 1672 × 941 pour les écrans entiers.
 - Une retouche « porte ouverte » ou « écran allumé » n'est reprise que sur sa zone (COMPOSITES dans `outils/preparer_assets.py`).

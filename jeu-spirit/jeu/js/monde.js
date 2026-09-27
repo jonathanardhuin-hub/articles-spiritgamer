@@ -201,6 +201,12 @@ SG.QG = {
 };
 SG.ARRIVEE_PLAINE = { ecran: '1,2', x: 640, y: 390 };
 
+// zones de la carte du Réseau (image carte-reseau ramenée à 1280 × 720) : elles se dévoilent quand on les visite
+SG.CARTE_RESEAU = {
+  qg: { x: 650, y: 360, rx: 120, ry: 90 },
+  plaine: { x: 650, y: 330, rx: 330, ry: 170 },
+};
+
 SG.ECRAN_DEPART = '1,2';
 SG.DEPART = { x: 7.5 * SG.T, y: 5.8 * SG.T };
 SG.SORTIE_GROTTE = { ecran: '1,2', x: 270, y: 290 };

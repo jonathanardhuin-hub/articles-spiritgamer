@@ -520,7 +520,11 @@ SG.Jeu = class {
       case 'dialogue': this.majFeux(dt); this.majDialogue(dt, C, clics); break;
       case 'objet': this.majFeux(dt); this.objet.t += dt; if (this.objet.t > 0.8) this.majDialogue(dt, C, clics); break;
       case 'pause': this.majPause(C, clics); break;
-      case 'carte': if (C.appuis.carte || C.appuis.menu || C.appuis.A || C.appuis.B || clics.length) { SG.Son.effet('choix'); this.etat = 'jeu'; } break;
+      case 'carte':
+        // gauche / droite : carte du Réseau entier ou carte de la région
+        if (!this.estDonjon() && (C.appuis.gauche || C.appuis.droite)) { this.pageCarte = this.pageCarte === 'reseau' ? 'region' : 'reseau'; SG.Son.effet('choix'); break; }
+        if (C.appuis.carte || C.appuis.menu || C.appuis.A || C.appuis.B || clics.length) { SG.Son.effet('choix'); this.etat = 'jeu'; }
+        break;
       case 'transition': this.majTransition(dt); break;
       case 'finPartie': this.majFin(dt, C, clics); break;
     }
@@ -1538,6 +1542,7 @@ SG.Jeu = class {
     const ch = h * 0.24, cw = ch * 16 / 9;
     const ox = x + (w - cw * 3) / 2, oy = y + (h - ch * 3) / 2 + h * 0.03;
     for (const cle in SG.MONDE) {
+      if (!/^\d,\d$/.test(cle)) continue;
       const [cx, cy] = cle.split(',').map(Number);
       const vx = ox + cx * cw, vy = oy + cy * ch;
       if (this.visites && this.visites.has(cle)) {
@@ -1643,11 +1648,45 @@ SG.Jeu = class {
     SG.texte(ctx, 'Flèches : choisir    Tab : carte', 1025, 640, 17, '#9fc4e8', 'center');
   }
 
+  // la carte du monde : seules les régions déjà visitées sont dévoilées, le reste est sous la brume
+  dessinerCarteReseau(ctx, x, y, w, h) {
+    const im = SG.img['carte-reseau'];
+    if (!im || !im.width) { this.dessinerCarte(ctx, 70, 40, SG.W - 140, 610); return; }
+    ctx.drawImage(im, x, y, w, h);
+    const vu = (f) => [...(this.visites || [])].some(f);
+    const zones = [SG.CARTE_RESEAU.qg];
+    if (vu((k) => /^\d,\d$/.test(k))) zones.push(SG.CARTE_RESEAU.plaine);
+    const brume = this.brumeCarte || (this.brumeCarte = document.createElement('canvas'));
+    brume.width = w; brume.height = h;
+    const b = brume.getContext('2d');
+    const nuages = SG.img['carte-reseau-brume'];
+    if (nuages && nuages.width) b.drawImage(nuages, 0, 0, w, h);
+    else { b.fillStyle = 'rgba(6,10,26,0.9)'; b.fillRect(0, 0, w, h); }
+    b.globalCompositeOperation = 'destination-out';
+    for (const z of zones) {
+      const cx = z.x / 1280 * w, cy = z.y / 720 * h, rx = z.rx / 1280 * w, ry = z.ry / 720 * h;
+      b.save(); b.translate(cx, cy); b.scale(1, ry / rx);
+      const g = b.createRadialGradient(0, 0, rx * 0.55, 0, 0, rx);
+      g.addColorStop(0, 'rgba(0,0,0,1)'); g.addColorStop(1, 'rgba(0,0,0,0)');
+      b.fillStyle = g; b.beginPath(); b.arc(0, 0, rx, 0, Math.PI * 2); b.fill(); b.restore();
+    }
+    // le cadre de la carte reste toujours visible
+    ctx.save(); ctx.beginPath(); ctx.rect(x + w * 0.045, y + h * 0.07, w * 0.91, h * 0.86); ctx.clip();
+    ctx.drawImage(brume, x, y, w, h); ctx.restore();
+    // Spirit : au QG ou dans la Plaine
+    const z = SG.MONDE[this.ecran] && SG.MONDE[this.ecran].interieur ? SG.CARTE_RESEAU.qg : SG.CARTE_RESEAU.plaine;
+    const mx = x + z.x / 1280 * w, my = y + (z.y - (z === SG.CARTE_RESEAU.plaine ? 60 : 0)) / 720 * h, p = 1 + Math.sin(this.t * 6) * 0.25;
+    ctx.fillStyle = 'rgba(220,30,40,0.35)'; ctx.beginPath(); ctx.arc(mx, my, 14 * p, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#d8202e'; ctx.strokeStyle = '#3a0a0a'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(mx, my, 7, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+  }
+
   dessinerEcranCarte(ctx) {
     ctx.fillStyle = 'rgba(3,8,20,0.8)';
     ctx.fillRect(0, 0, SG.W, SG.H);
     if (this.estDonjon()) this.dessinerCarteDonjon(ctx, 70, 40, SG.W - 140, 610);
-    else this.dessinerCarte(ctx, 70, 40, SG.W - 140, 610);
+    else if (this.pageCarte === 'region') this.dessinerCarte(ctx, 70, 40, SG.W - 140, 610);
+    else this.dessinerCarteReseau(ctx, 98, 40, 1084, 610);
+    if (!this.estDonjon()) SG.texte(ctx, this.pageCarte === 'region' ? '◀ Carte du Réseau' : 'Carte de la région ▶', SG.W / 2, 668, 18, '#7fe8ff', 'center');
     const lieu = this.ecran === 'grotte' ? 'La grotte de l\'ermite' : this.estDonjon() ? this.salle().nom : SG.MONDE[this.ecran].nom;
     SG.texte(ctx, 'Tu es ici : ' + lieu, SG.W / 2, 695, 22, '#ffffff', 'center');
   }

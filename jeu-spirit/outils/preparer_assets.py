@@ -122,6 +122,8 @@ def composer(nom, im):
 
 
 FACULTATIVES = {
+    'carte-reseau': ('interface/carte-reseau.png', 'w', 836, ''),
+    'carte-reseau-brume': ('interface/carte-reseau-brume.png', 'w', 836, ''),
     'bureau-lynx-pub': ('qg/bureau-de-mika-pub.png', 'w', 836, ''),
     'loge-ecrans-jeu': ('prologue/loge-ecrans-jeu.png', 'w', 836, ''),
     'loge-ecrans-pub': ('prologue/loge-ecrans-pub.png', 'w', 836, ''),
