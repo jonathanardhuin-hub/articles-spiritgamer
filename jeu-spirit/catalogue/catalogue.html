@@ -170,8 +170,8 @@
   const suitesPorte = (desc) => /porte|portes/.test(desc) ? [PORTE_OUVERTE('la porte d\'entrée décrite dans le prompt précédent (et seulement elle)')] : null;
   const salleVide = (theme) => `Format paysage 16:9, dimensions exactes 1672 × 941 pixels. Une salle de donjon vide vue de dessus comme dans les Zelda en 2D, avec exactement le même cadrage que la salle jointe : murs épais tout autour (un neuvième de la hauteur de l'image en haut et en bas, un seizième de la largeur à gauche et à droite), murs pleins et continus sur les quatre côtés, sans aucune porte ni ouverture (le jeu découpe les portes lui-même). Sol en dalles, parfaitement vide, sans objet ni personnage. Toon HD, contours épais, lumière d'ambiance. Aucun texte.\n\nThème : ${theme}`;
   const marche = (quadrupede) => quadrupede
-    ? `Pour chacune des 3 vues de la carte précédente (face, dos, profil droit), fais 2 images de marche : d'abord patte avant gauche et patte arrière droite en avant, puis patte avant droite et patte arrière gauche en avant. Même taille, même cadrage et même éclairage que les images de poses jointes.`
-    : `Pour chacune des 3 vues de la carte précédente (face, dos, profil droit), fais 2 images de marche : d'abord la jambe gauche en avant et la droite en arrière, puis la jambe droite en avant et la gauche en arrière. Une seule jambe en avant à la fois, bien visible. Les bras se balancent à l'opposé des jambes. Même taille, même cadrage et même éclairage que les images de poses jointes.`;
+    ? `Pour chacune des 3 vues de la carte des poses (face, dos, profil droit), fais 2 images de marche : d'abord patte avant gauche et patte arrière droite en avant, puis patte avant droite et patte arrière gauche en avant. Même taille, même cadrage et même éclairage que les images de poses jointes.`
+    : `Pour chacune des 3 vues de la carte des poses (face, dos, profil droit), fais 2 images de marche : d'abord la jambe gauche en avant et la droite en arrière, puis la jambe droite en avant et la gauche en arrière. Une seule jambe en avant à la fois, bien visible. Les bras se balancent à l'opposé des jambes. Même taille, même cadrage et même éclairage que les images de poses jointes.`;
 
   const cartes = [];
   let numero = {};
@@ -194,6 +194,7 @@
       n: style === null ? suites.length : n + (suites ? suites.length : 0),
       prompts: style === null ? suites : [`${entete(n)}\n\n${style}\n\n${liste}`].concat(suites || []),
     });
+    return cartes[cartes.length - 1].id;
   }
   const P3 = (a, b, c) => [`de face : ${a}`, `de dos : ${b}`, `de profil (tourné vers la droite) : ${c}`];
   const RS = ['spirit-officiel', 'spirit-face', 'spirit-dos', 'spirit-profil'];
@@ -472,25 +473,25 @@ Le centre de la pièce reste dégagé pour marcher.`]);
     for (const [nom, desc, type, projectile] of R.monstres) {
       const poses = [`Le ${nom} vu de face : ${desc}.`, `Le même ${nom} vu exactement de dos.`, `Le même ${nom} vu exactement de profil, tourné vers la droite.`];
       if (projectile) poses.push(`Son projectile : ${projectile}.`);
-      carte(e, 'ennemis', `${nom} : poses`, `Monstre de la ${R.nom}.`, ['monstres', 'cornu'], MONSTRE, poses);
+      const idPoses = carte(e, 'ennemis', `${nom} : poses`, `Monstre de la ${R.nom}.`, ['monstres', 'cornu'], MONSTRE, poses);
       if (type === 'jambes' || type === 'quadrupede' || type === 'pattes') {
         const items = [];
         for (const v of ['de face', 'de dos', 'de profil droit']) for (const pas of (type === 'jambes' ? ['jambe gauche en avant', 'jambe droite en avant'] : ['première foulée', 'deuxième foulée (pattes inversées)'])) items.push(`${nom} ${v}, ${pas}.`);
         carte(e, 'ennemis', `${nom} : marche`, 'Les images de marche, pour qu\'il ne glisse pas.', ['cornu', 'cornu-pas'],
-          `${MONSTRE}\n\n${type === 'pattes' ? 'Pour chacune des 3 vues de la carte précédente, fais 2 images de marche : pattes de gauche et de droite en alternance. Même taille, même cadrage et même éclairage que les images de poses jointes.' : marche(type === 'quadrupede')}`,
-          items, `Joins aussi les 3 poses du ${nom} créées avec la carte précédente.`);
+          `${MONSTRE}\n\n${type === 'pattes' ? 'Pour chacune des 3 vues de la carte des poses, fais 2 images de marche : pattes de gauche et de droite en alternance. Même taille, même cadrage et même éclairage que les images de poses jointes.' : marche(type === 'quadrupede')}`,
+          items, `Joins aussi les 3 images du ${nom} que tu as créées avec la carte ${idPoses} (face, dos, profil).`);
       } else {
         const anim = { ailes: ['ailes levées au maximum', 'ailes baissées au maximum', 'en piqué vers l\'avant'], flotte: ['étiré vers le haut', 'tassé vers le bas', 'qui attaque en fonçant vers l\'avant'], boule: ['roulé en boule, vu de face', 'roulé en boule, vu de profil', 'qui se déroule, à moitié sorti'], rampe: ['étalé au sol', 'dressé à mi-hauteur', 'dressé de toute sa taille, prêt à frapper'], sable: ['seulement une bosse de sable qui bouge, avec les yeux qui dépassent', 'à moitié sorti du sable', 'bondissant hors du sable, gueule ouverte'] }[type];
         carte(e, 'ennemis', `${nom} : mouvement`, 'Les images d\'animation, pour qu\'il bouge vraiment.', ['monstres'],
           `${MONSTRE}\n\nMême créature que les images de poses jointes, même taille, même cadrage.`,
-          anim.map((a) => `Le ${nom} vu de face, ${a}.`), `Joins les 3 poses du ${nom} créées avec la carte précédente.`);
+          anim.map((a) => `Le ${nom} vu de face, ${a}.`), `Joins les 3 images du ${nom} que tu as créées avec la carte ${idPoses} (face, dos, profil).`);
       }
     }
     // sbires du donjon
-    carte(e, 'ennemis', `Sbires du ${R.donjon}`, 'Les ennemis de l\'intérieur du donjon.', ['popup', 'clic'], SBIRE, R.sbires);
+    const idSbires = carte(e, 'ennemis', `Sbires du ${R.donjon}`, 'Les ennemis de l\'intérieur du donjon.', ['popup', 'clic'], SBIRE, R.sbires);
     carte(e, 'ennemis', `Sbires du ${R.donjon} : mouvement`, 'Une deuxième image par sbire.', ['popup', 'clic'],
       `${SBIRE}\n\nMêmes créatures que celles jointes, même taille, même cadrage.`, R.animSbires.map((a) => a[0].toUpperCase() + a.slice(1) + '.'),
-      'Joins les 3 sbires créés avec la carte précédente.');
+      `Joins les 3 sbires que tu as créés avec la carte ${idSbires}.`);
     // boss
     const [bnom, bdesc, battaque, bextra] = R.boss;
     carte(e, 'boss', bnom, `Le boss du ${R.donjon}.`, bnom === 'Le Plagiaire' ? ['reine', 'spirit-officiel', 'spirit-face'] : ['reine', 'monstres'],
@@ -526,12 +527,13 @@ Le centre de la pièce reste dégagé pour marcher.`]);
     carte(e, 'decors', `${R.nom} : grotte secrète`, 'L\'intérieur des grottes cachées de la région (fragment de cœur, Pixels, habitant).', ['grotte'],
       `Format paysage 16:9, dimensions exactes 1672 × 941 pixels. Même rendu et même cadrage que la grotte jointe : vue de dessus comme dans les Zelda en 2D, sol dégagé au centre, sortie en bas au milieu. Toon HD, contours épais. Aucun personnage, aucun texte.`,
       [`Une ${R.grotte}.`]);
-    // Spirit et son nouvel objet
+    // l'objet du donjon d'abord, puis Spirit qui s'en sert (il faut joindre l'objet)
+    const idObjets = carte(e, 'objets', `Objets : ${R.donjon}`, 'L\'objet du donjon et ce qui va avec. À faire avant la pose de Spirit qui s\'en sert.', ['ampli', 'manette'], OBJET, R.objets);
+    const nomObjet = R.objets[0].split(' :')[0].replace(/^(Un |Une |Le |La |Les |L')/, '');
     const [snom, sdesc, sf, sd, sp] = R.spirit;
     carte(e, 'perso', snom, `Le nouveau mouvement de Spirit avec l'objet du ${R.donjon}.`, RS,
       `${SPIRIT}\n\n${VUES}\n\n${FOND_P}\n\n${sdesc}.`, [`de face : ${sf}`, `de dos : ${sd}`, `de profil (tourné vers la droite) : ${sp}`].concat(snom.includes('Lunettes') ? ['portrait pour les dialogues : buste et tête de face, lunettes sur les yeux, sourire malin'] : []),
-      `Joins aussi l'objet créé avec la carte « objets » de cette étape.`);
-    carte(e, 'objets', `Objets : ${R.donjon}`, 'L\'objet du donjon et ce qui va avec.', ['ampli', 'manette'], OBJET, R.objets);
+      `Joins aussi l'image de l'objet (${nomObjet}) que tu as créée avec la carte ${idObjets}, image 1.`);
   }
 
   // ================================================================== FINAL
@@ -612,7 +614,7 @@ Le centre de la pièce reste dégagé pour marcher.`]);
   for (let i = cartes.length - 1; i >= 0; i--) if (RECUES.has(cartes[i].id)) cartes.splice(i, 1);
 
   // cartes ajoutées ou modifiées lors de la dernière mise à jour
-  const NOUVEAUX = new Set(['PRO-03', 'D1-17', 'R3-11', 'R4-11', 'R5-11', 'R6-11', 'R7-11', 'R8-11', 'FIN-08']);
+  const NOUVEAUX = new Set(['PRO-03', 'D1-17', 'R2-28', 'R2-29', 'R3-28', 'R3-29', 'R4-28', 'R4-29', 'R5-28', 'R5-29', 'R6-28', 'R6-29', 'R7-28', 'R7-29', 'R8-28', 'R8-29', 'R3-11', 'R4-11', 'R5-11', 'R6-11', 'R7-11', 'R8-11', 'FIN-08']);
 
   // ------------------------------------------------------------------ affichage
   const ETAPES = [['nouveau', 'Nouveautés'], ['tout', 'Tout'], ['pro', 'Prologue'], ['pl', 'Plaine'], ['d1', 'Donjon 1'], ['qg', 'Parvis du QG'], ['r2', 'Forêt + Donjon 2'], ['r3', 'Monts + Donjon 3'], ['r4', 'Désert + Donjon 4'], ['r5', 'Lac + Donjon 5'], ['r6', 'Cité + Donjon 6'], ['r7', 'Marais + Donjon 7'], ['r8', 'Toundra + Donjon 8'], ['fin', 'Tour finale']];
