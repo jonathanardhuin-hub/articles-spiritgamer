@@ -35,6 +35,7 @@ Ne jamais dessiner, recoller ou reconstituer quoi que ce soit par-dessus une ima
 - Une porte ouverte garde exactement les mêmes battants que fermée : seul l'angle change.
 
 ## Images
+- Les prompts se donnent uniquement dans le catalogue, jamais dans la discussion : Jonathan s'y retrouve mieux.
 - Tout prompt avec Spirit rappelle le SG sur le casque. Dimensions 1672 × 941 pour les écrans entiers.
 - Une retouche « porte ouverte » ou « écran allumé » n'est reprise que sur sa zone (COMPOSITES dans `outils/preparer_assets.py`).
 - Une carte du catalogue disparaît quand ses images sont reçues ; ajouter une carte en fin de région pour ne pas décaler les codes.
