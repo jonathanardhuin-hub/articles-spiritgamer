@@ -5,7 +5,9 @@ Ces règles viennent de Jonathan, au fil des tests. Elles valent pour toute modi
 ## Nouvelle direction (septembre 2026) : pixel art façon Zelda
 Jonathan a décidé de tout refaire proprement « à la Zelda ». La nouvelle version est dans `zelda/` ; l'ancienne (toon HD, images ChatGPT) reste dans `jeu/` comme archive, rien n'est supprimé.
 - Style : pixel art 16 bits façon A Link to the Past / Minish Cap. Tuiles de 16 px, écrans de 16 × 11 tuiles, bandeau de 24 px au-dessus, image agrandie sans lissage.
-- Claude dessine tout, par le code (`zelda/js/pixel.js` pour les outils, `zelda/js/art.js` pour les dessins) : aucune image ChatGPT, aucun fichier image. Les règles « Images » et le catalogue plus bas concernent l'ancienne version.
+- Les graphismes viennent de planches de sprites faites par ChatGPT en pixel art (catalogue `zelda/catalogue/`, généré par `generer.py`), que Claude remet au propre et découpe avec `zelda/outils/nettoyer_planche.py` (retour à la vraie taille en pixels, fond magenta rendu transparent, palette réduite). Le dessin par le code (`zelda/js/art.js`) sert de prototype en attendant. Les règles « Images » et l'ancien catalogue plus bas concernent l'ancienne version.
+- Planches : fond magenta #FF00FF, grille invisible, taille réelle et facteur d'agrandissement écrits dans le prompt (personnages 32 × 32 × 8, portraits et boss 64 × 64 × 8, tuiles 16 × 16 × 8). La planche de Spirit (SP-01) fixe les proportions : tête ronde de 16 px identique de face, de dos et de profil, 26 px de haut. Toutes les autres cartes la joignent.
+- On avance dans l'ordre : Spirit d'abord, et on valide chaque planche en jeu avant de passer à la suivante.
 - On garde l'histoire et la logique du moteur (dialogues, objets, monstres, donjons) ; l'affichage passe aux tuiles.
 - Les écrans se décrivent en lettres dans `zelda/js/carte.js` ; les bords se raccordent d'un écran à l'autre ; collisions à la tuile.
 - Spirit garde ses couleurs (blanc, casque noir et bleu aux écouteurs cyan, tee-shirt bleu au logo cyan, short et baskets bleus). À 16 px, les lettres SG ne sont pas lisibles : elles apparaîtront sur les portraits des dialogues.
