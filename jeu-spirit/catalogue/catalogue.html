@@ -152,6 +152,7 @@
   const MONSTRE = `Même rendu que les monstres des images jointes : toon HD, contours noirs épais, volumes, créature menaçante et crédible (ni mignonne ni rigolote), corps sombre parcouru de fissures d'où filtre une lueur violette, yeux jaunes lumineux. Aucun animal réel, aucun sang. Fond uni gris moyen (#808080), créature entière et centrée, pas d'ombre au sol, pas de halo, aucun texte.`;
   const SBIRE = `Même rendu que les sbires joints : créature numérique maléfique, toon HD, contours noirs épais, métal ou matière sombre fissurée de violet lumineux, yeux jaunes brillants, inquiétante et pas rigolote. Aucun sang. Vue de face, légèrement plongeante comme dans les Zelda en 2D. Fond uni gris moyen (#808080), créature entière et centrée, pas d'ombre au sol, pas de halo, aucun texte.`;
   const OBJET = `Même rendu que l'objet joint : toon HD, contours noirs épais, couleurs franches, reflets nets. Objet seul, entier, centré, vu bien de face, sans perspective de biais. Fond uni gris moyen (#808080), pas d'ombre, pas de halo, aucun texte ni chiffre.`;
+  const EFFET = `Même rendu que les effets joints : toon HD, formes nettes, couleurs lumineuses. Effet seul, centré, vu de dessus comme dans les Zelda en 2D. Fond uni gris moyen (#808080), aucun texte. Jamais de sang ni de flammes rouges réalistes.`;
   const ELEM = `Même rendu et même angle que les éléments de décor joints : vue de dessus plongeante comme dans les Zelda en 2D, on voit le dessus et la face avant, jamais de biais ni de côté. Toon HD, contours noirs épais. Élément seul, entier, centré. Fond uni gris moyen (#808080), pas d'ombre au sol, aucun texte. Fais ces éléments dans la même conversation que les écrans de la région, et reprends exactement leurs couleurs et leur lumière, pour qu'une fois posés sur l'écran on ne voie aucun effet de collage.\n\nPour chaque élément qu'on coupe (buisson, touffe d'herbe), fais aussi une seconde image : sa version coupée, c'est-à-dire ce qui reste au sol juste après le coup, une petite base rase et propre avec quelques brins courts et deux ou trois feuilles tombées autour, même largeur de base et même couleur que l'élément entier, jamais une moitié d'élément tranchée net.`;
   const SOL = `Chaque image est une texture de sol carrée qui se répète sans raccord visible (seamless), vue exactement du dessus, sans perspective, sans ombre portée, sans objet posé, sans bord ni cadre. Toon HD, mêmes couleurs saturées que le sol joint.`;
   const GARDIEN = `Même rendu que le Gardien joint (Flash, le hibou reporter) : animal inventé qui se tient debout comme un personnage, toon HD, contours noirs épais, air bienveillant et un peu fatigué d'avoir été enfermé. Fond uni gris moyen (#808080), personnage entier et centré, pas d'ombre au sol, aucun texte.`;
@@ -272,6 +273,10 @@ Le centre de la pièce reste dégagé pour marcher.`]);
   for (const [k, nom, desc, sorties] of PLAINE) carte('pl', 'decors', `${nom} (écran ${k})`, `L'écran entier, avec sol, chemins, eau et arbres de bordure peints dedans. Position ${k} sur la carte de la Plaine (colonne, ligne).`, ['decor-plaine', 'sol-herbe', 'arbre'], ECRAN(PLAINE_BORD, desc, sorties), ['Une seule image, aucun texte.']);
   carte('pl', 'decors', 'Plaine : objets à poser', 'Les seuls éléments posés par-dessus les écrans.', ['decor-plaine'], ELEM,
     ['Un buisson vert vif rond (on le coupe avec l\'onde).', 'Une touffe de hautes herbes.', 'Un rocher gris fissuré.', 'Un panneau de bois, sans texte.']);
+  carte('pl', 'decors', 'La barrière de Bruit (route du nord)', 'La barrière qui ferme la route du nord et disparaît quand la Manette frappe le cristal de l\'étang. Deux images : fermée, puis en train de se dissiper. Noms : barriere.png, barriere-dissipe.png.', ['decor-plaine', 'monstres'],
+    ELEM,
+    ['Une barrière de Bruit qui ferme un chemin de terre de la largeur de deux cases : un mur d\'énergie vertical violet sombre et rouge, fait de fenêtres publicitaires brisées et de parasites qui grésillent, posé au ras du sol entre deux bornes de pierre sombre fissurées de violet. Vue de dessus plongeante comme le reste du décor, on voit sa face avant. Format paysage 2:1.',
+     'La même barrière qui se dissipe : le mur d\'énergie se défait en carrés lumineux et en fragments de fenêtres qui s\'envolent vers le haut, les bornes de pierre restent. Même taille, même cadrage.']);
 
   // ================================================================== DONJON 1 (maintenant)
   carte('d1', 'perso', 'Spirit lance la Manette', 'La pose du lancer, pour quand tu utilises la Manette Retour avec B.', RS.concat('manette'),
@@ -626,7 +631,6 @@ Le centre de la pièce reste dégagé pour marcher.`]);
      PORTE_OUVERTE('la porte en bois du mur du haut, à droite (et seulement elle ; reprends l\'image avec les portes fermées) ; on devine des bibliothèques pleines de livres derrière')]);
 
   // ================================================================== EFFETS
-  const EFFET = `Même rendu que les effets joints : toon HD, formes nettes, couleurs lumineuses. Effet seul, centré, vu de dessus comme dans les Zelda en 2D. Fond uni gris moyen (#808080), aucun texte. Jamais de sang ni de flammes rouges réalistes.`;
   carte('d1', 'effets', 'Effets du Terrier', 'Ce qui manque encore à l\'écran pendant les combats et les énigmes.', ['projectiles', 'ampli'], EFFET,
     ['Des étoiles d\'étourdissement : trois petites étoiles jaunes qui tournent en cercle (pour les ennemis frappés par la Manette).', 'Un grand nuage de fumée violette et noire avec des étincelles, pour la disparition d\'un boss.', 'Un petit éclat de lumière cyan en étoile, pour une grille qui s\'ouvre ou une énigme réussie.', 'Un nuage de poussière grise, pour un bloc qui glisse.']);
   carte('r2', 'effets', 'Effets de la Forêt et du Labyrinthe', 'Explosion, électricité, feuilles.', ['projectiles'], EFFET,
@@ -688,6 +692,27 @@ Le centre de la pièce reste dégagé pour marcher.`]);
     ['Un Ping vu de dessus, en vol : petite chauve-souris de pierre sombre, ailes de membrane grand ouvertes et levées, fissures violettes, deux yeux jaunes, une petite antenne de wifi cassée sur la tête. Largeur ailes ouvertes deux fois sa hauteur.',
      'Le même Ping vu de dessus, ailes baissées et repliées à moitié (deuxième image du battement), même taille, même cadrage.',
      'Le même Ping posé, ailes repliées contre le corps, vu de dessus, immobile, yeux mi-clos.']);
+  carte('d1', 'effets', 'Projectiles de tous les ennemis (Plaine et Terrier)', 'Chaque ennemi qui tire a son propre projectile, dessiné dans le même style que lui. Une image par projectile, en deux temps (en vol, puis qui éclate à l\'impact). Noms : pierre, pierre-eclat, pub, pub-eclat, bulle, bulle-eclat, lance, lance-eclat.', ['projectiles', 'monstres', 'popup', 'reine'],
+    EFFET,
+    ['La pierre du Crache-pierres : un caillou sombre fissuré de violet, entouré d\'une traînée de poussière, qui file vers la droite.',
+     'La même pierre qui éclate en morceaux et en poussière violette à l\'impact.',
+     'La fenêtre pub lancée par les Pop-ups et la Reine : une petite fenêtre de navigateur rouge et violette qui tourne sur elle-même, sans texte.',
+     'La même fenêtre pub qui éclate en éclats de verre et en carrés lumineux.',
+     'La bulle de notification des gargouilles : une bulle ronde rouge sombre, point lumineux au centre, anneau violet.',
+     'La même bulle qui explose en anneau d\'onde rouge et violet.',
+     'La lance du Cornu : une courte lance de pierre sombre à pointe violette lumineuse, vue de profil, pointe vers la droite.',
+     'La même lance qui se brise en deux à l\'impact, éclats de pierre.']);
+  carte('d1', 'interface', 'Barre de vie et effets des boss', 'Une vraie barre de vie pour chaque boss, et les effets de leur combat (arrivée, coup reçu, défaite). Noms : barre-boss.png, barre-boss-remplissage.png, boss-apparition.png, boss-touche.png, boss-defaite.png.', ['ui', 'reine', 'titre'],
+    EFFET,
+    ['Le cadre d\'une barre de vie de boss, très large et fine (format 8:1) : cadre de métal sombre ciselé aux bords cyan lumineux comme l\'interface jointe, une petite couronne violette à gauche, l\'intérieur vide et sombre.',
+     'Le remplissage de cette barre, seul : une bande d\'énergie rouge et violette qui pulse, bords nets, même format exact que l\'intérieur du cadre.',
+     'L\'apparition d\'un boss : un tourbillon de fenêtres pub et de parasites violets qui jaillit du sol, vu de dessus, format carré.',
+     'L\'impact d\'un coup sur un boss : une étoile d\'éclats blancs et cyan avec des fragments d\'écran, format carré.',
+     'La défaite d\'un boss : une grande explosion de fenêtres pub qui se désintègrent en carrés lumineux et en fumée violette, sans flamme ni sang, format carré.']);
+  carte('d1', 'perso', 'Flash, le Gardien libéré (à refaire)', 'Sur l\'image actuelle, l\'aile gauche de Flash est ratée : deux ailes fondues en une. À refaire en entier avec deux ailes bien distinctes, une de chaque côté. Noms : flash.png, portrait-flash.png.', ['flash', 'portrait-flash'],
+    GARDIEN,
+    ['Flash, le hibou reporter, debout vu de face, entier : exactement deux ailes, une à gauche et une à droite du corps, symétriques, bien séparées, chacune avec ses plumes ; il tient un petit carnet de reporter dans l\'aile droite. Aucune aile en trop, aucune aile fusionnée.',
+     'Portrait de Flash pour les dialogues : buste et tête de face, les deux ailes bien visibles de chaque côté, même cadrage que le portrait joint.']);
   for (let i = cartes.length - 1; i >= 0; i--) if (RECUES.has(cartes[i].id)) cartes.splice(i, 1);
 
   // PRO-01 : reçues l'irruption du Roi (image 2) et la Source brisée (image 3)
@@ -698,7 +723,7 @@ Le centre de la pièce reste dégagé pour marcher.`]);
   { const c = cartes.find((x) => x.id === 'QG-04'); if (c) { c.pourquoi = 'Il te reste la salle d\'arcade (le hall et la chambre de Lila sont reçus). Mêmes murs que ta loge.'; c.prompts = [c.prompts[0].replace(/^Crée 3 images[^\n]*/, 'Crée 1 image, seule dans son fichier.').replace(/\n1\) Le hall[^\n]*\n2\) La maison de Lila[^\n]*\n3\) /, '\n')]; c.n = 1; } }
 
   // cartes ajoutées ou modifiées lors de la dernière mise à jour
-  const NOUVEAUX = new Set(['QG-13', 'PRO-10', 'D1-09', 'D1-17', 'D1-19', 'D1-18', 'PRO-08', 'PRO-09', 'PRO-05', 'PRO-06', 'PRO-07', 'QG-10', 'PRO-01', 'D1-17', 'QG-04', 'QG-08', 'QG-09', 'PRO-03', 'D1-17', 'R2-28', 'R2-29', 'R3-28', 'R3-29', 'R4-28', 'R4-29', 'R5-28', 'R5-29', 'R6-28', 'R6-29', 'R7-28', 'R7-29', 'R8-28', 'R8-29', 'R3-11', 'R4-11', 'R5-11', 'R6-11', 'R7-11', 'R8-11', 'FIN-08']);
+  const NOUVEAUX = new Set(['PL-11', 'D1-20', 'D1-21', 'D1-22', 'QG-13', 'PRO-10', 'D1-09', 'D1-17', 'D1-19', 'D1-18', 'PRO-08', 'PRO-09', 'PRO-05', 'PRO-06', 'PRO-07', 'QG-10', 'PRO-01', 'D1-17', 'QG-04', 'QG-08', 'QG-09', 'PRO-03', 'D1-17', 'R2-28', 'R2-29', 'R3-28', 'R3-29', 'R4-28', 'R4-29', 'R5-28', 'R5-29', 'R6-28', 'R6-29', 'R7-28', 'R7-29', 'R8-28', 'R8-29', 'R3-11', 'R4-11', 'R5-11', 'R6-11', 'R7-11', 'R8-11', 'FIN-08']);
 
   // ------------------------------------------------------------------ affichage
   const ETAPES = [['nouveau', 'Nouveautés'], ['tout', 'Tout'], ['pro', 'Prologue'], ['pl', 'Plaine'], ['d1', 'Donjon 1'], ['qg', 'Parvis du QG'], ['r2', 'Forêt + Donjon 2'], ['r3', 'Monts + Donjon 3'], ['r4', 'Désert + Donjon 4'], ['r5', 'Lac + Donjon 5'], ['r6', 'Cité + Donjon 6'], ['r7', 'Marais + Donjon 7'], ['r8', 'Toundra + Donjon 8'], ['fin', 'Tour finale']];

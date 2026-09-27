@@ -546,6 +546,9 @@ Object.assign(SG.Jeu.prototype, {
         if (morts.includes(i)) return;
         const m = SG.creerMonstre(type, c * SG.T + 40, r * SG.T + 62);
         m.indexSpawn = i; m.salleSpawn = cle;
+        // jamais un ennemi devant la porte par laquelle Spirit entre : on le renvoie de l'autre côté de la salle
+        const sp = this.spirit;
+        if (sp && SG.dist(m.x, m.y, sp.x, sp.y) < 280) { m.x = SG.clamp(SG.W - m.x, 200, SG.W - 200); m.y = SG.clamp(SG.H + 40 - m.y, 220, 560); }
         this.placerLibre(m);
         this.monstres.push(m);
       });
@@ -736,6 +739,14 @@ Object.assign(SG.Jeu.prototype, {
       const mq = this.masqueSalle(), lq = mq && mq[SG.clamp(Math.floor((s.y - 10) / 20), 0, 35)];
       if (this.caseSalle(cc, rr) === 'v' || (lq && lq[SG.clamp(Math.floor(s.x / 20), 0, 63)] === 'v')) { s.chute = 0.7; s.attaque = 0; s.recul = null; SG.Son.effet('fin'); return; }
     }
+    if (this.flashAttend && !this.butins.some((b) => b.type === 'receptacle' && !b.fini) && this.etat === 'jeu') {
+      // Flash descend dans la salle, du côté opposé à Spirit
+      this.flashAttend = false;
+      const x = s.x < 640 ? 900 : 380, y = s.y < 360 ? 470 : 260;
+      this.pnj.push(new SG.Flash(x, y));
+      for (let i = 0; i < 5; i++) this.effets.push(new SG.Eclat(x + SG.hasard(-40, 40), y - 60 + SG.hasard(-40, 40)));
+      SG.Son.effet('objet');
+    }
     if (this.bossDialogue) { this.bossDialogue = false; this.dialogue(SG.TEXTES.donjon.bossDebut); return; }
     if (S.combat && this.sallePleine && this.monstres.length === 0 && !D.resolues.includes(k)) this.resoudre(k);
     // plaque : il faut y poser quelque chose de lourd (la gargouille), le poids de Spirit ne suffit pas
@@ -820,9 +831,11 @@ Object.assign(SG.Jeu.prototype, {
     const D = this.etatDonjon();
     D.fini = true;
     SG.Son.jouerMusique('donjon');
-    const b = new SG.Butin('receptacle', 640, 420, true);
-    this.butins.push(b);
-    this.pnj.push(new SG.Flash(640, 300));
+    // d'abord le cœur, loin de Spirit ; Flash n'apparaît qu'une fois le cœur ramassé
+    const s = this.spirit, x = s.x < 640 ? 880 : 400;
+    this.butins.push(new SG.Butin('receptacle', x, 420, true));
+    this.effets.push(new SG.Eclat(x, 390));
+    this.flashAttend = true;
     this.sauver();
   },
 
@@ -863,7 +876,7 @@ Object.assign(SG.Jeu.prototype, {
       for (const dir in ouv) {
         const d = SG.DIRS[dir], voisine = (sx0 + d.x) + ',' + (sy0 + d.y);
         const aPorte = SG.DONJON1.portes[SG.cleSalles(cle.slice(3), voisine)] || (cle.slice(3) === SG.DONJON1.entree.salle && dir === 'bas');
-        if (aPorte || (S0.murees && S0.murees.includes(dir))) continue;
+        if (aPorte && !(S0.murees && S0.murees.includes(dir))) continue;
         const [x, y, w, h, sx, sy] = ouv[dir];
         ctx.drawImage(peinte, sx * q, sy * q, w * q, h * q, x, y, w, h);
       }
