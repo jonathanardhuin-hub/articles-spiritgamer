@@ -96,6 +96,9 @@ LISTE = {
 # images « porte ouverte » : on ne garde de la version ouverte que la zone de la porte (et sa lumière au sol),
 # posée sur l'image de base, pour que rien d'autre ne bouge quand la porte s'ouvre
 COMPOSITES = {
+    'loge-ecrans-jeu': ('prologue/loge-de-spirit.webp', (410, 120, 900, 220)),
+    'loge-ecrans-pub': ('prologue/loge-de-spirit.webp', (410, 120, 900, 260)),
+    'loge-ecran-sg-brouille': ('prologue/loge-de-spirit.webp', (410, 120, 900, 260)),
     'loge-portail': ('prologue/loge-de-spirit.webp', (420, 380, 860, 720)),
     'loge-porte-ouverte': ('prologue/loge-de-spirit.webp', (420, 380, 860, 720)),
     'hall-ouvert': ('qg/hall.png', (556, 30, 728, 250)),
@@ -118,6 +121,9 @@ def composer(nom, im):
 
 
 FACULTATIVES = {
+    'loge-ecrans-jeu': ('prologue/loge-ecrans-jeu.png', 'w', 836, ''),
+    'loge-ecrans-pub': ('prologue/loge-ecrans-pub.png', 'w', 836, ''),
+    'loge-ecran-sg-brouille': ('prologue/loge-ecran-sg-brouille.png', 'w', 836, ''),
     'gargouille-poussable': ('donjon1/gargouille-poussable.png', 'w', 84, ''),
     'loge-porte-ouverte': ('prologue/loge-porte-ouverte.png', 'w', 836, ''),
     'bureau-lynx-ouvert': ('qg/bureau-de-mika-porte-ouverte.png', 'w', 836, ''),

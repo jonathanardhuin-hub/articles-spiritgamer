@@ -47,7 +47,7 @@ SG.DONJON1 = {
     },
     '2,3': {
       nom: 'La Salle du Bloc',
-      image: 'salle-mur-fele', murees: ['droite'],
+      image: 'salle-base', murees: ['droite'],
       plan: [
         '################',
         '#..............#',
@@ -78,7 +78,7 @@ SG.DONJON1 = {
       ],
       combat: true,
       ennemis: [['popup', 3, 3], ['popup', 12, 3], ['popup', 12, 6]],
-      coffre: { c: 3, r: 4, contenu: 'carte', cache: true },
+      coffre: { c: 7, r: 4, contenu: 'carte', cache: true },
     },
     '2,2': {
       nom: 'La Salle des Plaques',
@@ -96,7 +96,7 @@ SG.DONJON1 = {
       ],
       condition: 'plaque',
       ennemis: [['spamling', 3, 3], ['spamling', 12, 5]],
-      coffre: { c: 13, r: 4, contenu: 'cle', cache: true },
+      coffre: { c: 11, r: 4, contenu: 'cle', cache: true },
     },
     '1,1': {
       nom: 'Le Carrefour des Clics',
@@ -132,7 +132,7 @@ SG.DONJON1 = {
     },
     '2,1': {
       nom: 'Le Cristal',
-      image: 'salle-gouffre', cristalDx: 40, gouffre: [515, 118, 762, 600], ilot: [582, 285, 700, 400],
+      image: 'salle-gouffre', cristalDx: 40, cristalDy: -26, gouffre: [515, 118, 762, 600], ilot: [582, 285, 700, 400],
       plan: [
         '################',
         '#..............#',
@@ -146,7 +146,7 @@ SG.DONJON1 = {
       ],
       condition: 'cristal',
       ennemis: [['popup', 4, 2], ['popup', 4, 6]],
-      coffre: { c: 3, r: 4, contenu: 'cleBoss', cache: true },
+      coffre: { c: 3, r: 2, contenu: 'cleBoss', cache: true },
     },
     '1,0': {
       nom: 'Le Trône de la Reine',
@@ -444,6 +444,7 @@ SG.Manette = class {
       this.dist += Math.hypot(this.vx, this.vy) * dt;
       if (this.dist > 380 || this.x < 10 || this.x > SG.W - 10 || this.y < 10 || this.y > SG.H - 10) this.retour = true;
       if (jeu.toucherCristalEn && jeu.toucherCristalEn(this.x, this.y + 30)) this.retour = true;
+      else if (jeu.couperDecor(this.boite())) this.retour = true;
       else if (jeu.obstacleHaut(this.x, this.y + 30)) { this.retour = true; jeu.effets.push(new SG.Eclat(this.x, this.y)); }
     } else {
       const dx = s.x - this.x, dy = (s.y - 40) - this.y, d = Math.hypot(dx, dy) || 1;
@@ -973,7 +974,7 @@ Object.assign(SG.Jeu.prototype, {
       else if (ch === 'F') liste.push({ y, dessiner: (ctx) => SG.dessinBrasero(ctx, xd, y) });
       else if (ch === 'p') liste.push({ y, dessiner: (ctx) => SG.dessinPot(ctx, x, y) });
       else if (ch === 'C') liste.push({ y, dessiner: (ctx) => SG.dessinCoffre(ctx, x, y, D.coffres.includes(k)) });
-      else if (ch === 'X') liste.push({ y, dessiner: (ctx) => SG.dessinCristal(ctx, x + (S.cristalDx || 0), y, this.cristalFrappe, this.t) });
+      else if (ch === 'X') liste.push({ y: y + (S.cristalDy || 0), dessiner: (ctx) => SG.dessinCristal(ctx, x + (S.cristalDx || 0), y + (S.cristalDy || 0), this.cristalFrappe, this.t) });
     }
     // plaque enfoncée par la gargouille : elle s'illumine
     if (S.condition === 'plaque' && D.resolues.includes(k) && !this.imageSalle()) {
@@ -995,7 +996,8 @@ Object.assign(SG.Jeu.prototype, {
     // portes (toujours derrière les personnages : dessinées sur le fond)
     for (const dir of ['haut', 'bas', 'gauche', 'droite']) {
       const p = this.porteVers(dir);
-      liste.push({ y: dir === 'bas' ? SG.H + 100 : -100, dessiner: (ctx) => SG.dessinPorte(ctx, dir, p, this.porteOuverte(dir), this.sallePortesFermees(), !!this.imageSalle(), SG.clamp(((this.tSalle || 0) - SG.DELAI_GRILLES) / 0.22, 0, 1)) });
+      const verrou = p && (p.type === 'cle' || p.type === 'boss') && !this.etatDonjon().ouvertes.includes(p.cle);
+      liste.push({ y: dir === 'bas' ? SG.H + 100 : -100, dessiner: (ctx) => SG.dessinPorte(ctx, dir, p, this.porteOuverte(dir), this.sallePortesFermees() && !verrou, !!this.imageSalle(), SG.clamp(((this.tSalle || 0) - SG.DELAI_GRILLES) / 0.22, 0, 1)) });
     }
     this.avantPortes(liste);
   },

@@ -900,6 +900,8 @@ SG.Jeu = class {
   }
 
   dessinerEcransLoge(ctx) {
+    // les écrans peints (catalogue PRO-10) remplacent ces effets dessinés
+    if (SG.img['loge-ecrans-pub'] && SG.img['loge-ecrans-pub'].width) return;
     const E = SG.LOGE.ecrans, t = this.t;
     const dort = this.dortEncore();
     const cadre = (r, dessin) => {
@@ -927,17 +929,23 @@ SG.Jeu = class {
       });
     } else {
       // la pub du Roi Clickbait a pris tous les écrans
-      const clig = Math.sin(t * 9) > 0;
       for (const r of [E.gauche, E.milieu]) cadre(r, (x, y, w, h) => {
         image('intro-2', x, y, w, h, 330, 40, 620, 300);
-        ctx.strokeStyle = clig ? '#ff2a55' : '#ffd23a'; ctx.lineWidth = 4; ctx.strokeRect(x + 2, y + 2, w - 4, h - 4);
-        if (Math.random() < 0.08) { ctx.fillStyle = 'rgba(255,255,255,0.25)'; ctx.fillRect(x, y + Math.random() * h, w, 3); }
+        // la pub envahit l'écran : légères lignes de balayage, sans cadre
+        ctx.fillStyle = 'rgba(0,0,0,0.18)';
+        for (let yy = y + ((t * 30) % 4); yy < y + h; yy += 4) ctx.fillRect(x, yy, w, 1);
       });
     }
     if (this.evtPortail || (this.porteLoge && this.qg && this.qg.gus && !this.transition)) {
       const ev = this.evtPortail;
+      // tout l'écran SG se brouille : bandes horizontales sur toute la largeur, puis un flash cyan
       if (ev && ev.t < 1.8) cadre(E.sg, (x, y, w, h) => {
-        for (let i = 0; i < 40; i++) { ctx.fillStyle = Math.random() < 0.5 ? 'rgba(95,243,255,0.55)' : 'rgba(10,10,30,0.6)'; ctx.fillRect(x + Math.random() * w, y + Math.random() * h, 8 + Math.random() * 20, 2 + Math.random() * 3); }
+        ctx.fillStyle = `rgba(95,243,255,${0.15 + 0.2 * Math.random()})`; ctx.fillRect(x, y, w, h);
+        for (let i = 0; i < 14; i++) {
+          const yy = y + Math.random() * h, hh = 1 + Math.random() * 4;
+          ctx.fillStyle = Math.random() < 0.5 ? 'rgba(200,250,255,0.6)' : 'rgba(5,5,20,0.65)';
+          ctx.fillRect(x, yy, w, hh);
+        }
       });
     }
   }
@@ -1163,6 +1171,12 @@ SG.Jeu = class {
     if (this.fonds[cle]) return this.fonds[cle];
     const e = SG.MONDE[cle];
     const nomImage = cle === 'loge' && this.porteLoge ? 'loge-portail' : (this.varianteQG(cle) || e.image);
+    const ok = (n) => SG.img[n] && SG.img[n].width;
+    if (cle === 'loge' && !this.porteLoge) {
+      if (this.evtPortail && this.evtPortail.t < 1.8 && ok('loge-ecran-sg-brouille')) return SG.img['loge-ecran-sg-brouille'];
+      if (!this.dortEncore() && ok('loge-ecrans-pub')) return SG.img['loge-ecrans-pub'];
+      if (this.dortEncore() && !ok('loge-endormi') && ok('loge-ecrans-jeu')) return SG.img['loge-ecrans-jeu'];
+    }
     if (cle === 'loge' && this.dortEncore() && SG.img['loge-endormi'] && SG.img['loge-endormi'].width) return SG.img['loge-endormi'];
     if (nomImage && SG.img[nomImage] && SG.img[nomImage].width) return SG.img[nomImage];
     const k = Math.min(2, this.echelle);
@@ -1445,12 +1459,27 @@ SG.Jeu = class {
       const parle = d.car < texte.length && Math.floor(this.t * 8) % 2 === 0;
       const portraits = { spirit: parle ? 'portrait-spirit-parle' : 'portrait-spirit', ermite: 'portrait-ermite', flash: 'portrait-flash', lynx: 'portrait-lynx', gus: 'portrait-gus' };
       const im = SG.img[portraits[qui]];
-      const px = x + 22, py = y - 62, pw = 214, ph = 214;
-      SG.cadre(ctx, SG.img['ui-portrait'], px, py, pw, ph, 200, 38);
+      // le personnage en buste, sans cadre, posé dans la boîte de dialogue et qui dépasse un peu au-dessus
+      const cx = x + 140, bas = y + h - 16;
       ctx.save();
-      ctx.beginPath(); ctx.roundRect(px + 26, py + 26, pw - 52, ph - 52, 10); ctx.clip();
-      if (im && im.width) SG.dessinerPied(ctx, im, px + pw / 2, py + ph - 20, { echelle: 0.8 });
-      else if (qui === 'flash') { ctx.translate(px + pw / 2, py + ph / 2 + 60); ctx.scale(1.3, 1.3); new SG.Flash(0, 0).dessiner(ctx); }
+      const halo = ctx.createRadialGradient(cx, bas - 60, 10, cx, bas - 60, 130);
+      halo.addColorStop(0, 'rgba(95,243,255,0.28)'); halo.addColorStop(1, 'rgba(95,243,255,0)');
+      ctx.fillStyle = halo; ctx.fillRect(cx - 130, y - 70, 260, h + 54);
+      // le buste se fond doucement vers le bas au lieu d'être tranché net
+      const L = 250, Ht = bas - (y - 90), k = 2;
+      const tmp = this.tmpPortrait || (this.tmpPortrait = document.createElement('canvas'));
+      tmp.width = L * k; tmp.height = Ht * k;
+      const t2 = tmp.getContext('2d');
+      t2.setTransform(k, 0, 0, k, -(x + 16) * k, -(y - 90) * k);
+      if (im && im.width) SG.dessinerPied(t2, im, cx, bas + 30, { echelle: 1.05 });
+      else if (qui === 'flash') { t2.translate(cx, bas - 20); t2.scale(1.3, 1.3); new SG.Flash(0, 0).dessiner(t2); }
+      t2.setTransform(1, 0, 0, 1, 0, 0);
+      t2.globalCompositeOperation = 'destination-in';
+      const fondu = t2.createLinearGradient(0, 0, 0, tmp.height);
+      fondu.addColorStop(0, 'rgba(0,0,0,1)'); fondu.addColorStop(0.62, 'rgba(0,0,0,1)'); fondu.addColorStop(1, 'rgba(0,0,0,0)');
+      t2.fillStyle = fondu; t2.fillRect(0, 0, tmp.width, tmp.height);
+      t2.globalCompositeOperation = 'source-over';
+      ctx.drawImage(tmp, x + 16, y - 90, L, Ht);
       ctx.restore();
       SG.texte(ctx, { spirit: 'Spirit', ermite: 'L\'ermite', flash: 'Flash', lynx: 'Mika', gus: 'Gus' }[qui], x + 262, y + 58, 30, '#7fe8ff', 'left', null, null, true);
       tx = x + 262;
