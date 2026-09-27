@@ -139,12 +139,16 @@ def sols(etape, titre, sol, chemin, liquide, falaise, entree, extra_elements=Non
 
 def monstre(etape, nom, description, mode='marche', projectile=None, refs=None, taille=40):
     pas = (('ailes levées', 'ailes baissées') if mode == 'vol' else ('étiré vers le haut', 'tassé vers le bas') if mode == 'flotte' else ('pied gauche en avant', 'pied droit en avant'))
+    # 24 cases, toutes utiles : marche dans les trois vues, attaque, touché, apparition, projectile ou effet, disparition
     el = [f"de face, immobile", f"de face, {pas[0]}", f"de face, {pas[1]}", "de dos, immobile", f"de dos, {pas[0]}", f"de dos, {pas[1]}",
-          "de profil, immobile", f"de profil, {pas[0]}", f"de profil, {pas[1]}", "de face, il attaque", "de profil, il attaque", "de face, touché : recule, yeux plissés"]
+          "de profil, immobile", f"de profil, {pas[0]}", f"de profil, {pas[1]}", "de face, il attaque", "de dos, il attaque", "de profil, il attaque",
+          "de face, touché : il recule, yeux plissés", "de dos, touché", "de profil, touché",
+          "il apparaît (il sort de terre ou se matérialise), image 1 : presque rien", "apparition, image 2 : à moitié là", "apparition, image 3 : presque entier"]
     if projectile:
-        el += [f"son projectile en vol : {projectile}", "le même projectile, deuxième image du vol", "le projectile qui éclate à l'impact", "vide", "vide", "vide"]
-    el += ["il disparaît : il éclate en petits carrés violets et en fumée (image 1)", "image 2 de la disparition, plus éclatée", "image 3, presque rien", "vide", "vide", "vide"]
-    el += ['vide'] * (24 - len(el))
+        el += [f"son projectile en vol : {projectile}", "le même projectile, deuxième image du vol", "le projectile qui éclate à l'impact"]
+    else:
+        el += ["l'effet de son attaque (souffle, choc ou éclair, dans ses couleurs), image 1", "l'effet de son attaque, image 2", "l'effet de son attaque, image 3"]
+    el += ["il disparaît : il éclate en petits carrés violets et en fumée (image 1)", "image 2 de la disparition, plus éclatée", "image 3, presque rien"]
     carte(etape, 'ennemis', nom, f"Toutes les images de ce monstre sur une seule planche.", (refs or []) + REF_STYLE,
           f"{entete()}\n\n{grille(6, 4, taille)}\n\n{STYLE}\n\n{DESSUS}\n\n{MONSTRE}\n\nLe monstre : {description}\n\nIl est à la même échelle que Spirit sur la planche jointe (Spirit fait 34 pixels de haut dans une case de 40). {VUES}",
           el)
@@ -159,27 +163,47 @@ def boss(etape, nom, description, projectile, refs=None, deuxieme=None):
 def pnj(etape, titre, persos, refs=None):
     el = []
     for nom, d, action in persos:
-        el += [f"{nom} ({d}) de face, immobile", f"{nom} de face, pied gauche en avant", f"{nom} de face, pied droit en avant", f"{nom} de dos", f"{nom} de profil", f"{nom} de face : {action}"]
+        if len(persos) <= 2:
+            # deux rangées par personnage : marche complète dans les trois vues, plus trois expressions
+            el += [f"{nom} ({d}) de face, immobile", f"{nom} de face, pied gauche en avant", f"{nom} de face, pied droit en avant",
+                   f"{nom} de dos, immobile", f"{nom} de dos, pied gauche en avant", f"{nom} de dos, pied droit en avant",
+                   f"{nom} de profil, immobile", f"{nom} de profil, jambe avant tendue", f"{nom} de profil, jambes croisées (pas de passage)",
+                   f"{nom} de face : {action}", f"{nom} de face, il parle : bouche ouverte, une main levée", f"{nom} de face, surpris : yeux grands ouverts, bras écartés"]
+            if len(persos) == 1:
+                el += [f"{nom} de face, il salue de la main", f"{nom} de face, il donne un objet : mains tendues vers nous (l'objet n'est pas dessiné)", f"{nom} de face, il réfléchit, une main au menton",
+                       f"{nom} de face, il rit", f"{nom} de face, triste, tête basse", f"{nom} de face, fâché",
+                       f"{nom} de profil, il parle", f"{nom} de profil, il montre quelque chose vers la droite", f"{nom} de dos, il lève la tête",
+                       f"{nom} assis par terre, de face", f"{nom} de face, il sursaute", f"{nom} de face, il somnole debout, yeux fermés"]
+        else:
+            el += [f"{nom} ({d}) de face, immobile", f"{nom} de face, pied gauche en avant", f"{nom} de face, pied droit en avant", f"{nom} de dos", f"{nom} de profil", f"{nom} de face : {action}"]
     el += ['vide'] * (24 - len(el))
-    carte(etape, 'pnj', titre, "Les personnages qui marchent et parlent. Une rangée par personnage.", (refs or []) + REF_STYLE,
+    carte(etape, 'pnj', titre, "Les personnages qui marchent et parlent. Toute la planche est remplie : deux rangées par personnage quand il y en a deux, une rangée quand il y en a quatre.", (refs or []) + REF_STYLE,
           f"{entete()}\n\n{grille(6, 4, 40)}\n\n{STYLE}\n\n{DESSUS}\n\nPersonnages inventés (animaux qui se tiennent debout), sympathiques, à la même échelle et dans les mêmes proportions chibi que Spirit sur la planche jointe : grosse tête, petit corps, environ 34 pixels réels de haut dans une case de 40. {VUES}",
           el)
     portraits = []
+    EXPR = ['expression neutre', 'il parle, bouche ouverte, expression vive', 'content, grand sourire', 'surpris, yeux grands ouverts', 'fâché, sourcils froncés', 'inquiet, sourcils relevés']
+    par = 6 // min(3, len(persos))
     for nom, d, action in persos[:3]:
-        portraits += [f"portrait de {nom} : buste et tête de face, expression neutre", f"portrait de {nom} : il parle, bouche ouverte, expression vive"]
+        portraits += [f"portrait de {nom} : buste et tête de face, {e}" for e in EXPR[:par]]
     portraits += ['vide'] * (6 - len(portraits))
     carte(etape, 'pnj', titre + ' : portraits', "Les portraits affichés à côté du texte des dialogues.", (refs or []) + ['@SP-02'],
           f"{entete()}\n\n{grille(3, 2, 64, 8)}\n\n{STYLE}\n\nPortraits cadrés en buste, de face, dans des cases de 80 × 80 pixels réels, même style et même cadrage que les portraits de Spirit joints (ta planche SP-02).",
           portraits)
 
 def objets(etape, titre, pourquoi, elements, refs=None):
-    elements = elements + ['vide'] * (24 - len(elements)) if len(elements) <= 24 else elements
+    # peu d'objets : 6 grandes cases ; sinon 24 cases (même taille de pixel dans les deux cas)
+    cols, rangs = (3, 2) if len(elements) <= 6 else (6, 4)
+    if cols == 6 and len(elements) <= 12:
+        # chaque objet a aussi sa version qui brille, pour le moment où Spirit le trouve
+        elements = elements + [f"{e.split(' : ')[0]}, même dessin avec un éclat de lumière blanc (quand on le trouve)" for e in elements]
+    elements = elements + ['vide'] * (cols * rangs - len(elements)) if len(elements) <= cols * rangs else elements
     carte(etape, 'objets', titre, pourquoi, (refs or []) + REF_STYLE,
-          f"{entete()}\n\n{grille(6, 4, 40)}\n\n{STYLE}\n\nObjets et effets vus de face ou de dessus comme dans Zelda A Link to the Past, chacun centré dans sa case. Un objet que Spirit tient ou ramasse fait environ 16 à 20 pixels réels, à la même échelle que Spirit sur la planche jointe (34 pixels de haut).",
+          f"{entete()}\n\n{grille(cols, rangs)}\n\n{STYLE}\n\nObjets et effets vus de face ou de dessus comme dans Zelda A Link to the Past, chacun centré dans sa case. Un objet que Spirit tient ou ramasse fait environ 16 à 20 pixels réels, à la même échelle que Spirit sur la planche jointe (34 pixels de haut).",
           elements)
 
 def poses_spirit(etape, titre, pose, effet=None):
-    el = [f"de face : {pose}", f"de dos : {pose}", f"de profil : {pose}"] + ([f"{effet}, image 1", f"{effet}, image 2", f"{effet}, image 3"] if effet else ['vide'] * 3)
+    el = [f"de face : {pose}", f"de dos : {pose}", f"de profil : {pose}"] + ([f"{effet}, image 1", f"{effet}, image 2", f"{effet}, image 3"] if effet else
+          [f"de face, deuxième image du mouvement : {pose}", f"de dos, deuxième image du mouvement", f"de profil, deuxième image du mouvement"])
     carte(etape, 'perso', titre, "Spirit qui utilise cet objet. Joins ta planche de Spirit validée pour garder exactement ses proportions.", REFS_SPIRIT[:1] + ['@SP-01'],
           f"{entete()}\n\n{grille(3, 2, 80)}\n\n{STYLE}\n\n{SPIRIT}\n\nMêmes proportions exactes que sur la planche de Spirit jointe : copie sa tête, son corps et son casque, seule la pose change. Spirit fait toujours 34 pixels de haut ; la place en plus dans la case sert aux effets.",
           el)
