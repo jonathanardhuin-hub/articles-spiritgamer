@@ -100,23 +100,26 @@ COMPOSITES = {
     'loge-ecrans-jeu': ('prologue/loge-de-spirit.webp', (410, 120, 900, 220)),
     'loge-ecrans-pub': ('prologue/loge-de-spirit.webp', (410, 120, 900, 260)),
     'loge-ecran-sg-brouille': ('prologue/loge-de-spirit.webp', (410, 120, 900, 260)),
-    'loge-portail': ('prologue/loge-de-spirit.webp', (420, 380, 860, 720)),
-    'loge-porte-ouverte': ('prologue/loge-de-spirit.webp', (420, 380, 860, 720)),
+    # chaque état garde tout ce qui a déjà changé avant lui : écrans de l'état précédent + porte
+    'loge-portail': ('prologue/loge-de-spirit.webp', [(420, 380, 860, 720), (410, 120, 900, 260)]),
+    'loge-porte-ouverte': ('prologue/loge-de-spirit.webp', [(420, 380, 860, 720), (410, 120, 900, 260)]),
     'hall-ouvert': ('qg/hall.png', (556, 30, 728, 250)),
     'couloir-loge': ('qg/couloir.png', (200, 40, 400, 262)),
     'couloir-lynx': ('qg/couloir.png', (846, 40, 1034, 262)),
-    'bureau-lynx-ouvert': ('qg/bureau-du-lynx.png', (500, 400, 780, 720)),
+    'bureau-lynx-ouvert': ('qg/bureau-du-lynx.png', [(500, 400, 780, 720), (495, 155, 830, 260)]),
 }
 
 
 def composer(nom, im):
-    base_src, (x0, y0, x1, y1) = COMPOSITES[nom]
-    import numpy as np
+    base_src, zones = COMPOSITES[nom]
+    if isinstance(zones[0], (int, float)):
+        zones = [zones]
     from PIL import ImageFilter
     base = Image.open(os.path.join(IMG, base_src)).convert('RGBA').resize(im.size, Image.LANCZOS)
     k = im.size[0] / 1280
     m = Image.new('L', im.size, 0)
-    m.paste(255, (int(x0 * k), int(y0 * k), int(x1 * k), int(y1 * k)))
+    for (x0, y0, x1, y1) in zones:
+        m.paste(255, (int(x0 * k), int(y0 * k), int(x1 * k), int(y1 * k)))
     m = m.filter(ImageFilter.GaussianBlur(18 * k))
     return Image.composite(im, base, m)
 
