@@ -38,7 +38,7 @@ Ne jamais dessiner, recoller ou reconstituer quoi que ce soit par-dessus une ima
 - Les prompts se donnent uniquement dans le catalogue, jamais dans la discussion : Jonathan s'y retrouve mieux.
 - Tout prompt avec Spirit rappelle le SG sur le casque. Dimensions 1672 × 941 pour les écrans entiers.
 - Une retouche d'une même pièce garde exactement le même éclairage : aucune lueur, aucun reflet ni effet de lumière ajouté (sauf ce que la consigne demande, limité à la zone concernée).
-- Chaque état d'une pièce part de l'état précédent et garde tout ce qui a déjà changé (loge : écrans jeu, puis pub, puis écran SG parasité, puis porte ouverte, puis vortex avec l'écran parasité ; bureau de Mika : pub, puis porte ouverte avec la pub). Les composites du jeu reprennent toutes les zones déjà changées.
+- Chaque état d'une pièce part de l'état précédent et garde tout ce qui a déjà changé (loge : écrans jeu, puis pub, puis écran SG parasité, puis porte ouverte (avec la pub), puis porte ouverte avec l'écran parasité, puis vortex à partir de celle-ci ; bureau de Mika : pub, puis porte ouverte avec la pub). Les composites du jeu reprennent toutes les zones déjà changées.
 - Une retouche « porte ouverte » ou « écran allumé » n'est reprise que sur sa zone (COMPOSITES dans `outils/preparer_assets.py`).
 - Une carte du catalogue disparaît quand ses images sont reçues ; ajouter une carte en fin de région pour ne pas décaler les codes.
 
