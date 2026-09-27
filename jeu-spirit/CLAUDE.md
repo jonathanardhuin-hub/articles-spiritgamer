@@ -14,7 +14,8 @@ Ne jamais dessiner, recoller ou reconstituer quoi que ce soit par-dessus une ima
 
 ## Logique du monde
 - Rien de collé : les écrans et salles partent d'un sol vierge ; seuls trous, eau, lave et falaises sont peints dans le sol. Les objets sont posés par le jeu, avec les mêmes couleurs que le décor.
-- Quadrillage invisible : dans les salles, 13 × 6 dalles de 80 pixels logiques (104,5 px dans l'image de 1672). Tout objet est posé sur une dalle, bien de face, jamais en biais.
+- Quadrillage invisible : dans les salles, murs de 120 px logiques et sol de 13 × 6 dalles de 80 px (104,5 px dans l'image de 1672), origine du sol en (120, 120). Tout objet est posé sur une dalle, bien de face, jamais en biais.
+  À FAIRE à l'arrivée des nouvelles salles (D1-09) : le code des donjons utilise encore la grille 16 × 9 qui part de (0, 0), décalée d'une demi-dalle ; passer les plans en 13 × 6 avec cette origine avant d'utiliser les nouvelles images.
 - Portes : un tunnel dans l'épaisseur du mur où le personnage tient entier ; on change de salle dès l'embrasure ; aucune porte fermée ne laisse entrer Spirit ; rien devant une porte.
 - Seul le pied des objets bloque : on passe derrière statues, rochers, braseros.
 - Les cristaux ne réagissent qu'à la Manette. Les énigmes ne donnent pas la solution (pas de halo sur l'objet à pousser).

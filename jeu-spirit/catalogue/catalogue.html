@@ -544,8 +544,8 @@ Le centre de la pièce reste dégagé pour marcher.`]);
     carte(e, 'donjons', `${R.donjon} : la salle et ses portes`, 'La salle entière dessinée avec ses portes, puis la même avec les portes fermées de chaque façon. 5 étapes dans la même conversation ChatGPT, dans l\'ordre.', ['salle'],
       SALLE_PORTES(R.salle).split('\n\n').slice(1).join('\n\n'), ['Les quatre portes ouvertes.'], null, SUITES_PORTES);
     carte(e, 'donjons', `${R.donjon} : objets de salle`, 'Bloc à pousser, statue, lumière, pot et coffres, dans le thème du donjon.', ['bloc', 'statue', 'coffre'],
-      ELEM + `\n\nThème du donjon : ${R.salle}`,
-      ['Un bloc à pousser, taillé dans la même pierre que les murs de la salle.', 'Une statue gardienne menaçante sur socle.', `Une source de lumière : ${R.lumiere}.`, 'Un pot fermé qu\'on peut casser.', 'Un coffre fermé.', 'Le même coffre ouvert, vide, le couvercle basculé vers l\'arrière.']);
+      ELEM + `\n\nThème du donjon : ${R.salle}\n\nTous ces objets à la même échelle, faits dans la même conversation que la salle, avec ses couleurs et sa lumière. Chacun est vu bien de face, jamais en biais (arêtes horizontales et verticales, parallèles aux joints du sol), sa base occupe exactement une dalle de la salle. Pas de traînée au sol.`,
+      ['Un bloc à pousser, taillé dans la même pierre que les murs de la salle.', 'Une statue gardienne menaçante sur socle.', 'La même statue exactement, avec seulement un petit symbole lumineux sur son socle, de la même couleur que la plaque de pression de la salle : c\'est celle qu\'on peut pousser.', `Une source de lumière : ${R.lumiere}.`, 'Un pot fermé qu\'on peut casser.', 'Un coffre fermé.', 'Le même coffre ouvert, vide, le couvercle basculé vers l\'arrière.']);
     carte(e, 'donjons', `${R.donjon} : sols des salles`, 'Les variantes de la même salle avec leur sol spécial peint dedans (lave, eau, trous, trappe…). Toujours à partir de la salle aux portes ouvertes.', ['salle'],
       null, [], null, SOLS_SALLE(R.solsSalle));
     carte(e, 'donjons', `${R.donjon} : mécanismes`, 'Les éléments d\'énigme propres à ce donjon, avec leurs deux états quand ils changent.', ['salle', 'bloc', 'statue'],
@@ -676,6 +676,15 @@ Le centre de la pièce reste dégagé pour marcher.`]);
       'la salle du Gardien : un cercle de lumière douce et chaude au centre du sol, dalles propres et nettes.',
     ]));
 
+  // compléments de chaque région, ajoutés en dernier pour ne pas décaler les codes existants
+  for (const R of REGIONS) {
+    const e = R.e;
+    carte(e, 'ennemis', `Chauves-souris : ${R.donjon}`, 'Comme les chauves-souris de Zelda : elles volent par à-coups en zigzag et meurent en un coup de l\'objet à distance. Vues de dessus, ailes ouvertes.', ['popup', 'monstres'],
+      MONSTRE, [`Une chauve-souris vue de dessus, en vol, ailes grand ouvertes et levées, dans le thème du donjon : ${R.salle}`, 'La même vue de dessus, ailes baissées et à moitié repliées (deuxième image du battement).', 'La même posée, ailes repliées, vue de dessus.']);
+    carte(e, 'effets', `Projectiles et effets : ${R.donjon} et ${R.nom}`, 'Le projectile de chaque sbire et du boss qui tire, en vol puis à l\'impact, et les effets du boss (apparition, coup reçu, défaite). Même style que les créatures de la région.', ['projectiles', 'monstres'],
+      EFFET, ['Le projectile des sbires qui tirent, en vol, dans le thème du donjon.', 'Le même projectile qui éclate à l\'impact.', `Le projectile du boss ${R.boss[0]}, en vol.`, 'Le même qui éclate à l\'impact.', `L\'apparition de ${R.boss[0]} : un tourbillon dans les couleurs du donjon qui jaillit du sol, format carré.`, `${R.boss[0]} vaincu : il se désintègre en carrés lumineux et en fumée, sans flamme ni sang, format carré.`]);
+  }
+
   // cartes terminées (images reçues par Claude) : elles disparaissent du catalogue
   const RECUES = new Set(['QG-08', 'QG-10', 'QG-09', 'R2-01', 'PL-02', 'PL-03', 'PL-04', 'PL-05', 'PL-06', 'PL-07', 'PRO-04', 'PL-08', 'PL-09', 'PL-10', 'PRO-02', 'D1-12', 'D1-13', 'D1-16', 'QG-01', 'QG-02', 'QG-03', 'QG-05', 'QG-06', 'QG-07']);
   carte('d1', 'objets', 'Objets du Terrier, nouvelle série (plus grands, tous à la même échelle)', 'Les statues, braseros, pots, coffres et le bloc de maintenant sont trop petits et chacun a sa propre taille. Refais-les tous dans la même conversation, pour qu\'ils aient exactement la même échelle, et joins la salle et Spirit pour la taille. Une image par objet, noms : statue.png, gargouille-poussable.png, brasero.png, pot.png, coffre.png, coffre-ouvert.png, bloc.png.', ['salle', 'statue', 'bloc', 'coffre', 'spirit-face'],
@@ -723,7 +732,7 @@ Le centre de la pièce reste dégagé pour marcher.`]);
   { const c = cartes.find((x) => x.id === 'QG-04'); if (c) { c.pourquoi = 'Il te reste la salle d\'arcade (le hall et la chambre de Lila sont reçus). Mêmes murs que ta loge.'; c.prompts = [c.prompts[0].replace(/^Crée 3 images[^\n]*/, 'Crée 1 image, seule dans son fichier.').replace(/\n1\) Le hall[^\n]*\n2\) La maison de Lila[^\n]*\n3\) /, '\n')]; c.n = 1; } }
 
   // cartes ajoutées ou modifiées lors de la dernière mise à jour
-  const NOUVEAUX = new Set(['PL-11', 'D1-20', 'D1-21', 'D1-22', 'QG-13', 'PRO-10', 'D1-09', 'D1-17', 'D1-19', 'D1-18', 'PRO-08', 'PRO-09', 'PRO-05', 'PRO-06', 'PRO-07', 'QG-10', 'PRO-01', 'D1-17', 'QG-04', 'QG-08', 'QG-09', 'PRO-03', 'D1-17', 'R2-28', 'R2-29', 'R3-28', 'R3-29', 'R4-28', 'R4-29', 'R5-28', 'R5-29', 'R6-28', 'R6-29', 'R7-28', 'R7-29', 'R8-28', 'R8-29', 'R3-11', 'R4-11', 'R5-11', 'R6-11', 'R7-11', 'R8-11', 'FIN-08']);
+  const NOUVEAUX = new Set(['R2-31', 'R2-32', 'R3-31', 'R3-32', 'R4-32', 'R4-33', 'R5-31', 'R5-32', 'R6-31', 'R6-32', 'R7-31', 'R7-32', 'R8-32', 'R8-33', 'PL-11', 'D1-20', 'D1-21', 'D1-22', 'QG-13', 'PRO-10', 'D1-09', 'D1-17', 'D1-19', 'D1-18', 'PRO-08', 'PRO-09', 'PRO-05', 'PRO-06', 'PRO-07', 'QG-10', 'PRO-01', 'D1-17', 'QG-04', 'QG-08', 'QG-09', 'PRO-03', 'D1-17', 'R2-28', 'R2-29', 'R3-28', 'R3-29', 'R4-28', 'R4-29', 'R5-28', 'R5-29', 'R6-28', 'R6-29', 'R7-28', 'R7-29', 'R8-28', 'R8-29', 'R3-11', 'R4-11', 'R5-11', 'R6-11', 'R7-11', 'R8-11', 'FIN-08']);
 
   // ------------------------------------------------------------------ affichage
   const ETAPES = [['nouveau', 'Nouveautés'], ['tout', 'Tout'], ['pro', 'Prologue'], ['pl', 'Plaine'], ['d1', 'Donjon 1'], ['qg', 'Parvis du QG'], ['r2', 'Forêt + Donjon 2'], ['r3', 'Monts + Donjon 3'], ['r4', 'Désert + Donjon 4'], ['r5', 'Lac + Donjon 5'], ['r6', 'Cité + Donjon 6'], ['r7', 'Marais + Donjon 7'], ['r8', 'Toundra + Donjon 8'], ['fin', 'Tour finale']];
