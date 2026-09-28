@@ -271,10 +271,14 @@ def donjon(etape, nom, theme, lumiere, meca, objets_donjon):
                   [f"porte du mur de gauche, {s}" for s in ('ouverte', 'fermée par une grille', 'verrouillée', 'porte du boss', 'murée', 'fissurée')] +
                   [f"porte du mur de droite, {s}" for s in ('ouverte', 'fermée par une grille', 'verrouillée', 'porte du boss', 'murée', 'fissurée')],
                   extra=f" Thème : {theme}. Une porte fait 2 tuiles de large (toute la case). "
-                        "Sur les portes des murs de gauche et de droite, la serrure, la clé et la tête du boss sont tournées dans le même sens que la porte elle-même, vers l'intérieur de la salle.",
+                        "Portes de gauche et de droite : leur serrure et leur tête de boss sont COUCHÉES sur le côté, tournées d'un quart de tour comme la porte elle-même. "
+                        "Le haut de la serrure (l'anneau) et le haut de la tête (les cornes) sont du côté du mur ; le bas de la serrure (la fente) et le menton de la tête sont du côté de la salle. "
+                        "Mur de gauche : le haut pointe vers la gauche, le bas vers la droite. Mur de droite : le haut pointe vers la droite, le bas vers la gauche. "
+                        "Jamais de serrure ni de tête debout sur une porte de côté.",
                   suites=["Si ta planche est déjà faite et que seules les portes de côté ont la serrure ou la tête du boss dessinées de face, dans la même conversation : garde exactement la même planche, même dessin, mêmes portes, mêmes proportions, même taille de pixels. "
-                          "Change uniquement la serrure, la clé et la tête du boss des portes de gauche (rangée 3) et de droite (rangée 4) : elles sont posées sur la face de la porte tournée vers la salle, vues de côté comme la porte, "
-                          "tournées vers la droite pour le mur de gauche et vers la gauche pour le mur de droite, jamais dessinées de face."])
+                          "Change uniquement la serrure et la tête du boss des portes de gauche (rangée 3) et de droite (rangée 4) : couche-les sur le côté, d'un quart de tour. "
+                          "Le haut de la serrure (l'anneau) et les cornes de la tête du côté du mur, la fente de la serrure et le menton du côté de la salle. "
+                          "Rangée 3 (mur de gauche) : le haut pointe vers la gauche. Rangée 4 (mur de droite) : le haut pointe vers la droite. Plus aucune serrure ni tête debout sur ces deux rangées."])
     planche_decor(etape, f'{nom} : objets et mécanismes', "Tout ce qui est posé dans les salles, à la même échelle.",
                   ['un bloc à pousser, même pierre que les murs', 'une statue gardienne sur socle (toutes les statues sont identiques, même celle qu\'on peut pousser)', f'{lumiere}, éteinte', f'{lumiere}, allumée, image 1', f'{lumiere}, allumée, image 2',
                    'un pot fermé', 'le pot qui se brise', 'un coffre fermé', 'le même coffre ouvert, vide', 'un grand coffre (celui de l\'objet du donjon), fermé', 'le grand coffre ouvert',
