@@ -107,24 +107,6 @@ carte('sp', 'perso', 'Spirit : portraits des dialogues',
       ['neutre, petit sourire', 'il parle : bouche ouverte', 'étonné : yeux grands ouverts, petite bouche ronde', 'déterminé : sourcils froncés, sourire en coin', 'inquiet : sourcils relevés au centre, bouche serrée', 'content : grand sourire, yeux plissés de joie'],
       maintenant=True)
 
-# casques améliorés : la même planche, seules les couleurs du casque changent
-def casque(nom, trouve, couleur, hexa):
-    code = 'SP'
-    num[code] = num.get(code, 0) + 1
-    p1 = ("Reprends exactement la planche de Spirit jointe : mêmes 24 cases, mêmes poses, même dessin, même taille de pixels, même fond magenta #FF00FF, même format 1536 × 1024. "
-          "Rien ne bouge, rien n'est redessiné. Change uniquement les couleurs du casque-micro, dans toutes les cases : "
-          f"toutes les parties bleues et cyan du casque (arceau, liseré, écouteurs, touches lumineuses, bout du micro) deviennent {couleur} ({hexa}). "
-          "Les parties noires du casque restent noires. Le corps blanc, les yeux bleus, le tee-shirt bleu, les lettres SG sur la poitrine, le short et les baskets ne changent pas du tout. "
-          "Pixel art net, aucun flou, aucun anticrénelage, aucune lueur ajoutée.")
-    p2 = ("Vérifie la planche : les 24 cases sont identiques à la planche jointe, seules les couleurs du casque ont changé. "
-          "Si les yeux, le tee-shirt, le SG, les baskets ou une pose ont changé, refais la planche en corrigeant uniquement cela.")
-    cartes.append({'id': f"{code}-{num[code]:02d}", 'e': 'sp', 'cat': 'perso', 't': f'Spirit avec le {nom}',
-                   'p': f"Le {nom} ({trouve}) : la même planche que SP-01, seules les couleurs du casque changent. Une nouvelle conversation : joins ta planche SP-01 avec le SG sur la poitrine, puis colle le prompt 1. Le prompt 2 sert si ChatGPT a touché autre chose que le casque.",
-                   'r': ['@SP-01'], 'pr': [p1, p2], 'it': ['La planche (toutes les cases de la liste)'], 'n': 1, 'neuf': True, 'st': False})
-
-casque('Casque 2.0', 'trésor caché du donjon 4, deux fois moins de dégâts', 'or', 'or #f2c230, ombre #b8860b, lumière #fff1a0')
-casque('Casque 3.0', 'trésor caché du donjon 7, quatre fois moins de dégâts', 'violet', 'violet #9b4dff, ombre #5a22b0, lumière #d9b8ff')
-
 # ================================================================ décor et personnages communs
 REF_STYLE = ['@SP-01']
 def planche_decor(etape, titre, pourquoi, elements, refs=None, reel=48, fois=None, cols=6, rangs=4, extra='', suites=None):
@@ -219,10 +201,12 @@ def objets(etape, titre, pourquoi, elements, refs=None):
           f"{entete()}\n\n{grille(cols, rangs)}\n\n{STYLE}\n\nObjets et effets vus de face ou de dessus comme dans Zelda A Link to the Past, chacun centré dans sa case. Un objet que Spirit tient ou ramasse fait environ 16 à 20 pixels réels, à la même échelle que Spirit sur la planche jointe (34 pixels de haut).",
           elements)
 
+LIEUX = {'pro': 'Prologue', 'pl': 'Plaine', 'd1': 'Donjon 1', 'qg': 'Parvis du QG', 'r2': 'Forêt + Donjon 2', 'r3': 'Monts + Donjon 3', 'r4': 'Désert + Donjon 4',
+         'r5': 'Lac + Donjon 5', 'r6': 'Cité + Donjon 6', 'r7': 'Marais + Donjon 7', 'r8': 'Toundra + Donjon 8', 'fin': 'Tour finale'}
 def poses_spirit(etape, titre, pose, effet=None):
     el = [f"de face : {pose}", f"de dos : {pose}", f"de profil : {pose}"] + ([f"{effet}, image 1", f"{effet}, image 2", f"{effet}, image 3"] if effet else
           [f"de face, deuxième image du mouvement : {pose}", f"de dos, deuxième image du mouvement", f"de profil, deuxième image du mouvement"])
-    carte(etape, 'perso', titre, "Spirit qui utilise cet objet. Joins ta planche de Spirit validée pour garder exactement ses proportions.", REFS_SPIRIT[:1] + ['@SP-01'],
+    carte('sp', 'perso', titre, f"Spirit qui utilise cet objet (on le reçoit dans l'étape {LIEUX[etape]}). Joins ta planche de Spirit validée pour garder exactement ses proportions.", REFS_SPIRIT[:1] + ['@SP-01'],
           f"{entete()}\n\n{grille(3, 2, 80)}\n\n{STYLE}\n\n{SPIRIT}\n\nMêmes proportions exactes que sur la planche de Spirit jointe : copie sa tête, son corps et son casque, seule la pose change. Spirit fait toujours 34 pixels de haut ; la place en plus dans la case sert aux effets.",
           el)
 
@@ -313,6 +297,9 @@ monstre('d1', 'Ping (chauve-souris)', "une petite chauve-souris de pierre sombre
 boss('d1', 'La Reine Pop-up', "une immense fenêtre pub au grand œil violet central, couronne de cristaux violets, entourée de petites fenêtres pub qui flottent, tentacules d'éclats violets en dessous.", "une petite fenêtre pub qui file en tournant", refs=['m-reine'])
 pnj('d1', 'Flash, le premier Gardien', [('Flash', "un hibou reporter, plumage brun et crème, lunettes rondes, écharpe, un carnet de reporter ; deux ailes bien distinctes", 'il écrit dans son carnet')])
 poses_spirit('d1', 'Spirit lance la Manette', 'bras tendu, il vient de lancer la Manette (non dessinée)', 'la Manette qui tourne en vol')
+poses_spirit('d1', 'Spirit tire avec le Mégaphone', 'il tient le Mégaphone noir et bleu à deux mains devant lui et crie dedans', "l'onde du Mégaphone qui part")
+poses_spirit('d1', "Spirit monte à l'échelle", "vu de dos, il grimpe à une échelle (l'échelle n'est pas dessinée), une main en haut et un pied en haut")
+poses_spirit('qg', 'Spirit se protège avec le Pare-feu', 'le bras tendu devant lui, le bracelet Pare-feu au poignet projette un bouclier d\'énergie en hexagones cyan', 'le bouclier en hexagones qui arrête un projectile')
 objets('d1', 'Objets du Terrier', "Les objets du premier donjon.", ['le Mégaphone : mégaphone de reporter noir et bleu', "l'onde du Mégaphone, image 1", "l'onde du Mégaphone, image 2", 'une page du carnet de Flash (papier crème)', 'le fragment de la Source : un éclat de lumière blanche et cyan', 'le fragment qui brille, image 2'])
 
 # ================================================================ PARVIS DU QG
@@ -410,7 +397,38 @@ manque = utilises - set(REFS)
 assert not manque, manque
 refs = {k: vignette(REFS[k][1]) for k in utilises}
 labels = {k: REFS[k][0] for k in utilises}
-nouvelles = {'@SP-01': 'Ta planche de Spirit validée (carte SP-01)', '@SP-02': 'Tes portraits de Spirit validés (carte SP-02)'}
+CASQUES = [('Casque 2.0', "trésor caché du donjon 4", 'or', 'or #f2c230, ombre #b8860b, lumière #fff1a0'),
+           ('Casque 3.0', "trésor caché du donjon 7", 'violet', 'violet #9b4dff, ombre #5a22b0, lumière #d9b8ff')]
+def version_casque(c, nom, trouve, couleur, hexa):
+    p1 = ("Reprends exactement la planche de Spirit jointe : mêmes cases, mêmes poses, même dessin, mêmes objets et mêmes effets, même taille de pixels, même fond magenta #FF00FF, même format 1536 × 1024. "
+          "Rien ne bouge, rien n'est redessiné. Change uniquement les couleurs du casque-micro de Spirit, dans toutes les cases : "
+          f"toutes les parties bleues et cyan du casque (arceau, liseré, écouteurs, touches lumineuses, bout du micro) deviennent {couleur} ({hexa}). "
+          "Les parties noires du casque restent noires. Le corps blanc, les yeux bleus, le tee-shirt bleu, les lettres SG sur la poitrine, le short, les baskets et l'objet qu'il tient ne changent pas du tout. "
+          "Pixel art net, aucun flou, aucun anticrénelage, aucune lueur ajoutée.")
+    p2 = ("Vérifie la planche : toutes les cases sont identiques à la planche jointe, seules les couleurs du casque ont changé. "
+          "Si les yeux, le tee-shirt, le SG, les baskets, l'objet ou une pose ont changé, refais la planche en corrigeant uniquement cela.")
+    return {'id': c['id'], 'e': 'sp', 'cat': 'perso', 't': f"{c['t']} ({nom})", 'source': c['id'],
+            'p': f"La même planche que « {c['t']} », avec le {nom} ({trouve}) : seules les couleurs du casque changent. Nouvelle conversation : joins ta planche normale de cette carte, puis colle le prompt 1. Le prompt 2 sert si ChatGPT a touché autre chose que le casque.",
+            'r': ['@' + c['id']], 'pr': [p1, p2], 'it': ['La planche (toutes les cases de la liste)'], 'n': 1, 'neuf': True, 'st': False}
+
+# onglet Spirit : chaque planche, puis sa version Casque 2.0, puis sa version Casque 3.0
+sp = [c for c in cartes if c['e'] == 'sp']
+autres = [c for c in cartes if c['e'] != 'sp']
+nouveau, renum = [], {}
+for c in sp:
+    groupe = [c] + [version_casque(c, *k) for k in CASQUES]
+    for g in groupe:
+        g['neuf'] = True
+        vieux = g['id'] if 'source' not in g else None
+        g['id'] = f"SP-{len(nouveau) + 1:02d}"
+        if vieux: renum[vieux] = g['id']
+        nouveau.append(g)
+for g in nouveau:
+    if 'source' in g: g['r'] = ['@' + renum[g.pop('source')]]
+cartes = nouveau + autres
+for c in autres:
+    c['r'] = ['@' + renum[r[1:]] if r.startswith('@SP-') and r[1:] in renum else r for r in c['r']]
+nouvelles = {'@' + c['id']: f"Ta planche « {c['t']} » (carte {c['id']})" for c in cartes}
 
 data = {'gardees': {}, 'refs': refs, 'labels': labels, 'cartes': cartes, 'nouvelles': nouvelles}
 tpl = open(os.path.join(ICI, 'modele.html'), encoding='utf8').read()
