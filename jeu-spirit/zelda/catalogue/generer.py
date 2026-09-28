@@ -109,10 +109,10 @@ carte('sp', 'perso', 'Spirit : portraits des dialogues',
 
 # ================================================================ décor et personnages communs
 REF_STYLE = ['@SP-01']
-def planche_decor(etape, titre, pourquoi, elements, refs=None, reel=48, fois=None, cols=6, rangs=4, extra=''):
+def planche_decor(etape, titre, pourquoi, elements, refs=None, reel=48, fois=None, cols=6, rangs=4, extra='', suites=None):
     carte(etape, 'decors', titre, pourquoi, (refs or []) + REF_STYLE,
           f"{entete()}\n\n{grille(cols, rangs, reel, fois)}\n\n{STYLE}\n\n{DESSUS}\n\nMême pixel art et même taille de pixel que la planche de Spirit jointe : un petit élément (buisson, rocher, pot) fait 20 × 20 pixels réels comme une tuile de sol, un grand élément (arbre, entrée, porte) fait 40 × 40 et remplit sa case ; Spirit fait 34 pixels de haut à côté.{extra}",
-          elements)
+          elements, suites=suites)
 
 def sols(etape, titre, sol, chemin, liquide, falaise, entree, extra_elements=None, refs=None):
     elements = [f"{sol}, tuile de base qui se répète sans raccord visible", f"{sol}, variante avec quelques détails", f"{sol}, deuxième variante",
@@ -265,14 +265,21 @@ objets('pl', 'Objets, cœurs, Pixels et interface', "Tout ce qui s'affiche dans 
 # ================================================================ DONJON 1 : Terrier des Pop-ups
 def donjon(etape, nom, theme, lumiere, meca, objets_donjon):
     sols(etape, f'{nom} : sols et murs', f'dalles de pierre du donjon ({theme})', 'sol plus clair d\'un couloir', 'trou sans fond (vide noir)', f'mur épais du donjon ({theme})', 'porte du donjon')
-    # comme dans Zelda A Link to the Past : on ne dessine que la porte du mur du haut ; le jeu la retourne pour le mur du bas
-    # et la tourne d'un quart de tour pour les murs de gauche et de droite (serrure et tête du boss tournées vers la salle)
-    planche_decor(etape, f'{nom} : portes', "Seulement les portes du mur du HAUT, dans tous leurs états et leurs animations. Je fais moi-même les portes des autres murs en tournant celles-ci, comme dans Zelda : la serrure et la tête du boss sont alors toujours dans le bon sens par rapport au mur.",
-                  ['ouverte : passage sombre creusé dans l\'épaisseur du mur', 'fermée par une grille de barreaux', 'verrouillée : porte en bois avec une grosse serrure dorée', 'porte du boss fermée, ornée d\'une tête menaçante', 'murée : mur plein de la même pierre', 'fissurée : mur avec une grande fissure (on peut la faire sauter)',
-                   'la grille qui remonte, à moitié rentrée dans le mur', 'la grille presque entièrement rentrée', 'la serrure dorée qui tourne, une clé dedans', 'la porte à clé qui s\'ouvre : battants à moitié rentrés', 'la porte du boss qui s\'ouvre : la tête se fend en deux', 'la porte du boss grande ouverte : passage sombre avec le cadre orné',
-                   'le mur fissuré qui explose : éclats de pierre et poussière', 'le trou laissé par l\'explosion : passage aux bords cassés', 'un escalier qui descend, dans l\'embrasure', 'un escalier qui monte, dans l\'embrasure', 'la porte de sortie du donjon : lumière du jour au fond du passage', 'un passage secret : mur presque normal avec un petit indice (pierre plus claire)',
-                   'une torche murale éteinte', 'la torche murale allumée, image 1', 'la torche murale allumée, image 2', 'un ornement mural sculpté', 'une grille d\'aération dans le mur', 'une petite fissure décorative dans le mur'],
-                  extra=f" Thème : {theme}. TOUTES les portes de cette planche sont dans le mur du haut de la salle : vues d'en haut comme dans Zelda A Link to the Past, le mur en haut, le passage qui descend vers le bas de l'image, la serrure et la tête du boss tournées vers le bas (vers la salle). Aucune porte de côté, aucune porte en perspective. Une porte fait 2 tuiles de large (toute la case).")
+    planche_decor(etape, f'{nom} : portes', "Chaque porte dans tous ses états, pour les quatre murs. La porte est dessinée dans l'épaisseur du mur, comme un tunnel. Chaque porte est dans le bon sens pour son mur : serrure et tête du boss tournées vers l'intérieur de la salle.",
+                  [f"porte du mur du haut, {s}" for s in ('ouverte', 'fermée par une grille', 'verrouillée par une serrure dorée', 'porte du boss, ornée et menaçante', 'murée (mur plein)', 'fissurée (on peut la faire sauter)')] +
+                  [f"porte du mur du bas, {s}" for s in ('ouverte', 'fermée par une grille', 'verrouillée', 'porte du boss', 'murée', 'fissurée')] +
+                  [f"porte du mur de gauche, {s}" for s in ('ouverte', 'fermée par une grille', 'verrouillée', 'porte du boss', 'murée', 'fissurée')] +
+                  [f"porte du mur de droite, {s}" for s in ('ouverte', 'fermée par une grille', 'verrouillée', 'porte du boss', 'murée', 'fissurée')],
+                  extra=f" Thème : {theme}. Une porte fait 2 tuiles de large (toute la case).\n\n"
+                        "TOUT DANS LE BON SENS : chaque porte est vue depuis l'intérieur de la salle et ses détails (grille, serrure, clé, tête du boss, fissure) sont tournés vers la salle, dans la même perspective que la porte elle-même.\n"
+                        "– Mur du haut : la porte fait face au bas de l'image ; serrure et tête du boss droites, face à nous.\n"
+                        "– Mur du bas : la porte fait face au haut de l'image (vers la salle) ; serrure et tête du boss tournées vers le haut.\n"
+                        "– Mur de gauche : la porte est vue de côté, étroite et haute comme sur un mur de côté ; elle fait face à la droite de l'image. La serrure et la tête du boss sont posées sur cette face, vues de côté comme la porte, tournées vers la droite : jamais dessinées de face, jamais droites comme sur la porte du haut.\n"
+                        "– Mur de droite : même chose en miroir : la porte fait face à la gauche de l'image, serrure et tête du boss vues de côté, tournées vers la gauche.\n"
+                        "Les portes de gauche et de droite gardent leur forme de porte de côté (plus étroites, dans l'épaisseur du mur de côté) : on ne tourne pas la porte du haut.",
+                  suites=["Si ta planche est déjà faite et que seules les portes de côté ont la serrure ou la tête du boss dessinées de face, dans la même conversation : garde exactement la même planche, même dessin, mêmes portes, mêmes proportions, même taille de pixels. "
+                          "Change uniquement la serrure, la clé et la tête du boss des portes de gauche (rangée 3) et de droite (rangée 4) : elles sont posées sur la face de la porte tournée vers la salle, vues de côté comme la porte, "
+                          "tournées vers la droite pour le mur de gauche et vers la gauche pour le mur de droite, jamais dessinées de face."])
     planche_decor(etape, f'{nom} : objets et mécanismes', "Tout ce qui est posé dans les salles, à la même échelle.",
                   ['un bloc à pousser, même pierre que les murs', 'une statue gardienne sur socle (toutes les statues sont identiques, même celle qu\'on peut pousser)', f'{lumiere}, éteinte', f'{lumiere}, allumée, image 1', f'{lumiere}, allumée, image 2',
                    'un pot fermé', 'le pot qui se brise', 'un coffre fermé', 'le même coffre ouvert, vide', 'un grand coffre (celui de l\'objet du donjon), fermé', 'le grand coffre ouvert',
