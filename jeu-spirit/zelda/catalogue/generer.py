@@ -265,18 +265,13 @@ objets('pl', 'Objets, cœurs, Pixels et interface', "Tout ce qui s'affiche dans 
 # ================================================================ DONJON 1 : Terrier des Pop-ups
 def donjon(etape, nom, theme, lumiere, meca, objets_donjon):
     sols(etape, f'{nom} : sols et murs', f'dalles de pierre du donjon ({theme})', 'sol plus clair d\'un couloir', 'trou sans fond (vide noir)', f'mur épais du donjon ({theme})', 'porte du donjon')
-    planche_decor(etape, f'{nom} : portes', "Chaque porte dans tous ses états, pour les quatre murs. La porte est dessinée dans l'épaisseur du mur, comme un tunnel. Chaque porte est dans le bon sens pour son mur : serrure et tête du boss tournées vers l'intérieur de la salle.",
+    planche_decor(etape, f'{nom} : portes', "Chaque porte dans tous ses états. La porte est dessinée dans l'épaisseur du mur, comme un tunnel.",
                   [f"porte du mur du haut, {s}" for s in ('ouverte', 'fermée par une grille', 'verrouillée par une serrure dorée', 'porte du boss, ornée et menaçante', 'murée (mur plein)', 'fissurée (on peut la faire sauter)')] +
                   [f"porte du mur du bas, {s}" for s in ('ouverte', 'fermée par une grille', 'verrouillée', 'porte du boss', 'murée', 'fissurée')] +
                   [f"porte du mur de gauche, {s}" for s in ('ouverte', 'fermée par une grille', 'verrouillée', 'porte du boss', 'murée', 'fissurée')] +
                   [f"porte du mur de droite, {s}" for s in ('ouverte', 'fermée par une grille', 'verrouillée', 'porte du boss', 'murée', 'fissurée')],
-                  extra=f" Thème : {theme}. Une porte fait 2 tuiles de large (toute la case).\n\n"
-                        "TOUT DANS LE BON SENS : chaque porte est vue depuis l'intérieur de la salle et ses détails (grille, serrure, clé, tête du boss, fissure) sont tournés vers la salle, dans la même perspective que la porte elle-même.\n"
-                        "– Mur du haut : la porte fait face au bas de l'image ; serrure et tête du boss droites, face à nous.\n"
-                        "– Mur du bas : la porte fait face au haut de l'image (vers la salle) ; serrure et tête du boss tournées vers le haut.\n"
-                        "– Mur de gauche : la porte est vue de côté, étroite et haute comme sur un mur de côté ; elle fait face à la droite de l'image. La serrure et la tête du boss sont posées sur cette face, vues de côté comme la porte, tournées vers la droite : jamais dessinées de face, jamais droites comme sur la porte du haut.\n"
-                        "– Mur de droite : même chose en miroir : la porte fait face à la gauche de l'image, serrure et tête du boss vues de côté, tournées vers la gauche.\n"
-                        "Les portes de gauche et de droite gardent leur forme de porte de côté (plus étroites, dans l'épaisseur du mur de côté) : on ne tourne pas la porte du haut.",
+                  extra=f" Thème : {theme}. Une porte fait 2 tuiles de large (toute la case). "
+                        "Sur les portes des murs de gauche et de droite, la serrure, la clé et la tête du boss sont tournées dans le même sens que la porte elle-même, vers l'intérieur de la salle.",
                   suites=["Si ta planche est déjà faite et que seules les portes de côté ont la serrure ou la tête du boss dessinées de face, dans la même conversation : garde exactement la même planche, même dessin, mêmes portes, mêmes proportions, même taille de pixels. "
                           "Change uniquement la serrure, la clé et la tête du boss des portes de gauche (rangée 3) et de droite (rangée 4) : elles sont posées sur la face de la porte tournée vers la salle, vues de côté comme la porte, "
                           "tournées vers la droite pour le mur de gauche et vers la gauche pour le mur de droite, jamais dessinées de face."])
