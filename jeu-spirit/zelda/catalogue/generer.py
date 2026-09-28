@@ -107,6 +107,24 @@ carte('sp', 'perso', 'Spirit : portraits des dialogues',
       ['neutre, petit sourire', 'il parle : bouche ouverte', 'étonné : yeux grands ouverts, petite bouche ronde', 'déterminé : sourcils froncés, sourire en coin', 'inquiet : sourcils relevés au centre, bouche serrée', 'content : grand sourire, yeux plissés de joie'],
       maintenant=True)
 
+# casques améliorés : la même planche, seules les couleurs du casque changent
+def casque(nom, trouve, couleur, hexa):
+    code = 'SP'
+    num[code] = num.get(code, 0) + 1
+    p1 = ("Reprends exactement la planche de Spirit jointe : mêmes 24 cases, mêmes poses, même dessin, même taille de pixels, même fond magenta #FF00FF, même format 1536 × 1024. "
+          "Rien ne bouge, rien n'est redessiné. Change uniquement les couleurs du casque-micro, dans toutes les cases : "
+          f"toutes les parties bleues et cyan du casque (arceau, liseré, écouteurs, touches lumineuses, bout du micro) deviennent {couleur} ({hexa}). "
+          "Les parties noires du casque restent noires. Le corps blanc, les yeux bleus, le tee-shirt bleu, les lettres SG sur la poitrine, le short et les baskets ne changent pas du tout. "
+          "Pixel art net, aucun flou, aucun anticrénelage, aucune lueur ajoutée.")
+    p2 = ("Vérifie la planche : les 24 cases sont identiques à la planche jointe, seules les couleurs du casque ont changé. "
+          "Si les yeux, le tee-shirt, le SG, les baskets ou une pose ont changé, refais la planche en corrigeant uniquement cela.")
+    cartes.append({'id': f"{code}-{num[code]:02d}", 'e': 'sp', 'cat': 'perso', 't': f'Spirit avec le {nom}',
+                   'p': f"Le {nom} ({trouve}) : la même planche que SP-01, seules les couleurs du casque changent. Une nouvelle conversation : joins ta planche SP-01 avec le SG sur la poitrine, puis colle le prompt 1. Le prompt 2 sert si ChatGPT a touché autre chose que le casque.",
+                   'r': ['@SP-01'], 'pr': [p1, p2], 'it': ['La planche (toutes les cases de la liste)'], 'n': 1, 'neuf': True, 'st': False})
+
+casque('Casque 2.0', 'trésor caché du donjon 4, deux fois moins de dégâts', 'or', 'or #f2c230, ombre #b8860b, lumière #fff1a0')
+casque('Casque 3.0', 'trésor caché du donjon 7, quatre fois moins de dégâts', 'violet', 'violet #9b4dff, ombre #5a22b0, lumière #d9b8ff')
+
 # ================================================================ décor et personnages communs
 REF_STYLE = ['@SP-01']
 def planche_decor(etape, titre, pourquoi, elements, refs=None, reel=48, fois=None, cols=6, rangs=4, extra='', suites=None):
