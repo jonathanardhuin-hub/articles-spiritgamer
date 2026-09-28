@@ -193,7 +193,7 @@ def pnj(etape, titre, persos, refs=None):
 def objets(etape, titre, pourquoi, elements, refs=None):
     # peu d'objets : 6 grandes cases ; sinon 24 cases (même taille de pixel dans les deux cas)
     cols, rangs = (3, 2) if len(elements) <= 6 else (6, 4)
-    if cols == 6 and len(elements) <= 12:
+    if (cols == 6 and len(elements) <= 12) or (cols == 3 and len(elements) <= 3):
         # chaque objet a aussi sa version qui brille, pour le moment où Spirit le trouve
         elements = elements + [f"{e.split(' : ')[0]}, même dessin avec un éclat de lumière blanc (quand on le trouve)" for e in elements]
     elements = elements + ['vide'] * (cols * rangs - len(elements)) if len(elements) <= cols * rangs else elements
@@ -354,7 +354,18 @@ for (e, region, donj, sol, chemin, liquide, falaise, entree, theme, lumiere) in 
     if persos: pnj(e, f'{region} : Gardien et habitant', persos)
     donjon(e, donj, theme, lumiere, ANC.get(f'{k}-24', {'items': []})['items'], [])
     o = ANC.get(f'{k}-28')
-    if o: objets(e, f'{donj} : objets', "Les objets trouvés dans ce donjon.", [propre(x) for x in o['items']])
+    if o:
+        liste = [propre(x) for x in o['items']]
+        # les micros et les casques suivent exactement les couleurs du casque de Spirit (noir, bleu, cyan ; puis or ; puis violet)
+        TIGE = ("seulement la tige du micro, sans casque, sans arceau et sans écouteur : une fine tige courbe qui se fixe à l'écouteur gauche de Spirit, avec la capsule du micro au bout, "
+                "vue de profil, même forme que la tige du micro de Spirit sur la planche jointe")
+        liste = [(f"Le Micro Pro : {TIGE}, en métal chromé argenté avec une bague cyan #35d6ff, un peu plus épaisse que celle de Spirit" if x.startswith('Le Micro Pro') else
+                  f"Le Micro d'Or : {TIGE}, en or brillant (or #f2c230, ombre #b8860b, lumière #fff1a0) avec une bague cyan #35d6ff" if x.startswith("Le Micro d'Or") else x) for x in liste]
+        CASQUE_OBJ = ("le casque-micro de Spirit seul, posé, vu de face : arceau, deux écouteurs ronds et la fine tige du micro, exactement la forme du casque de Spirit sur la planche jointe ; "
+                      "les parties noires restent noires, toutes les parties qui sont bleues et cyan sur le casque normal sont ")
+        if e == 'r4': liste.append(f"Le Casque 2.0 (trésor caché) : {CASQUE_OBJ}en or (or #f2c230, ombre #b8860b, lumière #fff1a0)")
+        if e == 'r7': liste.append(f"Le Casque 3.0 (trésor caché) : {CASQUE_OBJ}en violet (violet #9b4dff, ombre #5a22b0, lumière #d9b8ff)")
+        objets(e, f'{donj} : objets', "Les objets trouvés dans ce donjon.", liste)
     for c in ANCIENNES:
         if c['id'].startswith(k + '-') and c['cat'] == 'perso' and c['titre'].startswith('Spirit') and c['items']:
             poses_spirit(e, c['titre'], propre(c['items'][0].split(' : ', 1)[-1]))
